@@ -2,16 +2,16 @@
       <h2 class="text-3xl font-bold mb-6 text-black">Available Plots</h2>
                         <div class="flex flex-col sm:flex-row mb-4 gap-4 items-center justify-between">
                             <div class="w-full sm:w-auto">
-                                <form action="{{ route('dashboard', parameters: ['viewType' => 'plots']) }}" method="GET" class="w-full">
+                                <form action="{{ route('dashboard') }}" method="GET" class="w-full">
                                     <div class="relative">
                                         <input type="text" name="search" class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200" placeholder="Search plots..." value="{{ request('search') }}">
                                         <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
                                     </div>
-                                </form>
+                                </form> 
                             </div>
                             <div class="flex flex-wrap gap-2 w-full sm:w-auto justify-end">
-                                <a href="{{ route('dashboard', ['viewType' => 'plots', 'new_listings' => true]) }}" class="inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150">Show New Listings Only</a>
-                                <a href="{{ route('dashboard', ['viewType' => 'plots']) }}" class="inline-flex items-center px-4 py-2 bg-gray-500 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-600 focus:bg-gray-600 active:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition ease-in-out duration-150">Clear Filters</a>
+                                <a href="{{ route('dashboard') }}" class="inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150">Show New Listings Only</a>
+                                <a href="{{ route('dashboard') }}" class="inline-flex items-center px-4 py-2 bg-gray-500 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-600 focus:bg-gray-600 active:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition ease-in-out duration-150">Clear Filters</a>
                             </div>
                         </div>
                         <div class="p-6 rounded-xl shadow-lg">
@@ -26,17 +26,20 @@
                                             @endif
                                             <div class="p-4 flex-grow">
                                                 <h5 class="text-lg font-bold text-gray-900 dark:text-gray-100 mb-2">{{ $plot->title }}</h5>
-                                                <p class="text-gray-600 dark:text-gray-400 text-sm mb-3">{{ Str::limit($plot->description, 100) }}</p>
                                                 <ul class="text-sm text-gray-700 dark:text-gray-300 space-y-1">
                                                     <li class="flex justify-between items-center py-1"><strong>Price:</strong><span>${{ number_format($plot->price, 2) }}</span></li>
                                                     <li class="flex justify-between items-center py-1"><strong>Area:</strong><span>{{ number_format($plot->area_sqm, 2) }} sqm</span></li>
                                                     <li class="flex justify-between items-center py-1"><strong>Location:</strong><span>{{ $plot->location }}</span></li>
+                                                    <li class="flex justify-between items-center py-1"><strong>Status:</strong><span>{{ ucfirst($plot->status) }}</span></li>
                                                 </ul>
+                                                <p class="text-gray-600 dark:text-gray-400 text-sm mb-3">{{ Str::limit($plot->description, 100) }}</p>
+
                                             </div>
+                                            
                                             <div class="p-4 border-t border-gray-200 dark:border-gray-600 flex items-center justify-between gap-2">
-                                                <a href="{{ route('customer.plots.show', $plot->id) }}" class="flex-grow text-center px-4 py-2 bg-yellow-500 text-white rounded-md font-semibold text-sm uppercase tracking-widest hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2 transition ease-in-out duration-150">View Details</a>
+                                                <a href="{{ route('customer.plots.show', ['plot' => $plot->id]) }}" class="flex-grow text-center px-4 py-2 bg-yellow-500 text-white rounded-md font-semibold text-sm uppercase tracking-widest hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2 transition ease-in-out duration-150">View Details</a>
                                                 @if(Auth::user()->savedPlots->contains($plot))
-                                                    <form action="{{ route('saved-plots.destroy', $plot->id) }}" method="POST">
+                                                    <form action="{{ route('saved-plots.destroy', ['plot_id' => $plot->id]) }}" method="POST">
                                                         @csrf
                                                         @method('DELETE')
                                                         <button type="submit" class="p-2 rounded-full text-red-500 hover:bg-red-100" title="Unsave Plot">

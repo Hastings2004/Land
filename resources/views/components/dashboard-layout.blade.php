@@ -112,7 +112,7 @@
                             <i class="fas fa-envelope-open-text mr-3 text-lg"></i>
                             Manage Inquiries
                         </a>
-                    </li>
+                    </li> 
                 @else
                     {{-- Customer-specific plot links --}}
                     <li class="mb-2">

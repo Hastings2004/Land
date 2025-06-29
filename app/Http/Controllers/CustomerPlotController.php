@@ -30,12 +30,12 @@ class CustomerPlotController extends Controller
 
         $plots = $query->paginate(9);
 
-        return view('customer.index', compact('plots'));
+        return view('customer.plots.index', compact('plots'));
 
     }
     /**
      * Display the specified resource.
-     */
+     */ 
     public function show(Plot $plot)
     {
         if ($plot->status === 'sold' && optional($plot->activeReservation)->user_id !== Auth::id()) {

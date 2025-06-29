@@ -14,88 +14,91 @@ class PlotSeeder extends Seeder
      */
     public function run(): void
     {
-        $faker = Faker::create();
-        
-        $locations = [
-            'Riverside Gardens', 'Sunset Hills', 'Green Valley Estate', 'Palm Springs',
-            'Ocean View Heights', 'Mountain Ridge', 'Crystal Lake', 'Cedar Park',
-            'Golden Meadows', 'Silver Oaks', 'Maple Grove', 'Pine Valley',
-            'Rose Garden Estate', 'Oak Hill', 'Willow Creek', 'Cherry Blossom'
+        $plots = [
+            [
+                'title' => 'Oceanview Residential Plot',
+                'price' => 350000.00,
+                'area_sqm' => 1200.50, // size in sqm
+                'location' => 'Malibu Coastal Area',
+                'status' => 'available',
+                'description' => 'Premium beachfront property with stunning ocean views, perfect for luxury villa construction. Includes all utilities connections.'
+            ],
+            [
+                'title' => 'Downtown Commercial Plot',
+                'price' => 1200000.00,
+                'area_sqm' => 2500.75,
+                'location' => 'Manhattan Business District',
+                'status' => 'reserved',
+                'description' => 'Prime commercial space in heart of financial district. Zoned for high-rise office buildings with excellent transport links.'
+            ],
+            [
+                'title' => 'Suburban Family Plot',
+                'price' => 185000.00,
+                'area_sqm' => 800.00,
+                'location' => 'Springfield Suburbs',
+                'status' => 'available',
+                'description' => 'Quiet neighborhood plot with good schools nearby. Ideal for family home with garden space. Water and electricity already connected.'
+            ],
+            [
+                'title' => 'Mountain Retreat Land',
+                'price' => 275000.00,
+                'area_sqm' => 5000.25,
+                'location' => 'Rocky Mountain Range',
+                'status' => 'available',
+                'description' => 'Secluded mountain property with breathtaking views. Perfect for vacation home or eco-retreat. Access via private road.'
+            ],
+            [
+                'title' => 'Agricultural Farmland',
+                'price' => 150000.00,
+                'area_sqm' => 10000.00,
+                'location' => 'Central Valley',
+                'status' => 'sold',
+                'description' => 'Fertile agricultural land with irrigation system. Suitable for crops or livestock. Includes small farmhouse.'
+            ],
+            [
+                'title' => 'Lakefront Cottage Plot',
+                'price' => 220000.00,
+                'area_sqm' => 1500.50,
+                'location' => 'Crystal Lake',
+                'status' => 'available',
+                'description' => 'Charming lakeside property with private dock. Includes fishing rights and mature trees. Perfect for weekend getaway.'
+            ],
+            [
+                'title' => 'Urban Redevelopment Plot',
+                'price' => 750000.00,
+                'area_sqm' => 1800.00,
+                'location' => 'Brooklyn Industrial Zone',
+                'status' => 'available',
+                'description' => 'Former industrial site ready for redevelopment. Approved for mixed residential/commercial use. Excellent investment opportunity.'
+            ],
+            [
+                'title' => 'Gated Community Plot',
+                'price' => 320000.00,
+                'area_sqm' => 950.75,
+                'location' => 'Palm Springs Estates',
+                'status' => 'reserved',
+                'description' => 'Premium plot in secure gated community. Includes access to shared amenities: pool, gym, and clubhouse.'
+            ],
+            [
+                'title' => 'Hillside View Property',
+                'price' => 195000.00,
+                'area_sqm' => 2200.25,
+                'location' => 'Hollywood Hills',
+                'status' => 'available',
+                'description' => 'Sloping plot with panoramic city views. Architectural plans available. Challenging build but rewarding location.'
+            ],
+            [
+                'title' => 'Desert Oasis Plot',
+                'price' => 125000.00,
+                'area_sqm' => 3000.00,
+                'location' => 'Mojave Desert',
+                'status' => 'available',
+                'description' => 'Unique off-grid property with natural spring. Ideal for sustainable living experiment or artist retreat.'
+            ]
         ];
 
-        $statuses = ['available', 'sold', 'reserved'];
-        
-        $plotTypes = [
-            ['min_area' => 300, 'max_area' => 500, 'min_price' => 50000, 'max_price' => 120000],
-            ['min_area' => 500, 'max_area' => 800, 'min_price' => 120000, 'max_price' => 200000],
-            ['min_area' => 800, 'max_area' => 1200, 'min_price' => 200000, 'max_price' => 350000],
-            ['min_area' => 1200, 'max_area' => 2000, 'min_price' => 350000, 'max_price' => 600000],
-        ];
-
-        for ($i = 1; $i <= 50; $i++) {
-            $plotType = $faker->randomElement($plotTypes);
-            $area = $faker->numberBetween($plotType['min_area'], $plotType['max_area']);
-            $basePrice = $faker->numberBetween($plotType['min_price'], $plotType['max_price']);
-            
-            // Add some variation to pricing
-            $priceVariation = $faker->numberBetween(-10, 15); // -10% to +15%
-            $finalPrice = $basePrice + ($basePrice * $priceVariation / 100);
-            
-            $status = $faker->randomElement($statuses);
-            $location = $faker->randomElement($locations);
-            
-            // Generate plot number/title
-            $plotNumber = str_pad($i, 3, '0', STR_PAD_LEFT);
-            $title = "Plot {$plotNumber} - {$location}";
-            
-            // Generate description based on plot characteristics
-            $descriptions = [
-                "Prime residential plot with excellent road access and utilities connection.",
-                "Spacious plot perfect for building your dream home with garden space.",
-                "Well-located plot in a developing neighborhood with good infrastructure.",
-                "Corner plot with dual road access and great investment potential.",
-                "Peaceful plot surrounded by nature, ideal for family residence.",
-                "Modern residential plot with all amenities nearby including schools and shopping.",
-                "Elevated plot with scenic views and excellent drainage system.",
-                "Rectangular plot with proper boundary marking and clear title.",
-                "Premium plot in gated community with 24/7 security and maintenance.",
-                "Investment opportunity in rapidly developing area with high appreciation potential."
-            ];
-            
-            DB::table('plots')->insert([
-                'title' => $title,
-                'description' => $faker->randomElement($descriptions) . " Area: {$area} sqm. " . $faker->sentence(10),
-                'price' => round($finalPrice, 2),
-                'area_sqm' => $area,
-                'location' => $location,
-                'status' => $status,
-                'is_new_listing' => $faker->boolean(30), // 30% chance of being new listing
-                'created_at' => $faker->dateTimeBetween('-6 months', 'now'),
-                'updated_at' => $faker->dateTimeBetween('-1 month', 'now'),
-            ]);
-        }
-        
-        // Add some premium plots
-        for ($i = 51; $i <= 60; $i++) {
-            $area = $faker->numberBetween(2000, 5000);
-            $pricePerSqm = $faker->numberBetween(400, 800);
-            $totalPrice = $area * $pricePerSqm;
-            
-            $plotNumber = str_pad($i, 3, '0', STR_PAD_LEFT);
-            $premiumLocations = ['Luxury Heights', 'Executive Gardens', 'VIP Estate', 'Premium Ridge'];
-            $location = $faker->randomElement($premiumLocations);
-            
-            DB::table('plots')->insert([
-                'title' => "Premium Plot {$plotNumber} - {$location}",
-                'description' => "Exclusive premium plot in luxury development. Features include landscaped surroundings, underground utilities, wide roads, and exclusive club access. Perfect for luxury home construction with ample space for gardens and recreational facilities.",
-                'price' => $totalPrice,
-                'area_sqm' => $area,
-                'location' => $location,
-                'status' => $faker->randomElement(['available', 'reserved']),
-                'is_new_listing' => $faker->boolean(50),
-                'created_at' => $faker->dateTimeBetween('-3 months', 'now'),
-                'updated_at' => $faker->dateTimeBetween('-1 week', 'now'),
-            ]);
+        foreach ($plots as $plot) {
+            \App\Models\Plot::create($plot);
         }
     }
 }

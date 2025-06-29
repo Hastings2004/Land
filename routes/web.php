@@ -50,7 +50,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/saved-plots', [SavedPlotController::class, 'index'])->name('saved-plots.index');
     Route::post('/saved-plots', [SavedPlotController::class, 'store'])->name('saved-plots.store');
     Route::delete('/saved-plots/{plot_id}', [SavedPlotController::class, 'destroy'])->name('saved-plots.destroy');
-
+ 
     // Reservations
     Route::get('/reservations', [ReservationController::class, 'index'])->name('reservations.index');
     Route::post('/reservations', [ReservationController::class, 'store'])->name('reservations.store');
