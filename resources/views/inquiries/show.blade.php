@@ -1,6 +1,6 @@
 <x-dashboard-layout>
     <div class="max-w-4xl mx-ato py-12 px-4 sm:px-6 lg:px-8">
-        <h2 class="text-4xl font-extrabold mb-8 tracking-tight" style="font-family: 'Fira Sans', 'Segoe UI', Arial, sans-serif; color: #ff6fbc;">
+        <h2 class="text-4xl font-extrabold mb-8 tracking-tight" style="font-family: 'Fira Sans', 'Segoe UI', Arial, sans-serif; color: #facc15;">
             Inquiry Details
         </h2>
         <link href="https://fonts.googleapis.com/css2?family=Fira+Sans:wght@700&display=swap" rel="stylesheet">
@@ -54,27 +54,21 @@
             <span class="px-4 py-1 inline-flex text-sm leading-5 font-semibold rounded-full"
             style="
                 @if($inquiry->status == 'new')
-                background: linear-gradient(90deg, #ff6fbc 0%, #ffb86c 100%);
-                color: #fff;
-                box-shadow: 0 2px 8px rgba(255, 111, 188, 0.15);
-                border: 2px solid #ff6fbc;
+                background: #facc15; /* yellow */
+                color: #23272f;
+                box-shadow: 0 2px 8px rgba(250, 204, 21, 0.15);
+                border: 2px solid #facc15;
                 letter-spacing: 1px;
                 @elseif($inquiry->status == 'viewed')
                 background: #fff3cd; color: #23272f;
                 @elseif($inquiry->status == 'responded')
                 background: #b2f2e5; color: #23272f;
                 @else
-                background: #f3e8ff; color: #23272f;
+                background: #f3e8ff; color: #256cfa;
                 @endif
                 padding-left: 1rem; padding-right: 1rem;
                 padding-top: 0.25rem; padding-bottom: 0.25rem;
                 border-radius: 1rem;
-                @if($inquiry->status == 'new')
-                background: linear-gradient(90deg, #ff6fbc 0%, #ffb86c 100%);
-                color: #fff;
-                box-shadow: 0 2px 8px rgba(255, 111, 188, 0.15);
-                border: 2px solid #ff6fbc;
-                @endif
                 font-weight: bold;
                 font-family: 'Fira Sans', 'Segoe UI', Arial, sans-serif;
                 font-size: 1rem;
@@ -99,7 +93,7 @@
             <div class="mt-10 flex flex-wrap gap-4 pt-6 border-t border-gray-300">
                 <!-- Edit: Teal for a modern, appealing primary action -->
                 <a href="{{ route('inquiries.edit', $inquiry) }}"
-                   class="px-6 py-2 bg-teal-500 text-white rounded-lg shadow hover:bg-teal-600 focus:outline-none focus:ring-2 focus:ring-teal-400 focus:ring-offset-2 transition font-semibold">
+                   class="px-6 py-2 bg-green-500 text-white rounded-lg shadow hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-offset-2 transition font-semibold">
                     Edit Inquiry
                 </a>
                 <!-- Delete: Red for clear destructive action -->
@@ -107,13 +101,13 @@
                     @csrf
                     @method('DELETE')
                     <button type="submit"
-                            class="px-6 py-2 bg-orange-400 text-white rounded-lg shadow hover:bg-orange-500 focus:outline-none focus:ring-2 focus:ring-orange-300 focus:ring-offset-2 transition font-semibold">
+                            class="px-6 py-2 bg-red-500 text-white rounded-lg shadow hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-300 focus:ring-offset-2 transition font-semibold">
                         Delete Inquiry
                     </button>
                 </form>
                 <!-- Back: Slate for a neutral, modern secondary action -->
                 <a href="{{ route('inquiries.index') }}"
-                   class="px-6 py-2 bg-pink-400 text-white rounded-lg shadow hover:bg-pink-500 focus:outline-none focus:ring-2 focus:ring-pink-300 focus:ring-offset-2 transition font-semibold">
+                   class="px-6 py-2 bg-yellow-400 text-white rounded-lg shadow hover:bg-yellow-500 focus:outline-none focus:ring-2 focus:ring-yellow-300 focus:ring-offset-2 transition font-semibold">
                     Back to List
                 </a>
             </div>

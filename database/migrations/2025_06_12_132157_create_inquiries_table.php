@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string("name");
             $table->string("email")->unique();
-            $table->integer("phone")->unique();
+            $table->bigInteger("phone")->unique();
             $table->string("message");
             $table->foreignId("plot_id")->nullable()->constrained()->cascadeOnDelete();
             $table->enum("status", ["viewed", "new", "responded", "closed"])->default("new");

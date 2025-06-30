@@ -85,9 +85,10 @@
                         <span class="text-xs font-semibold uppercase text-gray-500 px-3">Admin Panel</span>
                     </li>
                 @endif
-                <li>
+                <li class="mb-2">
                     <a href="{{ route('dashboard') }}"
-                       class="sidebar-item bg-yellow-500 text-white {{ ($activeView ?? '') === 'dashboard' ? 'active' : '' }} flex items-center p-3 rounded-lg font-medium">
+                       class="sidebar-item flex items-center p-3 rounded-lg font-medium transition-colors
+                       {{ ($activeView ?? '') === 'dashboard' ? 'bg-yellow-500 text-white' : 'text-gray-600 hover:bg-yellow-100' }}">
                         <i class="fas fa-home mr-3 text-lg"></i>
                         My Dashboard
                     </a>
@@ -96,7 +97,8 @@
                 @if (auth()->user()->isAdmin())
                     {{-- Admin-specific plot links --}}
                     <li class="mb-2">
-                        <a href="{{ route('plots.index') }}" class="sidebar-item {{ (request()->routeIs('plots.*')) ? 'active bg-yellow-500 text-white' : 'text-gray-600 hover:bg-gray-200' }} flex items-center p-3 rounded-lg font-medium">
+                        <a href="{{ route('plots.index') }}" class="sidebar-item flex items-center p-3 rounded-lg font-medium transition-colors
+                        {{ (request()->routeIs('plots.*')) ? 'bg-yellow-500 text-white' : 'text-gray-600 hover:bg-yellow-100' }}">
                             <i class="fas fa-th-list mr-3 text-lg"></i>
                             Manage Plots
                         </a>

@@ -1,67 +1,114 @@
 <x-dashboard-layout>
-    <div class="max-w-6xl mx-auto py-8">
-        <h1 class="text-3xl font-bold mb-6 text-gray-800">Inquiries</h1>
+    <h2 class="text-3xl font-bold mb-6 text-gray-800 dark:text-white">Inquiry Management</h2>
 
-        @if(session('success'))
-            <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-6" role="alert">
-                <span class="block sm:inline">{{ session('success') }}</span>
+    <div class="flex flex-col sm:flex-row mb-4 gap-4 items-center justify-between">
+        <div class="w-full sm:w-auto">
+            <form action="{{ route('inquiries.index') }}" method="GET" class="w-full">
+                <div class="relative">
+                    <input type="text" name="search"
+                        class="w-full pl-10 pr-4 py-2 border border-yellow-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-200 bg-white text-gray-900 placeholder-yellow-400"
+                        placeholder="Search inquiries..."
+                        value="{{ request('search') }}">
+                    <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-yellow-400"></i>
+                </div>
+            </form>
+        </div>
+        <div class="w-full sm:w-auto flex justify-end">
+            <a href="{{ route('inquiries.create') }}"
+            class="inline-flex items-center gap-2 px-7 py-2.5 bg-yellow-400 border-0 rounded-full font-semibold text-base text-white uppercase shadow-lg hover:bg-yellow-500 focus:outline-none focus:ring-4 focus:ring-yellow-200 focus:ring-offset-2 transition-all duration-200"
+            style="box-shadow: 0 4px 14px 0 rgba(251,191,36,0.18);"
+            >
+             <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+             </svg>
+             Submit New Inquiry
+            </a>
+        </div>
+    </div>
+
+    <div class="p-6 rounded-xl shadow-lg bg-white :bg-gray-800">
+        @if($inquiries->isEmpty())
+            <div class="alert bg-blue-100 border border-blue-400 text-blue-700 px-4 py-3 rounded relative">No inquiries found matching your criteria.</div>
+        @else
+            <div class="overflow-x-auto">
+                <table class="min-w-full bg-white border border-gray-300 rounded-xl shadow-lg">
+                    <thead>
+                        <tr>
+                            <th class="px-6 py-4 border-b border-r border-gray-300 bg-gradient-to-r from-yellow-100 to-yellow-200 text-left text-sm font-bold text-gray-700 uppercase tracking-wider first:rounded-tl-xl last:rounded-tr-xl">
+                                Name
+                            </th>
+                            <th class="px-6 py-4 border-b border-r border-gray-300 bg-gradient-to-r from-yellow-100 to-yellow-200 text-left text-sm font-bold text-gray-700 uppercase tracking-wider">
+                                Email
+                            </th>
+                            <th class="px-6 py-4 border-b border-r border-gray-300 bg-gradient-to-r from-yellow-100 to-yellow-200 text-left text-sm font-bold text-gray-700 uppercase tracking-wider">
+                                Status
+                            </th>
+                            <th class="px-6 py-4 border-b border-r border-gray-300 bg-gradient-to-r from-yellow-100 to-yellow-200 text-left text-sm font-bold text-gray-700 uppercase tracking-wider">
+                                Plot
+                            </th>
+                            <th class="px-6 py-4 border-b border-gray-300 bg-gradient-to-r from-yellow-100 to-yellow-200 text-center text-sm font-bold text-gray-700 uppercase tracking-wider last:rounded-tr-xl">
+                                Actions
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($inquiries as $inquiry)
+                            <tr class="hover:bg-yellow-50 transition">
+                                <td class="px-6 py-4 border-b border-r border-gray-200 bg-white text-gray-900 whitespace-nowrap">
+                                    <div class="flex items-center">
+                                        <div class="flex-shrink-0 h-10 w-10 bg-yellow-200 rounded-full flex items-center justify-center text-lg font-bold text-yellow-700 mr-3">
+                                            {{ strtoupper(substr($inquiry->name, 0, 1)) }}
+                                        </div>
+                                        <div>
+                                            <div class="text-base font-semibold">{{ $inquiry->name }}</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 border-b border-r border-gray-200 bg-white text-gray-700">
+                                    {{ $inquiry->email }}
+                                </td>
+                                <td class="px-6 py-4 border-b border-r border-gray-200 bg-white">
+                                    <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full shadow
+                                        @if($inquiry->status == 'new')
+                                            bg-blue-100 text-blue-800 border border-blue-300
+                                        @elseif($inquiry->status == 'viewed')
+                                            bg-yellow-100 text-yellow-800 border border-yellow-300
+                                        @elseif($inquiry->status == 'responded')
+                                            bg-green-100 text-green-800 border border-green-300
+                                        @else
+                                            bg-gray-100 text-gray-800 border border-gray-300
+                                        @endif
+                                    ">
+                                        {{ ucfirst($inquiry->status) }}
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4 border-b border-r border-gray-200 bg-white text-gray-700">
+                                    {{ $inquiry->plot->title ?? 'N/A' }}
+                                </td>
+                                <td class="px-6 py-4 border-b border-gray-200 bg-white text-right space-x-2">
+                                    <a href="{{ route('inquiries.show', $inquiry) }}"
+                                       class="inline-block px-4 py-2 bg-green-500 text-white font-semibold rounded-lg shadow hover:bg-green-600 transition"
+                                    >View</a>
+                                    <a href="{{ route('inquiries.edit', $inquiry) }}"
+                                       class="inline-block px-4 py-2 bg-yellow-400 text-white font-semibold rounded-lg shadow hover:bg-yellow-500 transition"
+                                    >Edit</a>
+                                    <form action="{{ route('inquiries.destroy', $inquiry) }}" method="POST" class="inline-block" onsubmit="return confirm('Are you sure you want to delete this inquiry?');">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit"
+                                            class="inline-block px-4 py-2 bg-red-500 text-white font-semibold rounded-lg shadow hover:bg-red-600 transition"
+                                        >Delete</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+            </div>
+            <div class="mt-6 flex justify-center">
+                {{ $inquiries->appends(request()->query())->links() }}
             </div>
         @endif
-
-        <div class="bg-white p-6 rounded-xl shadow-lg">
-            @if($inquiries->isEmpty())
-                <p class="text-gray-600">No inquiries found.</p>
-            @else
-                <div class="overflow-x-auto">
-                    <table class="min-w-full bg-white">
-                        <thead>
-                            <tr>
-                                <th class="px-6 py-3 border-b-2 border-gray-300 text-left text-sm font-bold text-gray-700 uppercase">Name</th>
-                                <th class="px-6 py-3 border-b-2 border-gray-300 text-left text-sm font-bold text-gray-700 uppercase">Email</th>
-                                <th class="px-6 py-3 border-b-2 border-gray-300 text-left text-sm font-bold text-gray-700 uppercase">Status</th>
-                                <th class="px-6 py-3 border-b-2 border-gray-300 text-left text-sm font-bold text-gray-700 uppercase">Submitted</th>
-                                <th class="px-6 py-3 border-b-2 border-gray-300 text-center text-sm font-bold text-gray-700 uppercase">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach($inquiries as $inquiry)
-                                <tr>
-                                    <td class="px-6 py-4 border-b">{{ $inquiry->name }}</td>
-                                    <td class="px-6 py-4 border-b">{{ $inquiry->email }}</td>
-                                    <td class="px-6 py-4 border-b">
-                                        <span class="px-3 py-1 text-sm font-semibold rounded-full 
-                                            @switch($inquiry->status)
-                                                @case('new') bg-blue-200 text-blue-800 @break
-                                                @case('viewed') bg-yellow-200 text-yellow-800 @break
-                                                @case('responded') bg-green-200 text-green-800 @break
-                                                @case('closed') bg-gray-200 text-gray-800 @break
-                                            @endswitch">
-                                            {{ ucfirst($inquiry->status) }}
-                                        </span>
-                                    </td>
-                                    <td class="px-6 py-4 border-b">{{ $inquiry->created_at->format('M d, Y') }}</td>
-                                    <td class="px-6 py-4 border-b text-center">
-                                        <div class="flex items-center justify-center gap-2">
-                                            <a href="{{ route('inquiries.show', $inquiry->id) }}" class="inline-block px-4 py-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300 font-semibold text-xs uppercase">View</a>
-                                            @if(Auth::user()->isAdmin())
-                                                <a href="{{ route('inquiries.edit', $inquiry->id) }}" class="inline-block px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600 font-semibold text-xs uppercase">Edit</a>
-                                                <form action="{{ route('inquiries.destroy', $inquiry->id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this inquiry?');">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button type="submit" class="inline-block px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 font-semibold text-xs uppercase">Delete</button>
-                                                </form>
-                                            @endif
-                                        </div>
-                                    </td>
-                                </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                </div>
-                <div class="mt-6">
-                    {{ $inquiries->links() }}
-                </div>
-            @endif
-        </div>
     </div>
 </x-dashboard-layout>
