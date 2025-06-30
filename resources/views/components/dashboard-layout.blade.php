@@ -85,7 +85,7 @@
                         <span class="text-xs font-semibold uppercase text-gray-500 px-3">Admin Panel</span>
                     </li>
                 @endif
-                <li>
+                <li class="mb-4">
                     <a href="{{ route('dashboard') }}"
                        class="sidebar-item bg-yellow-500 text-white {{ ($activeView ?? '') === 'dashboard' ? 'active' : '' }} flex items-center p-3 rounded-lg font-medium">
                         <i class="fas fa-home mr-3 text-lg"></i>
@@ -96,27 +96,27 @@
                 @if (auth()->user()->isAdmin())
                     {{-- Admin-specific plot links --}}
                     <li class="mb-2">
-                        <a href="{{ route('plots.index') }}" class="sidebar-item {{ (request()->routeIs('plots.*')) ? 'active bg-yellow-500 text-white' : 'text-gray-600 hover:bg-gray-200' }} flex items-center p-3 rounded-lg font-medium">
+                        <a href="{{ route('plots.index') }}" class="sidebar-item {{ (request()->routeIs('plots.*')) ? 'active bg-yellow-500 text-white' : 'text-gray-600 hover:bg-yellow-100' }} flex items-center p-3 rounded-lg font-medium">
                             <i class="fas fa-th-list mr-3 text-lg"></i>
                             Manage Plots
                         </a>
                     </li>
                     <li class="mb-2">
-                        <a href="{{ route('plots.create') }}" class="sidebar-item {{ (request()->routeIs('plots.create')) ? 'active bg-yellow-500 text-white' : 'text-gray-600 hover:bg-gray-200' }} flex items-center p-3 rounded-lg font-medium">
+                        <a href="{{ route('plots.create') }}" class="sidebar-item {{ (request()->routeIs('plots.create')) ? 'active bg-yellow-500 text-white' : 'text-gray-600 hover:bg-yellow-100' }} flex items-center p-3 rounded-lg font-medium">
                             <i class="fas fa-plus-square mr-3 text-lg"></i>
                             Add New Plot
                         </a>
                     </li>
                     <li class="mb-2">
-                        <a href="{{ route('inquiries.index') }}" class="sidebar-item {{ (request()->routeIs('inquiries.*')) ? 'active bg-yellow-500 text-white' : 'text-gray-600 hover:bg-gray-200' }} flex items-center p-3 rounded-lg font-medium">
+                        <a href="{{ route('inquiries.index') }}" class="sidebar-item {{ (request()->routeIs('inquiries.*')) ? 'active bg-yellow-500 text-white' : 'text-gray-600 hover:bg-yellow-100' }} flex items-center p-3 rounded-lg font-medium">
                             <i class="fas fa-envelope-open-text mr-3 text-lg"></i>
                             Manage Inquiries
                         </a>
                     </li> 
                 @else
                     {{-- Customer-specific plot links --}}
-                    <li class="mb-2">
-                        <a href="{{ route('customer.plots.index') }}" class="sidebar-item {{ (request()->routeIs('customer.plots.*')) ? 'active bg-yellow-500 text-white' : 'text-gray-600 hover:bg-gray-200' }} flex items-center p-3 rounded-lg font-medium">
+                    <li class="mb-4">
+                        <a href="{{ route('customer.plots.index') }}" class="sidebar-item {{ (request()->routeIs('customer.plots.*')) ? 'active bg-yellow-500 text-white' : 'text-gray-600 hover:bg-yellow-100' }} flex items-center p-3 rounded-lg font-medium">
                             <i class="fas fa-list-alt mr-3 text-lg"></i>
                             All Plots
                         </a>
