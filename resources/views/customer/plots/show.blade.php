@@ -30,23 +30,17 @@
                         {{ ucfirst($plot->status) }}
                     </span>
                 </div>
-                <p class="text-gray-600 mt-2">{{ $plot->location }}</p>
+                <div class="p-4 flex-grow">
+                    <h5 class="text-lg font-bold text-gray-900 dark:text-gray-100 mb-2">{{ $plot->title }}</h5>
+                    <ul class="text-sm text-gray-700 dark:text-gray-300 space-y-1">
+                        <li class="flex justify-between items-center py-1"><strong>Price:</strong><span>${{ number_format($plot->price, 2) }}</span></li>
+                        <li class="flex justify-between items-center py-1"><strong>Area:</strong><span>{{ number_format($plot->area_sqm, 2) }} sqm</span></li>
+                        <li class="flex justify-between items-center py-1"><strong>Location:</strong><span>{{ $plot->location }}</span></li>
+                        <li class="flex justify-between items-center py-1"><strong>Status:</strong><span>{{ ucfirst($plot->status) }}</span></li>
+                    </ul>
+                    <p class="text-gray-600 dark:text-gray-400 text-sm mb-3">{{ Str::limit($plot->description, 100) }}</p>
 
-                <div class="mt-6 border-t pt-4">
-                    <p class="text-gray-700">{{ $plot->description }}</p>
-                </div>
-                
-                <div class="mt-6 grid grid-cols-2 gap-4 text-center">
-                    <div class="p-4 bg-gray-100 rounded-lg">
-                        <p class="text-sm font-medium text-gray-500">Price</p>
-                        <p class="text-2xl font-bold text-gray-800">K{{ number_format($plot->price, 2) }}</p>
-                    </div>
-                    <div class="p-4 bg-gray-100 rounded-lg">
-                        <p class="text-sm font-medium text-gray-500">Area</p>
-                        <p class="text-2xl font-bold text-gray-800">{{ number_format($plot->area_sqm, 2) }} sqm</p>
-                    </div>
-                </div>
-
+                </div> 
                 <div class="mt-8 border-t pt-6">
                     @if($plot->status === 'available')
                         <form action="{{ route('reservations.store') }}" method="POST">
