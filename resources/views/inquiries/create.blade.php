@@ -13,27 +13,30 @@
                 @csrf
 
                 <div class="mb-4">
-                    <label for="name" class="block text-sm font-medium text-black">Your Name</label>
-                    <input type="text" name="name" id="name" value="{{ old('name') }}" required
-                           class="mt-1 block w-full h-10 border border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-black">
+                    <label for="name" class="block text-sm font-medium text-black mb-1">Your Name</label>
+                    <input type="text" name="name" id="name" @if(old('name')) value="{{ old('name') }}" @endif required
+                           class="mt-1 block w-full h-10 px-3 border border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-black">
                     @error('name')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
                 </div>
                 <div class="mb-4">
-                    <label for="email" class="block text-sm font-medium text-black">Your Email</label>
-                    <input type="email" name="email" id="email" value="{{ old('email') }}" required
-                           class="mt-1 block w-full h-10 border border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-black">
+                    <label for="email" class="block text-sm font-medium text-black mb-1">Your Email</label>
+                    <input type="email" name="email" id="email" @if(old('email')) value="{{ old('email') }}" @endif required
+                           class="mt-1 block w-full h-10 px-3 border border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-black">
                     @error('email')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
                 </div>
                 <div class="mb-4">
-                    <label for="phone" class="block text-sm font-medium text-black">Phone</label>
-                    <input type="text" name="phone" id="phone" value="{{ old('phone') }}"
-                           class="mt-1 block w-full h-10 border border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-black">
+                    <label for="phone" class="block text-sm font-medium text-black mb-1">Phone (Malawi)</label>
+                    <input type="text" name="phone" id="phone" @if(old('phone')) value="{{ old('phone') }}" @endif
+                           pattern="^(?:\+265\d{9}|0\d{9})$"
+                           title="Enter a valid Malawi phone number (e.g., +265991234567 or 0991234567)"
+                           placeholder="e.g., +265991234567 or 0991234567"
+                           class="mt-1 block w-full h-10 px-3 border border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-black">
                     @error('phone')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
                 </div>
                 <div class="mb-4">
-                    <label for="message" class="block text-sm font-medium text-black">Your Message</label>
+                    <label for="message" class="block text-sm font-medium text-black mb-1">Your Message</label>
                     <textarea name="message" id="message" rows="5" required
-                              class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-black">{{ old('message') }}</textarea>
+                              class="mt-1 block w-full px-3 border border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-black">@if(old('message')){{ old('message') }}@endif</textarea>
                     @error('message')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
                 </div>
                 {{-- If you want to link the inquiry to a specific plot, you can pass plot_id as a hidden field --}}
