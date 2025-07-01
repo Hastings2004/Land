@@ -55,6 +55,14 @@
                                 New
                             </div>
                         @endif
+                        <!-- Plot Image -->
+                        <div class="w-full h-48 flex items-center justify-center mb-4 bg-yellow-50 rounded-lg overflow-hidden border border-yellow-100">
+                            @if(!empty($plot->image_path))
+                                <img src="{{ asset('storage/' . $plot->image_path) }}" alt="Plot Image" class="object-cover w-full h-full">
+                            @else
+                                <img src="https://via.placeholder.com/400x200?text=No+Image" alt="No Image" class="object-cover w-full h-full">
+                            @endif
+                        </div>
                         <div class="p-6 flex-grow">
                             <!-- Plot Title with Property Icon -->
                             <h5 class="text-xl font-bold text-yellow-800 mb-3 flex items-center">
@@ -80,6 +88,10 @@
                                 <li class="flex justify-between items-center">
                                     <span><strong class="text-yellow-600">Owner:</strong></span>
                                     <span>{{ $plot->owner->name ?? 'N/A' }}</span>
+                                </li>
+                                <li class="flex justify-between items-center">
+                                    <span><strong class="text-yellow-600">Category:</strong></span>
+                                    <span>{{ $plot->category }}</span>
                                 </li>
                                 <li class="flex justify-between items-center">
                                     <span><strong class="text-yellow-600">Listed:</strong></span>

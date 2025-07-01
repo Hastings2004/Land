@@ -38,6 +38,8 @@ class Plot extends Model
         'location',
         'status',
         'is_new_listing',
+        'category',
+        'image_path',
     ];
     protected $casts = [
         'price' => 'decimal:2',

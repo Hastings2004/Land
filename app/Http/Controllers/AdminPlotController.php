@@ -96,7 +96,7 @@ class AdminPlotController extends Controller
      */
     public function edit(Plot $plot)
     {
-        $activeView = 'admin_plots_edit'; // For sidebar highlighting, etc.
+        $activeView = 'admin_plots_edit'; 
 
         return view('admin.plots.edit', compact('plot', 'activeView'));
     }
@@ -120,7 +120,7 @@ class AdminPlotController extends Controller
             'price' => 'required|numeric|min:0',
             'area_sqm' => 'required|numeric|min:0',
             'location' => 'required|string|max:255',
-            
+            'category' => 'required|in:residential,commercial,industrial',
         ]);
         // Update the plot with the validated data
         $plot->update($validated);
