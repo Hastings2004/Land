@@ -14,8 +14,9 @@ class CustomerPlotController extends Controller
      */
     public function index(Request $request)
     {
-       $query = Plot::where('status', 'available')->latest();
+       $query = Plot::query();
 
+        // Search
         if ($request->has('search')) {
             $query->where(function($q) use ($request) {
                 $q->where('title', 'like', "%{$request->search}%")
@@ -24,14 +25,50 @@ class CustomerPlotController extends Controller
             });
         }
 
+        // Category filter
+        if ($request->filled('category')) {
+            $query->where('category', $request->category);
+        }
+
+        // Location filter
+        if ($request->filled('location')) {
+            $query->where('location', $request->location);
+        }
+
+        // Price range filter
+        if ($request->filled('price_min')) {
+            $query->where('price', '>=', $request->price_min);
+        }
+        if ($request->filled('price_max')) {
+            $query->where('price', '<=', $request->price_max);
+        }
+
+        // Area range filter
+        if ($request->filled('area_min')) {
+            $query->where('area_sqm', '>=', $request->area_min);
+        }
+        if ($request->filled('area_max')) {
+            $query->where('area_sqm', '<=', $request->area_max);
+        }
+
+        // Status filter
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        // New listings filter
         if ($request->has('new_listings')) {
             $query->where('is_new_listing', true);
         }
 
-        $plots = $query->paginate(9);
+        $plots = $query->latest()->paginate(9)->appends($request->except('page'));
 
-        return view('customer.plots.index', compact('plots'));
+        // For dropdowns
+        $categories = ['residential', 'commercial', 'industrial'];
+        $locations = Plot::select('location')->distinct()->pluck('location');
+        $statuses = ['available', 'reserved', 'sold'];
 
+        return view('customer.plots.index', compact('plots', 'categories', 'locations', 'statuses'));
     }
     /**
      * Display the specified resource.

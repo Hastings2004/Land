@@ -219,10 +219,13 @@
                 <i class="fas fa-bars text-xl"></i>
             </button>
 
-            <div class="relative flex-grow mx-4 max-w-lg hidden sm:block">
-                <input type="text" placeholder="Search plots..." class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500">
-                <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-            </div>
+            <!-- Prominent Search Bar -->
+            <form action="{{ route('customer.plots.index') }}" method="GET" class="relative flex-grow mx-4 max-w-2xl flex items-center">
+                <input type="text" name="search" placeholder="Search for land, location, price..." value="{{ request('search') }}" class="w-full pl-12 pr-4 py-3 border-2 border-yellow-500 rounded-xl focus:outline-none focus:ring-2 focus:ring-yellow-500 text-lg shadow-md bg-yellow-50 placeholder-yellow-600 font-semibold transition-all duration-200" />
+                <button type="submit" class="absolute left-3 top-1/2 transform -translate-y-1/2 text-yellow-600 hover:text-yellow-800 focus:outline-none">
+                    <i class="fas fa-search text-2xl"></i>
+                </button>
+            </form>
 
             <div class="flex items-center space-x-4">
                 

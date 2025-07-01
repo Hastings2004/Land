@@ -3,32 +3,6 @@
     <!-- Increased bottom margin for better separation from the search/filter section -->
     <h2 class="text-3xl font-bold mb-10 text-yellow-700 text-center">Available Plots</h2>
 
-    <!-- Search and Filter Section -->
-    <div class="bg-white rounded-xl shadow-md p-6 mb-10 flex flex-col md:flex-row md:items-center md:justify-between gap-6">
-        <!-- Search Form with Icon -->
-        <form action="{{ route('dashboard', parameters: ['viewType' => 'plots']) }}" method="GET" class="w-full md:w-auto">
-            <div class="relative">
-                <input type="text" name="search" class="w-64 md:w-72 pl-10 pr-5 py-2 border border-yellow-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400 bg-white text-gray-800 placeholder-yellow-500 shadow-sm" placeholder="Search plots..." value="{{ request('search') }}">
-                <!-- Search Icon -->
-                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <svg class="h-5 w-5 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                    </svg>
-                </div>
-            </div>
-        </form>
-
-        <!-- Filter Buttons -->
-        <div class="flex flex-wrap gap-3 w-full md:w-auto justify-end">
-            <a href="{{ route('dashboard', ['viewType' => 'plots', 'new_listings' => true]) }}" class="inline-flex items-center px-5 py-2 bg-yellow-400 border border-transparent rounded-md font-semibold text-xs text-yellow-900 uppercase tracking-widest hover:bg-yellow-500 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:ring-offset-2 transition ease-in-out duration-150 shadow-sm">
-                Show New Listings Only
-            </a>
-            <a href="{{ route('dashboard', ['viewType' => 'plots']) }}" class="inline-flex items-center px-5 py-2 bg-yellow-200 border border-transparent rounded-md font-semibold text-xs text-yellow-900 uppercase tracking-widest hover:bg-yellow-300 focus:bg-yellow-300 active:bg-yellow-400 focus:outline-none focus:ring-2 focus:ring-yellow-300 focus:ring-offset-2 transition ease-in-out duration-150 shadow-sm">
-                Clear Filters
-            </a>
-        </div>
-    </div>
-
     <!-- Plots Display Section -->
     <!-- Adjusted padding for the main content area, slightly less than before for a more cohesive look -->
     <div class="p-6 rounded-2xl shadow-xl bg-white">
