@@ -34,6 +34,11 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/logout', [AuthController::class, 'logoutUser'])->name('logout');
     Route::get('/dashboard', [DashboardController::class, "index"])->name('dashboard');
     
+    // Plot approval routes for admins
+    Route::get('/plots/pending', [AdminPlotController::class, 'pending'])->name('plots.pending');
+    Route::post('/plots/{id}/approve', [AdminPlotController::class, 'approve'])->name('plots.approve');
+    Route::post('/plots/{id}/reject', [AdminPlotController::class, 'reject'])->name('plots.reject');
+
     Route::resource('plots', AdminPlotController::class);
     Route::get('/plots/search', [AdminPlotController::class, 'search'])->name('plots.search');
     

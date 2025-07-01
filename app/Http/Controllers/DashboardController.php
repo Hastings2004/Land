@@ -11,6 +11,9 @@ class DashboardController extends Controller
     public function index(){
         $user = auth()->user();
         $stats = null;
+        $months = $totals = $categoryLabels = $categoryCounts = $scatterData = [];
+        $plotsMonths = $plotsCounts = $inquiriesMonths = $inquiriesCounts = $topViewedLabels = $topViewedCounts = [];
+
         if ($user && $user->isAdmin()) {
             $stats = [
                 'totalPlots' => \App\Models\Plot::count(),
@@ -27,8 +30,6 @@ class DashboardController extends Controller
                 ->groupBy('month')
                 ->orderBy('month')
                 ->get();
-            $months = [];
-            $totals = [];
             $period = \Carbon\CarbonPeriod::create(now()->subMonths(11)->startOfMonth(), '1 month', now()->startOfMonth());
             foreach ($period as $date) {
                 $month = $date->format('Y-m');
@@ -58,8 +59,6 @@ class DashboardController extends Controller
                 ->groupBy('month')
                 ->orderBy('month')
                 ->get();
-            $plotsMonths = [];
-            $plotsCounts = [];
             $plotsPeriod = \Carbon\CarbonPeriod::create(now()->subMonths(11)->startOfMonth(), '1 month', now()->startOfMonth());
             foreach ($plotsPeriod as $date) {
                 $month = $date->format('Y-m');
@@ -74,8 +73,6 @@ class DashboardController extends Controller
                 ->groupBy('month')
                 ->orderBy('month')
                 ->get();
-            $inquiriesMonths = [];
-            $inquiriesCounts = [];
             $inquiriesPeriod = \Carbon\CarbonPeriod::create(now()->subMonths(11)->startOfMonth(), '1 month', now()->startOfMonth());
             foreach ($inquiriesPeriod as $date) {
                 $month = $date->format('Y-m');

@@ -170,4 +170,44 @@ class AdminPlotController extends Controller
 
         return view('admin.plots.index', ["plots" => $plots]);
     }
+
+    /**
+     * Display a list of pending plots for admin approval.
+     */
+    public function pending()
+    {
+        if (auth()->user()->role !== 'admin') {
+            abort(403, 'Unauthorized action.');
+        }
+        $plots = \App\Models\Plot::where('status', 'pending')->latest()->paginate(10);
+        return view('admin.plots.pending', compact('plots'));
+    }
+
+    /**
+     * Approve a pending plot.
+     */
+    public function approve($id)
+    {
+        if (auth()->user()->role !== 'admin') {
+            abort(403, 'Unauthorized action.');
+        }
+        $plot = \App\Models\Plot::findOrFail($id);
+        $plot->status = 'available';
+        $plot->save();
+        return redirect()->route('plots.pending')->with('success', 'Plot approved successfully.');
+    }
+
+    /**
+     * Reject a pending plot.
+     */
+    public function reject($id)
+    {
+        if (auth()->user()->role !== 'admin') {
+            abort(403, 'Unauthorized action.');
+        }
+        $plot = \App\Models\Plot::findOrFail($id);
+        $plot->status = 'rejected';
+        $plot->save();
+        return redirect()->route('plots.pending')->with('success', 'Plot rejected.');
+    }
 }

@@ -113,7 +113,13 @@
                             <i class="fas fa-envelope-open-text mr-3 text-lg"></i>
                             Manage Inquiries
                         </a>
-                    </li> 
+                    </li>
+                    <li class="mb-2">
+                        <a href="{{ route('plots.pending') }}" class="sidebar-item {{ (request()->routeIs('plots.pending')) ? 'active bg-yellow-500 text-white' : 'text-gray-600 hover:bg-yellow-100' }} flex items-center p-3 rounded-lg font-medium">
+                            <i class="fas fa-check-circle mr-3 text-lg"></i>
+                            Plot Approvals
+                        </a>
+                    </li>
                 @else
                     {{-- Customer-specific plot links --}}
                     <li class="mb-4">
@@ -153,7 +159,7 @@
                 <li class="mb-2">
                     <a href="{{route('customer.plots.show', auth()->user()->id)}}" class="sidebar-item flex items-center p-3 rounded-lg text-gray-600 hover:bg-yellow-100 transition-colors">
                         <i class="fas fa-magnifying-glass-location mr-3 text-lg"></i>
-                        Review Plot
+                        Manage Reviews
                     </a>
                 </li>
 

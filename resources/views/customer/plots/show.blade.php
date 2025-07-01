@@ -17,7 +17,12 @@
         @endif
 
         <div class="bg-white rounded-xl shadow-lg overflow-hidden">
-            <img src="{{ $plot->image_path ? asset('storage/' . $plot->image_path) : 'https://placehold.co/1200x400' }}" alt="{{ $plot->title }}" class="w-full h-64 object-cover">
+            <div class="relative group">
+                <img src="{{ $plot->image_path ? asset('storage/' . $plot->image_path) : 'https://placehold.co/1200x400' }}" alt="{{ $plot->title }}" class="w-full h-64 object-cover rounded-xl border-4 border-gray-200 shadow-lg transition-transform duration-300 group-hover:scale-105 group-hover:shadow-2xl">
+                <div class="absolute bottom-2 left-1/2 transform -translate-x-1/2 bg-white bg-opacity-80 px-4 py-2 rounded-lg shadow text-gray-800 text-lg font-semibold mt-2">
+                    {{ $plot->title }}
+                </div>
+            </div>
             <div class="p-6">
                 <div class="flex justify-between items-start">
                     <h1 class="text-3xl font-bold text-gray-800">{{ $plot->title }}</h1>
