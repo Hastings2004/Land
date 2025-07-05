@@ -14,13 +14,17 @@
     </head>
     <!-- Main container for the signup form, centered on the page and styled -->
     <div class="max-w-md mx-auto p-8 bg-white shadow-md rounded-lg mt-20">
-        <!-- Signup page title with consistent styling -->
+                        <!-- Signup page title with consistent styling -->
         <h3 class="text-yellow-500 text-2xl font-semibold mb-6 text-center">ATSOGO SIGNUP PAGE</h3>
+
+
 
         <!-- Signup form starts here -->
         <form action="{{ route('register') }}" method="post">
             <!-- CSRF token for security (Laravel specific) -->
             @csrf
+
+
 
             <!-- Username Input Field with Icon -->
             <div class="mb-4">
@@ -135,13 +139,13 @@
                     type="submit"
                     class="w-full bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition duration-150 ease-in-out"
                 >
-                    Register
+                    <i class="fas fa-user-plus mr-2"></i>Create Account
                 </button>
             </div>
         </form>
     </div>
 
-    {{-- JavaScript for password visibility toggle --}}
+        {{-- JavaScript for password visibility toggle --}}
     <script>
         /**
          * Toggles the visibility of a password input field.

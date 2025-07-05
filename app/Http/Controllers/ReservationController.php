@@ -13,7 +13,43 @@ class ReservationController extends Controller
     public function index()
     {
         $reservations = Auth::user()->reservations()->with('plot')->latest()->paginate(10);
-        return view('reservations.index', compact('reservations'));
+        return view('customer.reservations.index', compact('reservations'));
+    }
+
+    /**
+     * Admin view: Show all reservations
+     */
+    public function adminIndex()
+    {
+        $reservations = Reservation::with(['user', 'plot'])->latest()->paginate(15);
+        return view('admin.reservations.index', compact('reservations'));
+    }
+
+    /**
+     * Admin: Approve a reservation
+     */
+    public function approve(Reservation $reservation)
+    {
+        $reservation->status = 'approved';
+        $reservation->save();
+
+        return back()->with('success', 'Reservation approved successfully.');
+    }
+
+    /**
+     * Admin: Reject a reservation
+     */
+    public function reject(Reservation $reservation)
+    {
+        $reservation->status = 'rejected';
+        $reservation->save();
+
+        // Update the plot status back to available
+        $plot = $reservation->plot;
+        $plot->status = 'available';
+        $plot->save();
+
+        return back()->with('success', 'Reservation rejected successfully.');
     }
 
     public function store(Request $request)
@@ -37,7 +73,7 @@ class ReservationController extends Controller
             'expires_at' => Carbon::now()->addHours(24),
             'status' => 'active',
         ]);
-        
+
         // Update the plot status
         $plot->status = 'reserved';
         $plot->save();
@@ -54,7 +90,7 @@ class ReservationController extends Controller
 
         $reservation->status = 'cancelled';
         $reservation->save();
-        
+
         // Update the plot status back to available
         $plot = $reservation->plot;
         $plot->status = 'available';

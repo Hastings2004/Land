@@ -14,13 +14,15 @@
     </head>
     <!-- Main container for the login form, centered on the page and styled -->
     <div class="max-w-md mx-auto p-8 bg-white shadow-md rounded-lg mt-20">
-        <!-- Login page title -->
+                        <!-- Login page title -->
         <h3 class="text-yellow-500 text-2xl font-semibold mb-6 text-center">ATSOGO LOGIN PAGE</h3>
 
         <!-- Login form starts here -->
         <form action="{{ route('login') }}" method="post">
             <!-- CSRF token for security (Laravel specific) -->
             @csrf
+
+
 
             <!-- Email Input Field with Icon -->
             <div class="mb-4">
@@ -90,7 +92,7 @@
                     type="submit"
                     class="w-full bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition duration-150 ease-in-out"
                 >
-                    Login
+                    <i class="fas fa-sign-in-alt mr-2"></i>Login
                 </button>
             </div>
             {{-- session message --}}
@@ -108,7 +110,7 @@
         </div>
     </div>
 
-    {{-- JavaScript for password visibility toggle --}}
+        {{-- JavaScript for password visibility toggle --}}
     <script>
         /**
          * Toggles the visibility of a password input field.

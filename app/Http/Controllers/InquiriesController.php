@@ -17,28 +17,14 @@ class InquiriesController extends Controller
      */
     public function index(Request $request)
     {
-        // For admin panel: Fetch all inquiries, possibly with pagination
-        // Add sorting, filtering, or searching as needed
+        // Customer view: Show only their own inquiries
         $user = Auth::user();
-
-        // Retrieve inquiries where the 'email' column in the inquiries table
-        // matches the email of the currently authenticated user.
-
-        if ($user->role === 'admin') {
-            $inquiries = Inquiries::latest()->paginate(15);
-        } else {
-            $inquiries = Inquiries::
-                where('email', $user->email) 
-                ->latest()
-                ->paginate(15); // Order by latest and paginate
-        }
+        $inquiries = Inquiries::where('email', $user->email)->latest()->paginate(15);
 
         // Optional: Add search functionality
         if ($request->has('search') && !empty($request->search)) {
             $searchTerm = '%' . $request->search . '%';
-
-            // Apply search functionality, ensuring it still filters by the user's email
-            $inquiries = Inquiries::where('email', $user->email) // Still filter by user's email
+            $inquiries = Inquiries::where('email', $user->email)
                 ->where(function($query) use ($searchTerm) {
                     $query->where('name', 'like', $searchTerm)
                         ->orWhere('email', 'like', $searchTerm)
@@ -46,12 +32,33 @@ class InquiriesController extends Controller
                 })
                 ->latest()
                 ->paginate(15)
-                ->appends(['search' => $request->search]); // Maintain search query in pagination links
+                ->appends(['search' => $request->search]);
         }
 
-        $activeView = 'inquiries_index'; // For dashboard sidebar highlighting
+        return view('customer.inquiries.index', compact('inquiries'));
+    }
 
-        return view('inquiries.index', compact('inquiries', 'activeView'));
+    /**
+     * Admin view: Show all inquiries
+     */
+    public function adminIndex(Request $request)
+    {
+        $inquiries = Inquiries::latest()->paginate(15);
+
+        // Optional: Add search functionality
+        if ($request->has('search') && !empty($request->search)) {
+            $searchTerm = '%' . $request->search . '%';
+            $inquiries = Inquiries::where(function($query) use ($searchTerm) {
+                $query->where('name', 'like', $searchTerm)
+                    ->orWhere('email', 'like', $searchTerm)
+                    ->orWhere('message', 'like', $searchTerm);
+            })
+            ->latest()
+            ->paginate(15)
+            ->appends(['search' => $request->search]);
+        }
+
+        return view('admin.inquiries.index', compact('inquiries'));
     }
     /**
      * Show the form for creating a new resource (Inquiry).

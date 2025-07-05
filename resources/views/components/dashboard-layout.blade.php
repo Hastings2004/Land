@@ -12,7 +12,7 @@
             font-family: 'Inter', sans-serif;
             @apply bg-gray-100 text-gray-800; /* Default light mode background and text */
         }
-        
+
         /* Custom styles for sidebar transition */
         .sidebar {
             transition: transform 0.3s ease-in-out;
@@ -76,128 +76,101 @@
         <nav class="flex-grow p-4">
             <ul>
                 {{-- Common Links for all authenticated users (e.g., Dashboard Overview) --}}
-                @if(auth()->check() && !auth()->user()->isAdmin())
-                    <li class="mb-2 mt-4 border-t border-gray-200 pt-4">
-                        <span class="text-xs font-semibold uppercase text-gray-500 px-3">Customer Panel</span>
-                    </li>
-                @else
+                @if(auth()->check() && auth()->user()->isAdmin())
                     <li class="mb-2 mt-4 border-t border-gray-200 pt-4">
                         <span class="text-xs font-semibold uppercase text-gray-500 px-3">Admin Panel</span>
                     </li>
+                @else
+                    <li class="mb-2 mt-4 border-t border-gray-200 pt-4">
+                        <span class="text-xs font-semibold uppercase text-gray-500 px-3">Customer Panel</span>
+                    </li>
                 @endif
                 <li>
-                    <a href="{{ route('dashboard') }}"
+                    <a href="{{ auth()->user()->isAdmin() ? route('admin.dashboard') : route('customer.dashboard') }}"
                        class="sidebar-item flex items-center p-3 rounded-lg font-medium transition-colors
                        {{ ($activeView ?? '') === 'dashboard' ? 'bg-yellow-500 text-white' : 'text-gray-600 hover:bg-yellow-100' }}">
                         <i class="fas fa-home mr-3 text-lg"></i>
-                        My Dashboard
+                        Dashboard
                     </a>
                 </li>
 
-                @if (auth()->user()->isAdmin())
-                    {{-- Admin-specific plot links --}}
+                {{-- Admin-specific links --}}
+                @if(auth()->check() && auth()->user()->isAdmin())
                     <li class="mb-2">
-                        <a href="{{ route('plots.index') }}" class="sidebar-item {{ (request()->routeIs('plots.*')) ? 'active bg-yellow-500 text-white' : 'text-gray-600 hover:bg-gray-200' }} flex items-center p-3 rounded-lg font-medium">
+                        <a href="{{ route('admin.plots.index') }}" class="sidebar-item {{ (request()->routeIs('admin.plots.*')) ? 'active bg-yellow-500 text-white' : 'text-gray-600 hover:bg-gray-200' }} flex items-center p-3 rounded-lg font-medium">
                             <i class="fas fa-th-list mr-3 text-lg"></i>
                             Manage Plots
                         </a>
                     </li>
                     <li class="mb-2">
-                        <a href="{{ route('plots.create') }}" class="sidebar-item {{ (request()->routeIs('plots.create')) ? 'active bg-yellow-500 text-white' : 'text-gray-600 hover:bg-yellow-100' }} flex items-center p-3 rounded-lg font-medium">
+                        <a href="{{ route('admin.plots.create') }}" class="sidebar-item {{ (request()->routeIs('admin.plots.create')) ? 'active bg-yellow-500 text-white' : 'text-gray-600 hover:bg-yellow-100' }} flex items-center p-3 rounded-lg font-medium">
                             <i class="fas fa-plus-square mr-3 text-lg"></i>
                             Add New Plot
                         </a>
                     </li>
                     <li class="mb-2">
-                        <a href="{{ route('inquiries.index') }}" class="sidebar-item {{ (request()->routeIs('inquiries.*')) ? 'active bg-yellow-500 text-white' : 'text-gray-600 hover:bg-yellow-100' }} flex items-center p-3 rounded-lg font-medium">
+                        <a href="{{ route('admin.inquiries.index') }}" class="sidebar-item {{ (request()->routeIs('admin.inquiries.*')) ? 'active bg-yellow-500 text-white' : 'text-gray-600 hover:bg-yellow-100' }} flex items-center p-3 rounded-lg font-medium">
                             <i class="fas fa-envelope-open-text mr-3 text-lg"></i>
                             Manage Inquiries
                         </a>
                     </li>
                     <li class="mb-2">
-                        <a href="{{ route('plots.pending') }}" class="sidebar-item {{ (request()->routeIs('plots.pending')) ? 'active bg-yellow-500 text-white' : 'text-gray-600 hover:bg-yellow-100' }} flex items-center p-3 rounded-lg font-medium">
+                        <a href="{{ route('admin.plots.pending') }}" class="sidebar-item {{ (request()->routeIs('admin.plots.pending')) ? 'active bg-yellow-500 text-white' : 'text-gray-600 hover:bg-yellow-100' }} flex items-center p-3 rounded-lg font-medium">
                             <i class="fas fa-check-circle mr-3 text-lg"></i>
                             Plot Approvals
                         </a>
                     </li>
-                @else
-                    {{-- Customer-specific plot links --}}
-                    <li class="mb-4">
-                        <a href="{{ route('customer.plots.index') }}" class="sidebar-item {{ (request()->routeIs('customer.plots.*')) ? 'active bg-yellow-500 text-white' : 'text-gray-600 hover:bg-yellow-100' }} flex items-center p-3 rounded-lg font-medium">
-                            <i class="fas fa-list-alt mr-3 text-lg"></i>
-                            All Plots
+                    <li class="mb-2">
+                        <a href="{{ route('admin.users.index') }}" class="sidebar-item {{ (request()->routeIs('admin.users.*')) ? 'active bg-yellow-500 text-white' : 'text-gray-600 hover:bg-yellow-100' }} flex items-center p-3 rounded-lg font-medium">
+                            <i class="fas fa-users mr-3 text-lg"></i>
+                            Manage Users
+                        </a>
+                    </li>
+                    <li class="mb-2">
+                        <a href="{{ route('admin.reservations.index') }}" class="sidebar-item {{ (request()->routeIs('admin.reservations.*')) ? 'active bg-yellow-500 text-white' : 'text-gray-600 hover:bg-yellow-100' }} flex items-center p-3 rounded-lg font-medium">
+                            <i class="fas fa-calendar-alt mr-3 text-lg"></i>
+                            Manage Reservations
                         </a>
                     </li>
                 @endif
-                
-                
 
-                {{-- Customer Specific Sidebar Items (Only for Non-Admins / Customers) --}}
-                {{-- These links are now only visible if the user is NOT an admin --}}
-                @if (auth()->check() && !auth()->user()->isAdmin())
+                {{-- Customer-specific links --}}
+                @if(auth()->check() && !auth()->user()->isAdmin())
                     <li class="mb-2">
-                        <a href="{{route('inquiries.index')}}" class="sidebar-item flex items-center p-3 rounded-lg text-gray-600 hover:bg-yellow-100 transition-colors">
-                            <i class="fas fa-question-circle mr-3 text-lg"></i>
-                            Inquiries
+                        <a href="{{ route('customer.plots.index') }}" class="sidebar-item {{ (request()->routeIs('customer.plots.*')) ? 'active bg-yellow-500 text-white' : 'text-gray-600 hover:bg-yellow-100' }} flex items-center p-3 rounded-lg font-medium">
+                            <i class="fas fa-list-alt mr-3 text-lg"></i>
+                            Browse Plots
                         </a>
                     </li>
-                    
-                   <li class="mb-2">
-                        <a href="{{ route('saved-plots.index') }}" class="sidebar-item flex items-center p-3 rounded-lg text-gray-600 hover:bg-yellow-100 transition-colors">
+                    <li class="mb-2">
+                        <a href="{{ route('customer.saved-plots.index') }}" class="sidebar-item {{ (request()->routeIs('customer.saved-plots.*')) ? 'active bg-yellow-500 text-white' : 'text-gray-600 hover:bg-yellow-100' }} flex items-center p-3 rounded-lg font-medium">
                             <i class="fas fa-bookmark mr-3 text-lg"></i>
                             Saved Plots
                         </a>
                     </li>
                     <li class="mb-2">
-                        <a href="{{ route('reservations.index') }}" class="sidebar-item flex items-center p-3 rounded-lg text-gray-600 hover:bg-yellow-100 transition-colors">
-                            <i class="fas fa-calendar-alt mr-3 text-lg"></i>
-                            Reservations
+                        <a href="{{ route('customer.reservations.index') }}" class="sidebar-item {{ (request()->routeIs('customer.reservations.*')) ? 'active bg-yellow-500 text-white' : 'text-gray-600 hover:bg-yellow-100' }} flex items-center p-3 rounded-lg font-medium">
+                            <i class="fas fa-calendar-check mr-3 text-lg"></i>
+                            My Reservations
+                        </a>
+                    </li>
+                    <li class="mb-2">
+                        <a href="{{ route('customer.inquiries.index') }}" class="sidebar-item {{ (request()->routeIs('customer.inquiries.*')) ? 'active bg-yellow-500 text-white' : 'text-gray-600 hover:bg-yellow-100' }} flex items-center p-3 rounded-lg font-medium">
+                            <i class="fas fa-envelope mr-3 text-lg"></i>
+                            My Inquiries
                         </a>
                     </li>
                 @endif
 
-                <li class="mb-2">
-                    <a href="{{route('customer.plots.show', auth()->user()->id)}}" class="sidebar-item flex items-center p-3 rounded-lg text-gray-600 hover:bg-yellow-100 transition-colors">
-                        <i class="fas fa-magnifying-glass-location mr-3 text-lg"></i>
-                        Manage Reviews
-                    </a>
-                </li>
 
+
+                {{-- Common Profile Link --}}
                 <li class="mb-2">
-                    <a href="#" class="sidebar-item flex items-center p-3 rounded-lg text-gray-600 hover:bg-yellow-100 transition-colors">
-                        <i class="fas fa-money-check-alt mr-3 text-lg"></i>
-                        Payment
-                    </a>
-                </li>
-                <li class="mb-2">
-                    <a href="{{route('user.edit', auth()->user()->id)}}" class="sidebar-item flex items-center p-3 rounded-lg text-gray-600 hover:bg-yellow-100 transition-colors">
+                    <a href="{{ route('profile.edit') }}" class="sidebar-item flex items-center p-3 rounded-lg text-gray-600 hover:bg-yellow-100 transition-colors">
                         <i class="fas fa-user mr-3 text-lg"></i>
                         Profile
                     </a>
                 </li>
-
-                {{-- End Customer Specific Sidebar Items --}}
-
-                {{-- Admin Specific Sidebar Items (Only for Admins) --}}
-                @if(auth()->check() && auth()->user()->isAdmin())
-
-                <li class="mb-2">
-                    <a href="{{ route('user.index') }}" class="sidebar-item {{ ($activeView ?? '') === 'admin_users_index' ? 'active bg-yellow-500 text-white' : 'text-gray-600 hover:bg-yellow-100' }} flex items-center p-3 rounded-lg font-medium transition-colors">
-                        <i class="fas fa-users mr-3 text-lg"></i>
-                        Manage Users
-                    </a>
-                </li>
-                <li class="mb-2">
-                    <a href="{{ route('dashboard', ['viewType' => 'admin', 'id' => 'settings']) }}" class="sidebar-item {{ ($activeView ?? '') === 'admin_settings_index' ? 'active bg-yellow-500 text-white' : 'text-gray-600 hover:bg-yellow-100' }} flex items-center p-3 rounded-lg font-medium transition-colors">
-                        <i class="fas fa-cog mr-3 text-lg"></i>
-                        Manage Settings
-                    </a>
-                </li>
-
-
-                {{-- Add more admin links here (e.g., Manage Users, Settings) --}}
-                @endif
-                {{-- End Admin Specific Sidebar Items --}}
 
                 <!-- Logout option moved to sidebar -->
                 <li class="mt-4 border-t border-gray-200 pt-4">
@@ -228,7 +201,7 @@
             </form>
 
             <div class="flex items-center space-x-4">
-                
+
                 <button class="p-2 rounded-full hover:bg-gray-200 icon-btn relative">
                     <i class="fas fa-bell text-lg"></i>
                     <span class="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-red-100  rounded-full">2</span>
@@ -275,7 +248,7 @@
             function toggleSidebar() { sidebar.classList.toggle('-translate-x-full'); mobileMenuOverlay.classList.toggle('hidden'); }
             window.toggleSidebar = toggleSidebar;
 
-            
+
 
             window.addEventListener('resize', () => { if (window.innerWidth >= 1024) { sidebar.classList.remove('-translate-x-full'); mobileMenuOverlay.classList.add('hidden'); } });
 

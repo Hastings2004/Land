@@ -12,17 +12,33 @@ class UserController extends Controller
     //
     public function index()
     {
+        $users = User::all();
+        return view('admin.users.index', compact('users'));
+    }
+
+    /**
+     * Show user's own profile edit form
+     */
+    public function editProfile()
+    {
         $user = Auth::user();
-        if ($user->role == 'admin') {
-            $users = User::all();
-            return view('admin.users.index', compact('users'));
-        }
+        return view('users.edit', compact('user'));
+    }
 
-        if ($user->role == 'customer') {
-            return view('components.profile', compact('user'));
-        }
+    /**
+     * Update user's own profile
+     */
+    public function updateProfile(Request $request)
+    {
+        $user = Auth::user();
+        $validated = $request->validate([
+            'username' => 'required|string|max:50',
+            'email' => 'required|email|max:50|unique:users,email,' . $user->id,
+            'phone_number' => 'required|numeric',
+        ]);
 
-        abort(403, 'Unauthorized action.');
+        $user->update($validated);
+        return redirect()->route('profile.edit')->with('success', 'Profile updated successfully.');
     }
 
     public function edit($id)
@@ -51,34 +67,22 @@ class UserController extends Controller
         return redirect()->route('user.edit', $editUser->id)->with('success', 'User details updated successfully.');
     }
 
-    public function changePassword(Request $request, $id)
+        public function changePassword(Request $request)
     {
         $user = Auth::user();
-        if ($user->role !== 'admin' && $user->id != $id) {
-            abort(403, 'Unauthorized action.');
-        }
-        
-        $editUser = User::findOrFail($id);
-        
-        // Admins don't need to provide the current password
-        if ($user->role === 'admin') {
-            $validated = $request->validate([
-                'password' => 'required|string|min:4|confirmed',
-            ]);
-        } else {
-            $validated = $request->validate([
-                'current_password' => 'required|string',
-                'password' => 'required|string|min:4|confirmed',
-            ]);
 
-            if (!Hash::check($validated['current_password'], $editUser->password)) {
-                return back()->withErrors(['current_password' => 'The provided current password does not match our records.']);
-            }
+        $validated = $request->validate([
+            'current_password' => 'required|string',
+            'password' => 'required|string|min:4|confirmed',
+        ]);
+
+        if (!Hash::check($validated['current_password'], $user->password)) {
+            return back()->withErrors(['current_password' => 'The provided current password does not match our records.']);
         }
-        
-        $editUser->password = Hash::make($validated['password']);
-        $editUser->save();
-        
-        return redirect()->route('user.edit', $editUser->id)->with('success', 'Password changed successfully.');
+
+        $user->password = Hash::make($validated['password']);
+        $user->save();
+
+        return redirect()->route('profile.edit')->with('success', 'Password changed successfully.');
     }
 }

@@ -8,20 +8,32 @@ use Illuminate\Http\Request;
 class DashboardController extends Controller
 {
     //
-    public function index(){
+    /**
+     * Main dashboard route - redirects based on user role
+     */
+    public function index()
+    {
         $user = auth()->user();
-        $stats = null;
-        $months = $totals = $categoryLabels = $categoryCounts = $scatterData = [];
-        $plotsMonths = $plotsCounts = $inquiriesMonths = $inquiriesCounts = $topViewedLabels = $topViewedCounts = [];
 
-        if ($user && $user->isAdmin()) {
+        if ($user->isAdmin()) {
+            return redirect()->route('admin.dashboard');
+        } else {
+            return redirect()->route('customer.dashboard');
+        }
+    }
+
+    /**
+     * Admin dashboard with comprehensive statistics
+     */
+    public function adminDashboard()
+    {
             $stats = [
                 'totalPlots' => \App\Models\Plot::count(),
                 'totalUsers' => \App\Models\User::count(),
                 'totalReservations' => \App\Models\Reservation::count(),
                 'totalInquiries' => \App\Models\Inquiries::count(),
                 'totalReviews' => \App\Models\Review::count(),
-                'totalRevenue' => \App\Models\Payment::sum('amount'), // Assumes 'amount' column exists
+            'totalRevenue' => \App\Models\Payment::sum('amount'),
             ];
 
             // Revenue per month for the last 12 months
@@ -30,6 +42,8 @@ class DashboardController extends Controller
                 ->groupBy('month')
                 ->orderBy('month')
                 ->get();
+
+        $months = $totals = [];
             $period = \Carbon\CarbonPeriod::create(now()->subMonths(11)->startOfMonth(), '1 month', now()->startOfMonth());
             foreach ($period as $date) {
                 $month = $date->format('Y-m');
@@ -59,6 +73,8 @@ class DashboardController extends Controller
                 ->groupBy('month')
                 ->orderBy('month')
                 ->get();
+
+        $plotsMonths = $plotsCounts = [];
             $plotsPeriod = \Carbon\CarbonPeriod::create(now()->subMonths(11)->startOfMonth(), '1 month', now()->startOfMonth());
             foreach ($plotsPeriod as $date) {
                 $month = $date->format('Y-m');
@@ -73,6 +89,8 @@ class DashboardController extends Controller
                 ->groupBy('month')
                 ->orderBy('month')
                 ->get();
+
+        $inquiriesMonths = $inquiriesCounts = [];
             $inquiriesPeriod = \Carbon\CarbonPeriod::create(now()->subMonths(11)->startOfMonth(), '1 month', now()->startOfMonth());
             foreach ($inquiriesPeriod as $date) {
                 $month = $date->format('Y-m');
@@ -81,11 +99,43 @@ class DashboardController extends Controller
                 $inquiriesCounts[] = $found ? (int)$found->count : 0;
             }
 
-            // Top 5 viewed plots (assumes 'views' column exists)
+        // Top 5 viewed plots
             $topViewed = \App\Models\Plot::orderByDesc('views')->take(5)->get(['title', 'views']);
             $topViewedLabels = $topViewed->pluck('title')->toArray();
             $topViewedCounts = $topViewed->pluck('views')->toArray();
-        }
-        return view('dashboard', compact('stats', 'months', 'totals', 'categoryLabels', 'categoryCounts', 'scatterData', 'plotsMonths', 'plotsCounts', 'inquiriesMonths', 'inquiriesCounts', 'topViewedLabels', 'topViewedCounts'));
+
+        return view('admin.dashboard', compact(
+            'stats', 'months', 'totals', 'categoryLabels', 'categoryCounts',
+            'scatterData', 'plotsMonths', 'plotsCounts', 'inquiriesMonths',
+            'inquiriesCounts', 'topViewedLabels', 'topViewedCounts'
+        ));
+    }
+
+    /**
+     * Customer dashboard with personal statistics
+     */
+    public function customerDashboard()
+    {
+        $user = auth()->user();
+
+        $stats = [
+            'savedPlots' => $user->savedPlots()->count(),
+            'reservations' => $user->reservations()->count(),
+            'inquiries' => \App\Models\Inquiries::where('email', $user->email)->count(),
+            'reviews' => $user->reviews()->count(),
+        ];
+
+        // Recent saved plots
+        $recentSavedPlots = $user->savedPlots()->latest()->take(5)->get();
+
+        // Active reservations
+        $activeReservations = $user->reservations()->where('status', 'active')->latest()->take(5)->get();
+
+        // Recent inquiries
+        $recentInquiries = \App\Models\Inquiries::where('email', $user->email)->latest()->take(5)->get();
+
+        return view('customer.dashboard', compact(
+            'stats', 'recentSavedPlots', 'activeReservations', 'recentInquiries'
+        ));
     }
 }

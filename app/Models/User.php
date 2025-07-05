@@ -23,8 +23,8 @@ class User extends Authenticatable implements CanResetPassword, MustVerifyEmail
         'username',
         'email',
         'phone_number',
-        'password', 
-        'role', 
+        'password',
+        'role',
     ];
 
     /**
@@ -48,14 +48,14 @@ class User extends Authenticatable implements CanResetPassword, MustVerifyEmail
         ];
     }
 
-    
+
     public function isAdmin(): bool
     {
         return $this->role === 'admin';
     }
 
     public function inquiries():HasMany{
-        return $this->hasMany(Inquiries::class);
+        return $this->hasMany(Inquiries::class, 'email', 'email');
     }
 
     public function savedPlots()

@@ -16,11 +16,15 @@ class Inquiries extends Model
         "email",
         "phone",
         "message",
-        "plote_id"
-        
+        "plot_id"
+
     ];
 
-    public function users() : BelongsTo {
-        return $this->belongsTo(User::class);        
+    public function user() : BelongsTo {
+        return $this->belongsTo(User::class, 'email', 'email');
+    }
+
+    public function plot() : BelongsTo {
+        return $this->belongsTo(Plot::class);
     }
 }
