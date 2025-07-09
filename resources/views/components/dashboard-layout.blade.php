@@ -819,7 +819,67 @@
             }, 4000);
         }
 
+        window.initSidebarHover = function() {
+            const sidebar = document.getElementById('sidebar');
+            const mobileMenuOverlay = document.getElementById('mobile-menu-overlay');
+            const hoverTrigger = document.getElementById('hover-trigger');
+            let sidebarOpen = false;
+            let hoverTimeout;
+
+            function openSidebar() {
+                sidebar.classList.remove('-translate-x-full');
+                sidebarOpen = true;
+            }
+
+            function closeSidebar() {
+                sidebar.classList.add('-translate-x-full');
+                sidebarOpen = false;
+            }
+
+            function toggleSidebar() { 
+                if (sidebarOpen) {
+                    closeSidebar();
+                } else {
+                    openSidebar();
+                }
+                mobileMenuOverlay.classList.toggle('hidden');
+            }
+            window.toggleSidebar = toggleSidebar;
+
+            // Hover functionality for desktop
+            if (window.innerWidth >= 1024 && hoverTrigger) {
+                hoverTrigger.onmouseenter = () => {
+                    clearTimeout(hoverTimeout);
+                    openSidebar();
+                };
+                sidebar.onmouseenter = () => {
+                    clearTimeout(hoverTimeout);
+                };
+                sidebar.onmouseleave = () => {
+                    hoverTimeout = setTimeout(() => {
+                        closeSidebar();
+                    }, 300);
+                };
+                hoverTrigger.onmouseleave = () => {
+                    hoverTimeout = setTimeout(() => {
+                        closeSidebar();
+                    }, 300);
+                };
+            }
+
+            // Mobile functionality
+            window.addEventListener('resize', () => { 
+                if (window.innerWidth >= 1024) { 
+                    closeSidebar();
+                    mobileMenuOverlay.classList.add('hidden'); 
+                } else {
+                    closeSidebar();
+                }
+            });
+        }
+        // Call on DOMContentLoaded
         window.addEventListener('DOMContentLoaded', function() {
+            window.initSidebarHover();
             const sidebar = document.getElementById('sidebar');
             const mobileMenuOverlay = document.getElementById('mobile-menu-overlay');
             const hoverTrigger = document.getElementById('hover-trigger');

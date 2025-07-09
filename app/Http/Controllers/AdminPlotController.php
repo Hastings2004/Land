@@ -132,7 +132,7 @@ class AdminPlotController extends Controller
             'area_sqm' => 'required|numeric|min:0',
             'location' => 'required|string|max:255',
             'category' => 'required|string|in:residential,commercial,industrial',
-            'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:10240',
+            'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:30720',
             'is_new_listing' => 'nullable', 
         ]);
 

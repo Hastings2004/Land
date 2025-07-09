@@ -230,8 +230,28 @@
 
                             </div>
                         @endif
+                        <!-- Hidden file input for images -->
+                        <input type="file" name="images[]" id="images" multiple class="hidden" />
                     </div>
-            </div>
+                    <script>
+                    // Make upload button or drag area clickable to open file input
+                    document.addEventListener('DOMContentLoaded', function() {
+                        const fileInput = document.getElementById('images');
+                        const uploadBtn = document.querySelector('button[onclick*="image-upload"]');
+                        const dragArea = document.getElementById('drag-area');
+                        if (uploadBtn) {
+                            uploadBtn.addEventListener('click', function(e) {
+                                e.preventDefault();
+                                fileInput.click();
+                            });
+                        }
+                        if (dragArea) {
+                            dragArea.addEventListener('click', function() {
+                                fileInput.click();
+                            });
+                        }
+                    });
+                    </script>
 
                 <!-- Price & Area -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">

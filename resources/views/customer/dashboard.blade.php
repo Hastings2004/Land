@@ -564,6 +564,35 @@
     </style>
 
     <script>
+        // Notification function for quick actions and other messages
+        function showNotification(message, type = 'info') {
+            let notification = document.getElementById('custom-notification');
+            if (!notification) {
+                notification = document.createElement('div');
+                notification.id = 'custom-notification';
+                notification.style.position = 'fixed';
+                notification.style.top = '30px';
+                notification.style.right = '30px';
+                notification.style.zIndex = 9999;
+                notification.style.minWidth = '200px';
+                notification.style.padding = '16px 24px';
+                notification.style.borderRadius = '8px';
+                notification.style.boxShadow = '0 4px 12px rgba(0,0,0,0.08)';
+                notification.style.fontWeight = 'bold';
+                notification.style.fontSize = '16px';
+                notification.style.transition = 'opacity 0.3s';
+                notification.style.opacity = 0;
+                document.body.appendChild(notification);
+            }
+            notification.textContent = message;
+            notification.style.background = type === 'success' ? '#facc15' : (type === 'error' ? '#f87171' : '#38bdf8');
+            notification.style.color = type === 'error' ? '#fff' : '#1e293b';
+            notification.style.opacity = 1;
+            setTimeout(() => {
+                notification.style.opacity = 0;
+            }, 1800);
+        }
+
         // Navigation function with loading state
         function navigateTo(url) {
             showNotification('Navigating...', 'info');

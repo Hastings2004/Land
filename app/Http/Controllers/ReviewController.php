@@ -22,20 +22,20 @@ class ReviewController extends Controller
 
         // Authorization Check:
         // 1. Check if the user has a "completed" reservation for this plot.
-        $canReview = $user->reservations()
-                          ->where('plot_id', $plot->id)
-                          ->where('status', 'completed')
-                          ->exists();
+        // $canReview = $user->reservations()
+        //                   ->where('plot_id', $plot->id)
+        //                   ->where('status', 'completed')
+        //                   ->exists();
 
-        if (!$canReview) {
-            return back()->with('error', 'You are not eligible to review this plot.');
-        }
+        // if (!$canReview) {
+        //     return back()->with('review_error', 'Sorry, you can only review plots you have completed a reservation for. Complete your reservation to leave a review!');
+        // }
 
         // 2. Check if the user has already reviewed this plot.
         $hasReviewed = $plot->reviews()->where('user_id', $user->id)->exists();
 
         if ($hasReviewed) {
-            return back()->with('error', 'You have already reviewed this plot.');
+            return back()->with('review_error', 'You have already submitted a review for this plot. Thank you for your feedback!');
         }
 
         Review::create([

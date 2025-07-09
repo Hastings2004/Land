@@ -127,17 +127,180 @@
                             <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                         @enderror
                     </div>
-            </div>
-                <!-- Images Upload Section -->
-                <div class="mb-6">
-                    <label class="block text-sm font-semibold text-gray-700 mb-1">Upload Images</label>
-                    <input type="file" name="images[]" id="images" multiple accept="image/*" class="block w-full text-sm text-gray-700 border border-yellow-300 rounded-lg cursor-pointer bg-yellow-50 focus:outline-none focus:ring-2 focus:ring-yellow-400">
-                    <div id="imagePreviewGallery" class="mt-4 flex flex-wrap gap-3"></div>
-                    <p class="text-xs text-gray-500 mt-2">Select all images at once (hold Ctrl or Shift). Max 10MB each.</p>
-                    @error('images.*')
-                        <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
-                    @enderror
                 </div>
+                <!-- Images Upload Section -->
+                <div class="md:col-span-2">
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">
+                        Upload Images <span class="text-xs text-gray-400">(Max 30MB each, multiple allowed)</span>
+                    </label>
+                    <div id="drop-area" class="flex flex-col items-center justify-center border-2 border-dashed border-yellow-400 rounded-lg p-6 bg-yellow-50 hover:bg-yellow-100 transition cursor-pointer mb-4">
+                        <i class="fas fa-cloud-upload-alt text-yellow-500 text-3xl mb-2"></i>
+                        <span class="text-gray-700 font-semibold mb-1">Drag & drop images here or</span>
+                        <label for="images" class="inline-flex items-center px-4 py-2 bg-yellow-500 text-white font-semibold rounded-lg shadow hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:ring-offset-2 transition-all duration-200 cursor-pointer">
+                            <i class="fas fa-upload mr-2"></i>
+                            <span>Select Images</span>
+                            <input type="file" id="images" name="images[]" multiple accept="image/*" class="hidden">
+                        </label>
+                        <span id="selected-files" class="text-sm text-gray-500 mt-2"></span>
+                    </div>
+                    <div id="image_preview" class="flex flex-wrap gap-4 mt-4"></div>
+                    <div id="image-upload-error" class="text-red-500 text-xs mt-2 hidden"></div>
+                </div>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const imageInput = document.getElementById('images');
+        const imagePreviewContainer = document.getElementById('image_preview');
+        const errorDiv = document.getElementById('image-upload-error');
+        const selectedFilesSpan = document.getElementById('selected-files');
+        const dropArea = document.getElementById('drop-area');
+        let filesArray = [];
+        let dragSrcIndex = null;
+
+        // Drag-and-drop events
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropArea.addEventListener(eventName, (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                dropArea.classList.add('bg-yellow-100');
+            });
+        });
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropArea.addEventListener(eventName, (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                dropArea.classList.remove('bg-yellow-100');
+            });
+        });
+        dropArea.addEventListener('drop', (e) => {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            handleFiles(files);
+        });
+
+        // File input change
+        imageInput.addEventListener('change', function() {
+            handleFiles(this.files);
+            this.value = '';
+        });
+
+        function handleFiles(fileList) {
+            errorDiv.classList.add('hidden');
+            let errorMessages = [];
+            let validFiles = [];
+            for (let i = 0; i < fileList.length; i++) {
+                const file = fileList[i];
+                if (!file.type.startsWith('image/')) {
+                    errorMessages.push(`"${file.name}" is not an image file.`);
+                    continue;
+                }
+                if (file.size > 30 * 1024 * 1024) {
+                    errorMessages.push(`"${file.name}" is larger than 30MB.`);
+                    continue;
+                }
+                // Prevent duplicates by name+size
+                if (!filesArray.some(f => f.name === file.name && f.size === file.size)) {
+                    validFiles.push(file);
+                }
+            }
+            filesArray = filesArray.concat(validFiles);
+            updatePreview();
+            if (filesArray.length > 0) {
+                selectedFilesSpan.textContent = filesArray.length === 1 ? filesArray[0].name : `${filesArray.length} files selected`;
+            } else {
+                selectedFilesSpan.textContent = '';
+            }
+            if (errorMessages.length > 0) {
+                errorDiv.innerHTML = errorMessages.join('<br>');
+                errorDiv.classList.remove('hidden');
+            }
+        }
+
+        function updatePreview() {
+            imagePreviewContainer.innerHTML = '';
+            filesArray.forEach((file, idx) => {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const imgDiv = document.createElement('div');
+                    imgDiv.className = 'relative w-24 h-24 rounded-lg overflow-hidden border border-yellow-300 shadow-sm bg-white flex items-center justify-center m-1 group';
+                    imgDiv.setAttribute('draggable', 'true');
+                    imgDiv.setAttribute('data-idx', idx);
+                    // Drag events for reordering
+                    imgDiv.addEventListener('dragstart', function(ev) {
+                        dragSrcIndex = idx;
+                        ev.dataTransfer.effectAllowed = 'move';
+                        this.classList.add('opacity-50');
+                    });
+                    imgDiv.addEventListener('dragend', function(ev) {
+                        this.classList.remove('opacity-50');
+                    });
+                    imgDiv.addEventListener('dragover', function(ev) {
+                        ev.preventDefault();
+                        this.classList.add('ring-2', 'ring-yellow-400');
+                    });
+                    imgDiv.addEventListener('dragleave', function(ev) {
+                        this.classList.remove('ring-2', 'ring-yellow-400');
+                    });
+                    imgDiv.addEventListener('drop', function(ev) {
+                        ev.preventDefault();
+                        this.classList.remove('ring-2', 'ring-yellow-400');
+                        if (dragSrcIndex !== null && dragSrcIndex !== idx) {
+                            const moved = filesArray.splice(dragSrcIndex, 1)[0];
+                            filesArray.splice(idx, 0, moved);
+                            updatePreview();
+                        }
+                        dragSrcIndex = null;
+                    });
+                    // Image
+                    const img = document.createElement('img');
+                    img.src = e.target.result;
+                    img.className = 'object-cover w-full h-full pointer-events-none';
+                    img.alt = 'Preview';
+                    imgDiv.appendChild(img);
+                    // Remove button
+                    const removeBtn = document.createElement('button');
+                    removeBtn.type = 'button';
+                    removeBtn.className = 'absolute top-1 right-1 bg-white bg-opacity-80 rounded-full p-1 text-red-500 hover:bg-red-100 transition group-hover:scale-110';
+                    removeBtn.title = 'Remove';
+                    removeBtn.innerHTML = '<i class="fas fa-times"></i>';
+                    removeBtn.onclick = function(e) {
+                        e.preventDefault();
+                        filesArray.splice(idx, 1);
+                        updatePreview();
+                        if (filesArray.length > 0) {
+                            selectedFilesSpan.textContent = filesArray.length === 1 ? filesArray[0].name : `${filesArray.length} files selected`;
+                        } else {
+                            selectedFilesSpan.textContent = '';
+                        }
+                    };
+                    imgDiv.appendChild(removeBtn);
+                    imagePreviewContainer.appendChild(imgDiv);
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        // On form submit, append all files in filesArray to FormData
+        const form = document.querySelector('form[action*="admin.plots.store"]');
+        form.addEventListener('submit', function(e) {
+            if (filesArray.length > 0) {
+                // Remove any existing file inputs
+                const oldInputs = form.querySelectorAll('input[type="file"][name="images[]"]');
+                oldInputs.forEach(i => i.remove());
+                // Create a new input for each file
+                filesArray.forEach((file, idx) => {
+                    const dt = new DataTransfer();
+                    dt.items.add(file);
+                    const fileInput = document.createElement('input');
+                    fileInput.type = 'file';
+                    fileInput.name = 'images[]';
+                    fileInput.files = dt.files;
+                    fileInput.style.display = 'none';
+                    form.appendChild(fileInput);
+                });
+            }
+        });
+    });
+    </script>
                 <!-- Submit Button -->
                 <div class="pt-2">
                     <button type="submit" id="submitBtn"
@@ -350,76 +513,31 @@
             
             // Dropzone.js Script
             // Dropzone.autoDiscover = false; // This line is no longer needed
-            // const dzPreviewContainer = document.getElementById('dzPreviewContainer'); // This line is no longer needed
-            // const customDropzone = document.getElementById('customDropzone'); // This line is no longer needed
-            // const mainForm = document.querySelector('form[action*="admin.plots.store"]'); // This line is no longer needed
-
-            // const myDropzone = new Dropzone(customDropzone, { // This block is no longer needed
-            //     url: '#', // Prevent auto-upload
-            //     autoProcessQueue: false,
-            //     uploadMultiple: true,
-            //     parallelUploads: 10,
-            //     maxFiles: 10,
-            //     maxFilesize: 10, // MB
-            //     acceptedFiles: 'image/*',
-            //     addRemoveLinks: false, // We'll use custom remove buttons
-            //     previewsContainer: dzPreviewContainer,
-            //     clickable: customDropzone,
-            //     previewTemplate: `<div class='dz-preview dz-image-preview relative group w-24 h-24 rounded-lg overflow-hidden border-2 border-yellow-300 bg-white shadow-md flex items-center justify-center'>
-            //         <img data-dz-thumbnail class='w-full h-full object-cover rounded-lg' />
-            //         <button type='button' class='absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center opacity-80 hover:opacity-100 transition' data-dz-remove title='Remove'><i class='fas fa-times text-xs'></i></button>
-            //     </div>`
-            // });
-
-            // // Custom remove button handler
-            // customDropzone.addEventListener('click', function(e) {
-            //     if (e.target.closest('[data-dz-remove]')) {
-            //         const preview = e.target.closest('.dz-preview');
-            //         if (preview) {
-            //             const file = preview.file;
-            //             myDropzone.removeFile(file);
-            //         }
-            //     }
-            // });
-
-            // // Responsive: adjust preview container layout
-            // function updatePreviewLayout() {
-            //     if (window.innerWidth < 640) {
-            //         dzPreviewContainer.classList.add('flex-col');
-            //         dzPreviewContainer.classList.remove('flex-wrap');
-            //     } else {
-            //         dzPreviewContainer.classList.remove('flex-col');
-            //         dzPreviewContainer.classList.add('flex-wrap');
-            //     }
-            // }
-            // window.addEventListener('resize', updatePreviewLayout);
-            // updatePreviewLayout();
+            // const myDropzone = new Dropzone("#dropzone", { // This line is no longer needed
+            //     url: "#", // Prevent auto-upload // This line is no longer needed
+            //     autoProcessQueue: false, // This line is no longer needed
+            //     uploadMultiple: true, // This line is no longer needed
+            //     parallelUploads: 10, // This line is no longer needed
+            //     maxFiles: 10, // This line is no longer needed
+            //     maxFilesize: 10, // MB // This line is no longer needed
+            //     acceptedFiles: 'image/*', // This line is no longer needed
+            //     addRemoveLinks: true, // This line is no longer needed
+            //     dictRemoveFile: 'Remove', // This line is no longer needed
+            //     previewsContainer: "#dropzone", // This line is no longer needed
+            //     clickable: true, // This line is no longer needed
+            // }); // This line is no longer needed
 
             // On form submit, append all Dropzone files to a hidden file input and submit natively
-            // mainForm.addEventListener('submit', function(e) { // This block is no longer needed
-            //     // Remove any previous hidden file input
-            //     const oldInput = document.getElementById('dz-hidden-upload');
-            //     if (oldInput) oldInput.remove();
-            //     if (myDropzone.files.length > 0) {
-            //         // Create a new hidden file input
-            //         const input = document.createElement('input');
-            //         input.type = 'file';
-            //         input.name = 'images[]';
-            //         input.id = 'dz-hidden-upload';
-            //         input.multiple = true;
-            //         // Create a DataTransfer to hold the files
-            //         const dataTransfer = new DataTransfer();
-            //         myDropzone.files.forEach(file => {
-            //             if (file.status === 'added' || file.status === 'queued') {
-            //                 dataTransfer.items.add(file);
-            //             }
-            //         });
-            //         input.files = dataTransfer.files;
-            //         input.style.display = 'none';
-            //         mainForm.appendChild(input);
-            //     }
-            //     // Allow the form to submit natively
-            // });
+            document.addEventListener('DOMContentLoaded', function() {
+                const form = document.querySelector('form[action*="admin.plots.store"]');
+                form.addEventListener('submit', function(e) {
+                // Remove any previous hidden file input
+                const oldInput = document.getElementById('dz-hidden-upload');
+                if (oldInput) oldInput.remove();
+                    // The new file input is now directly in the form, so we don't need to append it.
+                    // The formData will automatically include all files from the new input.
+                });
+            });
             
             function showSuccessToast(message) {
                 // Remove existing toast if any
@@ -580,46 +698,48 @@
             
             window.addEventListener('resize', adjustFormLayout);
             adjustFormLayout();
-
-            document.getElementById('images').addEventListener('change', function(e) {
-                const preview = document.getElementById('imagePreviewGallery');
-                preview.innerHTML = '';
-                Array.from(e.target.files).forEach(file => {
-                    if (!file.type.startsWith('image/')) return;
-                    const reader = new FileReader();
-                    reader.onload = function(ev) {
-                        const img = document.createElement('img');
-                        img.src = ev.target.result;
-                        img.className = 'w-24 h-24 object-cover rounded border shadow';
-                        preview.appendChild(img);
-                    };
-                    reader.readAsDataURL(file);
-                });
-            });
         });
     </script>
     <!-- Dropzone.js CSS -->
     <!-- Dropzone.js Script -->
-    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.9.3/min/dropzone.min.js"></script> -->
+    <!-- Dropzone.js CSS -->
     <style>
-        /* #customDropzone.dz-drag-hover { // This rule is no longer needed */
-        /*     background-color: #fef3c7; */
-        /*     border-color: #f59e0b; */
-        /* } */
-        /* #dzPreviewContainer .dz-preview { // This rule is no longer needed */
-        /*     margin-bottom: 0 !important; */
-        /*     margin-right: 0 !important; */
-        /* } */
-        /* #dzPreviewContainer .dz-preview .dz-progress { // This rule is no longer needed */
-        /*     display: none; */
-        /* } */
-        /* #dzPreviewContainer .dz-preview button[data-dz-remove] { // This rule is no longer needed */
-        /*     z-index: 20; */
-        /* } */
-        /* @media (max-width: 640px) { // This rule is no longer needed */
-        /*     #customDropzone { height: 16rem; } */
-        /*     #dzPreviewContainer { flex-direction: column; gap: 0.5rem; } */
-        /*     #dzPreviewContainer .dz-preview { width: 5rem; height: 5rem; } */
-        /* } */
+        /* The styles for Dropzone.js are no longer needed as the new file input is simpler. */
+        /*
+        .dropzone {
+            border: 2px dashed #f59e0b;
+            background: #fef9c3;
+            border-radius: 1rem;
+            min-height: 160px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            cursor: pointer;
+        }
+        .dropzone .dz-message {
+            color: #b45309;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+        .dropzone .dz-preview .dz-image img {
+            border-radius: 0.5rem;
+        }
+        #dzPreviewContainer .dz-preview {
+            margin-bottom: 0 !important;
+            margin-right: 0 !important;
+        }
+        #dzPreviewContainer .dz-preview .dz-progress {
+            display: none;
+        }
+        #dzPreviewContainer .dz-preview button[data-dz-remove] {
+            z-index: 20;
+        }
+        @media (max-width: 640px) {
+            #customDropzone { height: 16rem; }
+            #dzPreviewContainer { flex-direction: column; gap: 0.5rem; }
+            #dzPreviewContainer .dz-preview { width: 5rem; height: 5rem; }
+        }
+        */
     </style>
 </x-dashboard-layout>

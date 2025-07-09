@@ -203,17 +203,23 @@
                     </div>
 
                     <div class="p-4">
-                        @if($plot->plotImages->isNotEmpty())
-                            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                                @foreach($plot->plotImages as $plotImage)
-                                    <div class="relative group cursor-pointer" onclick="openImageModal('{{ $plotImage->image_url }}', '{{ $plot->title }}')">
-                                        <img src="{{ $plotImage->image_url }}" alt="Plot Image" 
-                                             class="w-full h-32 object-cover rounded-lg shadow-md group-hover:shadow-xl transition-all duration-300 group-hover:scale-105">
-                                        <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-300 rounded-lg flex items-center justify-center">
-                                            <i class="fas fa-expand text-white text-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></i>
+                        @if($plot->plotImages->count() > 0)
+                            <!-- Carousel for multiple images -->
+                            <div class="relative group w-full h-80 md:h-[28rem] bg-gray-100 flex items-center justify-center">
+                                <div id="admin-carousel" class="w-full h-full relative">
+                                    @foreach($plot->plotImages as $index => $image)
+                                        <img src="{{ $image->image_url }}" alt="{{ $image->alt_text ?: $plot->title }}" class="admin-carousel-img absolute inset-0 w-full h-full object-cover transition-opacity duration-700 {{ $index === 0 ? 'opacity-100 z-10' : 'opacity-0 z-0' }}" data-index="{{ $index }}">
+                                    @endforeach
+                                    @if($plot->plotImages->count() > 1)
+                                        <button onclick="adminPrevImage()" class="absolute left-4 top-1/2 -translate-y-1/2 bg-yellow-500/80 hover:bg-yellow-600 text-white rounded-full p-2 shadow-lg z-20"><i class="fas fa-chevron-left"></i></button>
+                                        <button onclick="adminNextImage()" class="absolute right-4 top-1/2 -translate-y-1/2 bg-yellow-500/80 hover:bg-yellow-600 text-white rounded-full p-2 shadow-lg z-20"><i class="fas fa-chevron-right"></i></button>
+                                        <div class="absolute bottom-4 left-1/2 -translate-x-1/2 flex space-x-2 z-20">
+                                            @foreach($plot->plotImages as $index => $image)
+                                                <span class="admin-carousel-dot w-3 h-3 rounded-full bg-white border-2 border-yellow-500 cursor-pointer {{ $index === 0 ? 'bg-yellow-500' : '' }}" data-index="{{ $index }}"></span>
+                                            @endforeach
                                         </div>
-                                    </div>
-                                @endforeach
+                                    @endif
+                                </div>
                             </div>
                         @elseif($plot->image_path)
                             <!-- Fallback for old single image -->
@@ -235,6 +241,47 @@
                         @endif
                     </div>
                 </div>
+
+                <script>
+                // Admin carousel logic (copied from customer view, adapted for admin)
+                document.addEventListener('DOMContentLoaded', function() {
+                    const images = document.querySelectorAll('.admin-carousel-img');
+                    const dots = document.querySelectorAll('.admin-carousel-dot');
+                    let currentIndex = 0;
+                    function showImage(idx) {
+                        images.forEach((img, i) => {
+                            img.classList.toggle('opacity-100', i === idx);
+                            img.classList.toggle('z-10', i === idx);
+                            img.classList.toggle('opacity-0', i !== idx);
+                            img.classList.toggle('z-0', i !== idx);
+                        });
+                        dots.forEach((dot, i) => {
+                            dot.classList.toggle('bg-yellow-500', i === idx);
+                            dot.classList.toggle('bg-white', i !== idx);
+                        });
+                        currentIndex = idx;
+                    }
+                    window.adminPrevImage = function() {
+                        let idx = currentIndex - 1;
+                        if (idx < 0) idx = images.length - 1;
+                        showImage(idx);
+                    };
+                    window.adminNextImage = function() {
+                        let idx = (currentIndex + 1) % images.length;
+                        showImage(idx);
+                    };
+                    dots.forEach((dot, i) => {
+                        dot.addEventListener('click', () => showImage(i));
+                    });
+                    if (images.length > 0) showImage(0);
+                    // Optional: auto-slide
+                    if (images.length > 1) {
+                        let autoSlide = setInterval(() => window.adminNextImage(), 4000);
+                        document.getElementById('admin-carousel').addEventListener('mouseenter', () => clearInterval(autoSlide));
+                        document.getElementById('admin-carousel').addEventListener('mouseleave', () => { autoSlide = setInterval(() => window.adminNextImage(), 4000); });
+                    }
+                });
+                </script>
 
                 <!-- Reviews Section -->
                 <div class="bg-white rounded-xl shadow-lg border border-yellow-100 mt-8 p-6">

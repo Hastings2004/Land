@@ -14,21 +14,7 @@
         </button>
     </div>
     <div class="max-w-4xl mx-auto py-8">
-        @if(session('success'))
-            <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-6" role="alert">
-                <span class="block sm:inline">{{ session('success') }}</span>
-            </div>
-        @endif
-        @if(session('error'))
-            <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-6" role="alert">
-                <span class="block sm:inline">{{ session('error') }}</span>
-            </div>
-        @endif
-        @if(session('info'))
-            <div class="bg-blue-100 border border-blue-400 text-blue-700 px-4 py-3 rounded relative mb-6" role="alert">
-                <span class="block sm:inline">{{ session('info') }}</span>
-            </div>
-        @endif
+        {{-- Remove unconditional success/error/info alerts at the top --}}
 
         <div class="bg-white rounded-xl shadow-lg overflow-hidden border border-yellow-200">
             <!-- Responsive Image Carousel -->
@@ -131,6 +117,35 @@
             <h2 class="text-2xl font-bold text-gray-800 mb-4 flex items-center gap-2">
                 <i class="fas fa-star text-yellow-500"></i> Customer Reviews
             </h2>
+            @if(session('review_error'))
+                <div id="review-error-popout" class="fixed left-1/2 top-0 mt-6 transform -translate-x-1/2 bg-red-500 text-white px-6 py-3 rounded-xl shadow-2xl z-50 animate-bounce-in flex items-center justify-center" style="max-width: 90vw; min-width: 260px; width: fit-content; font-size: 1rem;">
+                    <i class="fas fa-exclamation-triangle mr-3 text-lg"></i>
+                    <span class="font-semibold">{{ session('review_error') }}</span>
+                </div>
+                <script>
+                    setTimeout(function() {
+                        var el = document.getElementById('review-error-popout');
+                        if (el) el.style.display = 'none';
+                    }, 5000);
+                </script>
+            @elseif(session('success'))
+                <div id="review-success-popout" class="fixed top-4 right-4 bg-green-500 text-white px-4 py-3 rounded-lg shadow-lg z-50 animate-bounce-in flex items-center" style="max-width: 350px; width: auto;">
+                    <i class="fas fa-check-circle mr-2"></i>
+                    <span>{{ session('success') }}</span>
+                </div>
+                <script>
+                    setTimeout(function() {
+                        var el = document.getElementById('review-success-popout');
+                        if (el) el.style.display = 'none';
+                    }, 3000);
+                </script>
+            @endif
+            {{-- Remove the old top alert for success if review_error is present --}}
+            @if(session('success') && !session('review_error'))
+                <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-6" role="alert">
+                    <span class="block sm:inline">{{ session('success') }}</span>
+                </div>
+            @endif
             @if($plot->reviews->isEmpty())
                 <p class="text-gray-600">No reviews yet. Be the first to review this plot!</p>
             @else
@@ -171,25 +186,25 @@
                 @if($canReview)
                     <div class="mt-8 bg-white rounded-xl shadow-lg p-6">
                         <h2 class="text-2xl font-bold text-gray-800 mb-4">Leave a Review</h2>
-                        <form id="reviewForm" action="{{ url('customer/reviews') }}" method="POST">
+                        <form id="reviewForm" action="{{ url('customer/reviews') }}" method="POST" class="space-y-4">
                             @csrf
                             <input type="hidden" name="plot_id" value="{{ $plot->id }}">
                             <input type="hidden" name="rating" id="starRatingInput" value="5">
-                            <div class="mb-4">
+                            <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">Your Rating</label>
-                                <div id="starRating" class="flex items-center space-x-1 text-2xl cursor-pointer">
+                                <div id="starRating" class="flex items-center space-x-1 text-2xl cursor-pointer select-none">
                                     @for ($i = 1; $i <= 5; $i++)
-                                        <i class="fas fa-star text-yellow-400 star" data-value="{{ $i }}"></i>
+                                        <i class="fas fa-star text-yellow-400 star transition-transform duration-150 hover:scale-125 focus:scale-125 outline-none" data-value="{{ $i }}" tabindex="0"></i>
                                     @endfor
                                 </div>
                             </div>
-                            <div class="mb-4">
-                                <label for="comment" class="block text-sm font-medium text-gray-700">Your Comment</label>
-                                <textarea name="comment" id="comment" rows="4" maxlength="500" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-yellow-500 focus:ring-yellow-500"></textarea>
-                                <div class="text-xs text-gray-500 mt-1"><span id="charCount">0</span>/500 characters</div>
+                            <div class="relative">
+                                <label for="comment" class="block text-sm font-medium text-gray-700 mb-2">Your Comment</label>
+                                <textarea name="comment" id="comment" rows="5" maxlength="500" class="block w-full p-4 border border-gray-300 rounded-xl shadow-sm focus:border-yellow-500 focus:ring-2 focus:ring-yellow-400 focus:outline-none resize-none transition-all duration-200 text-gray-800 placeholder-gray-400" placeholder="Share your experience or feedback here..."></textarea>
+                                <span id="charCount" class="absolute top-3 right-4 text-xs text-gray-400 bg-white bg-opacity-80 px-2 rounded select-none pointer-events-none">0/500</span>
                             </div>
                             <div class="flex justify-end">
-                                <button type="submit" class="px-6 py-3 bg-yellow-500 text-white font-semibold rounded-lg hover:bg-yellow-600 transition-colors">Submit Review</button>
+                                <button type="submit" class="px-6 py-3 bg-yellow-500 text-white font-semibold rounded-lg hover:bg-yellow-600 focus:ring-2 focus:ring-yellow-400 transition-all duration-200 shadow-md">Submit Review</button>
                             </div>
                         </form>
                     </div>
@@ -199,16 +214,21 @@
                     const ratingInput = document.getElementById('starRatingInput');
                     let currentRating = 5;
                     stars.forEach((star, idx) => {
-                        star.addEventListener('mouseenter', () => {
-                            highlightStars(idx + 1);
-                        });
-                        star.addEventListener('mouseleave', () => {
-                            highlightStars(currentRating);
-                        });
+                        star.addEventListener('mouseenter', () => highlightStars(idx + 1));
+                        star.addEventListener('mouseleave', () => highlightStars(currentRating));
                         star.addEventListener('click', () => {
                             currentRating = idx + 1;
                             ratingInput.value = currentRating;
                             highlightStars(currentRating);
+                        });
+                        star.addEventListener('focus', () => highlightStars(idx + 1));
+                        star.addEventListener('blur', () => highlightStars(currentRating));
+                        star.addEventListener('keydown', (e) => {
+                            if (e.key === 'Enter' || e.key === ' ') {
+                                currentRating = idx + 1;
+                                ratingInput.value = currentRating;
+                                highlightStars(currentRating);
+                            }
                         });
                     });
                     function highlightStars(rating) {
@@ -222,9 +242,9 @@
                     const commentBox = document.getElementById('comment');
                     const charCount = document.getElementById('charCount');
                     commentBox.addEventListener('input', function() {
-                        charCount.textContent = this.value.length;
+                        charCount.textContent = this.value.length + '/500';
                     });
-                    // Toast confirmation
+                    // Toast confirmation (optional, can be removed if not needed)
                     document.getElementById('reviewForm').addEventListener('submit', function(e) {
                         setTimeout(() => {
                             showReviewToast('Thank you for your review!');
