@@ -182,19 +182,10 @@
         @auth
             @if(auth()->user()->role === 'customer')
                 @php
-                    // 1. Check if the user has already left a review
-            $hasReviewed = $plot->reviews()->where('user_id', Auth::id())->exists();
-
-            // 2. Check if the user has a completed reservation for this plot
-            $hasCompletedReservation = auth()->user()->reservations()
-                ->where('plot_id', $plot->id)
-                ->where('status', 'completed')
-                ->exists();
-
-            // The user can review only if they have a completed reservation AND haven't reviewed yet.
-            $canReview = $hasCompletedReservation && !$hasReviewed;
+                    // Only check if the user has already left a review
+                    $hasReviewed = $plot->reviews()->where('user_id', Auth::id())->exists();
                 @endphp
-                @if($canReview)
+                @if(!$hasReviewed)
                     <div class="mt-8 bg-white rounded-xl shadow-lg p-6">
                         <h2 class="text-2xl font-bold text-gray-800 mb-4">Leave a Review</h2>
                         <form id="reviewForm" action="{{ url('customer/reviews') }}" method="POST" class="space-y-4">
