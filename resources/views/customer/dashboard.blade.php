@@ -228,10 +228,10 @@
                                     </span>
                                 </div>
                                 <!-- Admin Name -->
-                                <div class="flex items-center text-xs text-gray-500">
+                                {{-- <div class="flex items-center text-xs text-gray-500">
                                     <i class="fas fa-user-shield text-yellow-500 mr-1"></i>
                                     Posted by: <span class="ml-1 font-semibold text-yellow-700">{{ $plot->admin->name ?? 'Admin' }}</span>
-                                </div>
+                                </div> --}}
                                 <!-- Price Section -->
                                 <div class="flex items-center justify-between pt-3 border-t border-yellow-200">
                                     <div class="flex-1">
