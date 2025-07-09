@@ -150,6 +150,9 @@
             @if($recommendedPlots->count() > 0)
                 <div class="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-4 md:gap-6">
                     @foreach($recommendedPlots as $plot)
+                        @php
+                            $isSaved = $plot->savedByUsers && $plot->savedByUsers->contains(auth()->id());
+                        @endphp
                         <div class="recommended-plot-card bg-gradient-to-br from-yellow-50 to-yellow-100 rounded-xl p-4 border border-yellow-200 hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 group cursor-pointer" 
                              onclick="window.location.href='{{ route('customer.plots.show', $plot->id) }}'">
                             <!-- Plot Image Carousel -->
@@ -194,12 +197,15 @@
                                     </span>
                                 </div>
                                 <!-- Quick Action Overlay -->
-                                <div class="absolute bottom-3 left-3 right-3 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-2 group-hover:translate-y-0">
+                                <div class="absolute bottom-3 left-3 right-3 opacity-100 transition-all duration-300 transform translate-y-2 group-hover:translate-y-0 z-20">
                                     <div class="flex space-x-2">
-                                        <button onclick="event.stopPropagation(); savePlot({{ $plot->id }})" 
-                                                class="flex-1 bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-2 rounded-lg font-medium text-sm transition-all duration-300 flex items-center justify-center shadow-lg">
-                                            <i class="fas fa-bookmark mr-1"></i>
-                                            Save
+                                        <button id="save-btn-{{ $plot->id }}"
+                                                onclick="event.stopPropagation(); savePlotUI({{ $plot->id }}, this)"
+                                                class="flex-1 px-3 py-2 rounded-lg font-medium text-sm transition-all duration-300 flex items-center justify-center shadow-lg
+                                                {{ $isSaved ? 'bg-green-500 text-white cursor-not-allowed' : 'bg-yellow-500 hover:bg-yellow-600 text-white' }}"
+                                                {{ $isSaved ? 'disabled' : '' }}>
+                                            <i class="fas {{ $isSaved ? 'fa-check' : 'fa-bookmark' }} mr-1"></i>
+                                            <span>{{ $isSaved ? 'Saved' : 'Save' }}</span>
                                         </button>
                                         <button onclick="event.stopPropagation(); sharePlot({{ $plot->id }})" 
                                                 class="bg-white hover:bg-gray-100 text-gray-700 px-3 py-2 rounded-lg font-medium text-sm transition-all duration-300 flex items-center justify-center shadow-lg">
@@ -900,5 +906,45 @@
             @endif
             @endforeach
         });
+
+        function savePlotUI(plotId, btn) {
+            if (btn.disabled) return;
+            btn.disabled = true;
+            btn.classList.remove('bg-yellow-500', 'hover:bg-yellow-600');
+            btn.classList.add('bg-green-500');
+            btn.innerHTML = '<i class="fas fa-check mr-1"></i>Saved';
+            const formData = new FormData();
+            formData.append('plot_id', plotId);
+            formData.append('_token', document.querySelector('meta[name="csrf-token"]').getAttribute('content'));
+            fetch('{{ route("customer.saved-plots.store") }}', {
+                method: 'POST',
+                body: formData,
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            })
+            .then(async response => {
+                if (response.status === 419 || response.status === 401 || response.status === 403) {
+                    showSavePlotModal('Session or permission error. Please log in again.', 'error', false);
+                    btn.disabled = false;
+                    btn.classList.remove('bg-green-500');
+                    btn.classList.add('bg-yellow-500', 'hover:bg-yellow-600');
+                    btn.innerHTML = '<i class="fas fa-bookmark mr-1"></i>Save';
+                    return;
+                }
+                let data;
+                try { data = await response.json(); } catch (e) { data = {}; }
+                if (data.success) {
+                    showSavePlotModal('Plot saved successfully!', 'success', true);
+                } else if (data.message) {
+                    showSavePlotModal(data.message, 'info', false);
+                }
+            })
+            .catch(() => {
+                showSavePlotModal('Network error. Please try again.', 'error', false);
+                btn.disabled = false;
+                btn.classList.remove('bg-green-500');
+                btn.classList.add('bg-yellow-500', 'hover:bg-yellow-600');
+                btn.innerHTML = '<i class="fas fa-bookmark mr-1"></i>Save';
+            });
+        }
     </script>
 </x-dashboard-layout>
