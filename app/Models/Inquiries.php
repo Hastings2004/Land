@@ -16,8 +16,9 @@ class Inquiries extends Model
         "email",
         "phone",
         "message",
-        "plot_id"
-
+        "plot_id",
+        "status",
+        "admin_response"
     ];
 
     public function user() : BelongsTo {

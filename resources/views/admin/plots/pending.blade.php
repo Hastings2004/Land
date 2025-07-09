@@ -28,13 +28,13 @@
                             <td class="px-6 py-4 whitespace-nowrap">{{ number_format($plot->area_sqm, 2) }}</td>
                             <td class="px-6 py-4 whitespace-nowrap">{{ $plot->location }}</td>
                             <td class="px-6 py-4 whitespace-nowrap flex gap-2">
-                                <form action="{{ route('plots.approve', $plot->id) }}" method="POST">
+                                <form action="{{ route('admin.plots.approve', $plot->id) }}" method="POST">
                                     @csrf
-                                    <button type="submit" class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded">Approve</button>
+                                    <button type="submit" class="px-3 py-1 bg-green-500 text-white rounded text-sm hover:bg-green-600">Approve</button>
                                 </form>
-                                <form action="{{ route('plots.reject', $plot->id) }}" method="POST">
+                                <form action="{{ route('admin.plots.reject', $plot->id) }}" method="POST">
                                     @csrf
-                                    <button type="submit" class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded">Reject</button>
+                                    <button type="submit" class="px-3 py-1 bg-red-500 text-white rounded text-sm hover:bg-red-600">Reject</button>
                                 </form>
                             </td>
                         </tr>

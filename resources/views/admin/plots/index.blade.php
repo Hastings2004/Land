@@ -1,141 +1,246 @@
 <x-dashboard-layout>
-    <!-- Page Title -->
-    <!-- Increased bottom margin for better separation from the search/filter section -->
-    <h2 class="text-3xl font-bold mb-10 text-yellow-700 text-center">Available Plots</h2>
+    <!-- Back Button -->
+    <div class="mb-6">
+        <a href="{{ route('dashboard') }}" 
+           class="inline-flex items-center px-4 py-2 bg-white text-gray-700 rounded-lg font-semibold text-sm border border-gray-300 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2 transition-all duration-200 transform hover:-translate-y-1">
+            <i class="fas fa-arrow-left mr-2"></i>
+            Back to Dashboard
+        </a>
+    </div>
 
-    <!-- Search and Filter Section -->
-    <div class="bg-white rounded-xl shadow-md p-6 mb-10 flex flex-col md:flex-row md:items-center md:justify-between gap-6">
-        <!-- Search Form with Icon -->
-        <form action="{{ route('dashboard', parameters: ['viewType' => 'plots']) }}" method="GET" class="w-full md:w-auto">
+    <!-- Page Header -->
+    <div class="mb-8 text-center">
+        <div class="inline-flex items-center justify-center w-16 h-16 bg-yellow-500 rounded-2xl shadow-xl mb-4 transform rotate-3 hover:rotate-0 transition-transform duration-300">
+            <i class="fas fa-map-marker-alt text-white text-xl"></i>
+        </div>
+        <h2 class="text-3xl font-bold text-gray-800 mb-2">
+            @if(request('search'))
+                Search Results for "{{ request('search') }}"
+            @else
+                Available Plots
+            @endif
+        </h2>
+        <p class="text-gray-500">
+            @if(request('search'))
+                Found {{ $plots->total() }} plot(s) matching your search
+            @else
+                Manage and view all your land plots
+            @endif
+        </p>
+    </div>
+
+    <!-- Search, Sort, Filter Section + Filters Panel (Alpine.js) -->
+    <div x-data="{ filtersOpen: false }" x-init="$nextTick(() => { filtersOpen = false })">
+        <div class="bg-white rounded-xl shadow p-4 md:p-6 mb-8 border border-gray-100">
+        <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between md:gap-6">
+            <!-- Search Form -->
+            <form action="{{ route('admin.plots.index') }}" method="GET" class="w-full md:w-auto flex-1">
             <div class="relative">
-                <input type="text" name="search" class="w-64 md:w-72 pl-10 pr-5 py-2 border border-yellow-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400 bg-white text-gray-800 placeholder-yellow-500 shadow-sm" placeholder="Search plots..." value="{{ request('search') }}">
-                <!-- Search Icon -->
-                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <svg class="h-5 w-5 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                    </svg>
+                    <input type="text" name="search" 
+                           class="w-full pl-12 pr-10 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 bg-gray-50 text-gray-800 placeholder-gray-500 transition-all duration-200 text-base md:text-sm" 
+                           placeholder="Search plots by title, location..." 
+                           value="{{ request('search') }}">
+                    <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                            <i class="fas fa-search text-yellow-500"></i>
                 </div>
+                    @if(request('search'))
+                        <a href="{{ route('admin.plots.index', array_merge(request()->except(['search', 'page']))) }}" 
+                               class="absolute inset-y-0 right-0 pr-4 flex items-center text-yellow-500 hover:text-yellow-700 transition-colors duration-200">
+                            <i class="fas fa-times"></i>
+                        </a>
+                    @endif
             </div>
         </form>
-
-        <!-- Filter Buttons -->
-        <div class="flex flex-wrap gap-3 w-full md:w-auto justify-end">
-            <a href="{{ route('dashboard', ['viewType' => 'plots', 'new_listings' => true]) }}" class="inline-flex items-center px-5 py-2 bg-yellow-400 border border-transparent rounded-md font-semibold text-xs text-yellow-900 uppercase tracking-widest hover:bg-yellow-500 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:ring-offset-2 transition ease-in-out duration-150 shadow-sm">
-                Show New Listings Only
-            </a>
-            <a href="{{ route('dashboard', ['viewType' => 'plots']) }}" class="inline-flex items-center px-5 py-2 bg-yellow-200 border border-transparent rounded-md font-semibold text-xs text-yellow-900 uppercase tracking-widest hover:bg-yellow-300 focus:bg-yellow-300 active:bg-yellow-400 focus:outline-none focus:ring-2 focus:ring-yellow-300 focus:ring-offset-2 transition ease-in-out duration-150 shadow-sm">
-                Clear Filters
-            </a>
+            <!-- Filter Button -->
+            <div class="flex flex-col sm:flex-row gap-3 w-full md:w-auto justify-end items-stretch md:items-center">
+                <button type="button" 
+                        @click="filtersOpen = !filtersOpen"
+                            :aria-expanded="filtersOpen ? 'true' : 'false'"
+                            aria-controls="filters-panel"
+                        class="inline-flex items-center px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-lg font-semibold text-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2 transition-all duration-200 shadow-sm">
+                        <i class="fas fa-filter mr-2 text-yellow-500"></i>
+                    Filters
+                        <i class="fas fa-chevron-down ml-2 text-xs transition-transform duration-200 text-yellow-500" :class="filtersOpen ? 'rotate-180' : ''"></i>
+                </button>
+                <a href="{{ route('admin.plots.index', ['new_listings' => true]) }}" 
+                       class="inline-flex items-center px-4 py-2 bg-yellow-500 text-white rounded-lg font-semibold text-sm hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2 transition-all duration-200 shadow-md hover:shadow-lg transform hover:-translate-y-1">
+                    <i class="fas fa-star mr-2"></i>
+                    New Listings
+                </a>
+            </div>
+        </div>
+    </div>
+    <!-- Filters Panel -->
+        <div class="mb-8">
+        <form action="{{ route('admin.plots.index') }}" method="GET" 
+                 id="filters-panel"
+             x-show="filtersOpen" 
+             x-cloak
+             x-transition:enter="transition ease-out duration-300"
+             x-transition:enter-start="transform opacity-0 -translate-y-4"
+             x-transition:enter-end="transform opacity-100 translate-y-0"
+             x-transition:leave="transition ease-in duration-200"
+             x-transition:leave-start="transform opacity-100 translate-y-0"
+             x-transition:leave-end="transform opacity-0 -translate-y-4"
+                 class="bg-white rounded-xl shadow p-6 border border-gray-100">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <!-- Status Filter -->
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Status</label>
+                    <select name="status" class="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500">
+                        <option value="">All Status</option>
+                        <option value="available" {{ request('status') === 'available' ? 'selected' : '' }}>Available</option>
+                        <option value="sold" {{ request('status') === 'sold' ? 'selected' : '' }}>Sold</option>
+                        <option value="pending" {{ request('status') === 'pending' ? 'selected' : '' }}>Pending</option>
+                    </select>
+                </div>
+                <!-- Category Filter -->
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Category</label>
+                    <select name="category" class="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500">
+                        <option value="">All Categories</option>
+                        <option value="residential" {{ request('category') === 'residential' ? 'selected' : '' }}>Residential</option>
+                        <option value="commercial" {{ request('category') === 'commercial' ? 'selected' : '' }}>Commercial</option>
+                        <option value="industrial" {{ request('category') === 'industrial' ? 'selected' : '' }}>Industrial</option>
+                    </select>
+                </div>
+                <!-- Price Range -->
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Price Range</label>
+                    <div class="flex gap-2">
+                        <input type="number" name="min_price" placeholder="Min" value="{{ request('min_price') }}" 
+                               class="flex-1 px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500">
+                        <input type="number" name="max_price" placeholder="Max" value="{{ request('max_price') }}" 
+                               class="flex-1 px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500">
+                    </div>
+                </div>
+                <!-- Area Range -->
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Area Range (sqm)</label>
+                    <div class="flex gap-2">
+                        <input type="number" name="min_area" placeholder="Min" value="{{ request('min_area') }}" 
+                               class="flex-1 px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500">
+                        <input type="number" name="max_area" placeholder="Max" value="{{ request('max_area') }}" 
+                               class="flex-1 px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500">
+                    </div>
+                </div>
+            </div>
+            <!-- Filter Actions -->
+            <div class="flex flex-col sm:flex-row gap-3 mt-6 pt-6 border-t border-gray-100">
+                <button type="submit" 
+                            @click="filtersOpen = false"
+                            class="inline-flex items-center px-6 py-2 bg-yellow-500 text-white rounded-lg font-semibold text-sm hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2 transition-all duration-200 shadow-md hover:shadow-lg transform hover:-translate-y-1">
+                    <i class="fas fa-search mr-2"></i>
+                    Apply Filters
+                </button>
+                <a href="{{ route('admin.plots.index') }}" 
+                       @click="filtersOpen = false"
+                       class="inline-flex items-center px-6 py-2 bg-white text-gray-700 rounded-lg font-semibold text-sm border border-gray-300 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2 transition-all duration-200">
+                    <i class="fas fa-times mr-2"></i>
+                    Clear All
+                </a>
+            </div>
+        </form>
         </div>
     </div>
 
     <!-- Plots Display Section -->
-    <!-- Adjusted padding for the main content area, slightly less than before for a more cohesive look -->
-    <div class="p-6 rounded-2xl shadow-xl bg-white">
+    <div class="bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden">
         @if($plots->isEmpty())
-            <!-- Alert for No Plots Available (Yellow themed) -->
-            <div class="alert bg-yellow-50 border border-yellow-500 text-yellow-700 px-6 py-4 rounded-lg flex items-center justify-center font-semibold">
-                <!-- Info Icon for the alert -->
-                <svg class="h-6 w-6 text-yellow-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                </svg>
-                No plots available matching your criteria.
+            <!-- No Plots Available -->
+            <div class="text-center py-16 px-6">
+                <div class="w-20 h-20 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-map-marker-alt text-yellow-600 text-2xl"></i>
+                </div>
+                <h3 class="text-xl font-semibold text-gray-800 mb-2">No Plots Found</h3>
+                <p class="text-gray-500 mb-6">No plots available matching your criteria.</p>
+                <a href="{{ route('admin.plots.create') }}" 
+                   class="inline-flex items-center px-6 py-3 bg-yellow-500 text-white rounded-lg font-semibold hover:bg-yellow-600 transition-all duration-200 shadow-md hover:shadow-lg transform hover:-translate-y-1">
+                    <i class="fas fa-plus mr-2"></i>
+                    Add New Plot
+                </a>
             </div>
         @else
-            <!-- Increased gap between plot cards for more visual breathing room -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+            <!-- Plots Grid -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 p-2 md:p-6">
                 @foreach($plots as $plot)
-                    <div class="relative bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 flex flex-col h-full border-2 border-yellow-200">
-                        @if($plot->is_new_listing)
-                            <!-- 'New' Badge with Sparkle Icon -->
-                            <div class="badge bg-yellow-500 text-white text-xs font-bold px-4 py-1 rounded-full absolute top-4 right-4 z-10 flex items-center shadow-md">
-                                <svg class="h-3 w-3 mr-1" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                                    <path fill-rule="evenodd" d="M10 2.5a.5.5 0 01.447.276l1.246 2.502 2.766.402a.5.5 0 01.277.854l-2 1.95.472 2.756a.5.5 0 01-.726.527L10 13.974l-2.463 1.295a.5.5 0 01-.726-.527l.472-2.756-2-1.95a.5.5 0 01.277-.854l2.766-.402L9.553 2.776A.5.5 0 0110 2.5z" clip-rule="evenodd"></path>
-                                </svg>
-                                New
+                    <div class="bg-white rounded-xl shadow-md hover:shadow-2xl transition-all duration-300 border border-gray-200 overflow-hidden group flex flex-col h-full cursor-pointer hover:-translate-y-1 hover:scale-[1.02] focus-within:shadow-2xl">
+                        <!-- Plot Images Carousel -->
+                        <div class="relative h-44 sm:h-48 md:h-52 bg-gray-100 overflow-hidden select-none">
+                            @if($plot->plotImages->isNotEmpty())
+                                @if($plot->plotImages->count() === 1)
+                                    <!-- Single Image -->
+                                    <img src="{{ $plot->plotImages->first()->image_url }}" 
+                                         alt="Plot Image" 
+                                         class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105">
+                                @else
+                                    <!-- Multiple Images with Carousel -->
+                                    <div class="relative h-full" x-data="{ current: 0, total: {{ $plot->plotImages->take(3)->count() }} }" @mouseenter="if(total>1){interval=setInterval(()=>{current=(current+1)%total},2000)}" @mouseleave="if(total>1){clearInterval(interval);current=0}">
+                                        @foreach($plot->plotImages->take(3) as $index => $plotImage)
+                                            <img src="{{ $plotImage->image_url }}" 
+                                                 alt="Plot Image {{ $index + 1 }}" 
+                                                 class="absolute inset-0 w-full h-full object-cover transition-opacity duration-500" 
+                                                 :class="current === {{ $index }} ? 'opacity-100 z-10' : 'opacity-0 z-0'">
+                                        @endforeach
+                                        <!-- Only show image counter if more than 1 image -->
+                                        <div class="absolute bottom-2 right-2 bg-yellow-500 text-white text-xs px-2 py-1 rounded-full">
+                                            {{ $plot->plotImages->count() }} images
+                                        </div>
                             </div>
                         @endif
-                        <!-- Plot Image -->
-                        <div class="w-full h-48 flex items-center justify-center mb-4 bg-yellow-50 rounded-lg overflow-hidden border border-yellow-100">
-                            @if(!empty($plot->image_path))
-                                <img src="{{ asset('storage/' . $plot->image_path) }}" alt="Plot Image" class="object-cover w-full h-full">
+                            @elseif($plot->image_path)
+                                <!-- Fallback for old single image -->
+                                <img src="{{ asset('storage/' . $plot->image_path) }}" 
+                                     alt="Plot Image" 
+                                     class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105">
                             @else
-                                <img src="https://via.placeholder.com/400x200?text=No+Image" alt="No Image" class="object-cover w-full h-full">
+                                <!-- No Image Placeholder -->
+                                <div class="w-full h-full flex items-center justify-center bg-yellow-50">
+                                    <div class="text-center">
+                                        <i class="fas fa-image text-yellow-300 text-3xl mb-2"></i>
+                                        <p class="text-yellow-400 font-semibold">No Image</p>
+                                    </div>
+                                </div>
                             @endif
-                        </div>
-                        <div class="p-6 flex-grow">
-                            <!-- Plot Title with Property Icon -->
-                            <h5 class="text-xl font-bold text-yellow-800 mb-3 flex items-center">
-                                <svg class="h-6 w-6 text-yellow-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
-                                </svg>
-                                {{ $plot->title }}
-                            </h5>
-                            <p class="text-gray-600 text-sm mb-4">{{ Str::limit($plot->description, 100) }}</p>
-                            <ul class="text-sm text-gray-700 space-y-2">
-                                <li class="flex justify-between items-center">
-                                    <span><strong class="text-yellow-600">Price:</strong></span>
-                                    <span>${{ number_format($plot->price, 2) }}</span>
-                                </li>
-                                <li class="flex justify-between items-center">
-                                    <span><strong class="text-yellow-600">Area:</strong></span>
-                                    <span>{{ number_format($plot->area_sqm, 2) }} sqm</span>
-                                </li>
-                                <li class="flex justify-between items-center">
-                                    <span><strong class="text-yellow-600">Location:</strong></span>
-                                    <span>{{ $plot->location }}</span>
-                                </li>
-                                <li class="flex justify-between items-center">
-                                    <span><strong class="text-yellow-600">Owner:</strong></span>
-                                    <span>{{ $plot->owner->name ?? 'N/A' }}</span>
-                                </li>
-                                <li class="flex justify-between items-center">
-                                    <span><strong class="text-yellow-600">Category:</strong></span>
-                                    <span>{{ $plot->category }}</span>
-                                </li>
-                                <li class="flex justify-between items-center">
-                                    <span><strong class="text-yellow-600">Listed:</strong></span>
-                                    <span>{{ $plot->created_at->format('M d, Y') }}</span>
-                                </li>
-                            </ul>
-                        </div>
-                        <div class="p-6 border-t border-yellow-100 flex items-center justify-between gap-3">
-                            <a href="{{ route('customer.plots.show', $plot->id) }}" class="flex-grow text-center px-4 py-2 bg-yellow-500 text-white rounded-md font-semibold text-sm uppercase tracking-widest hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2 transition ease-in-out duration-150">
-                                View Details
-                            </a>
-                            <!-- Save/Unsave Button with Icons -->
-                            @if(Auth::user()->savedPlots->contains($plot))
-                                <form action="{{ route('saved-plots.destroy', $plot->id) }}" method="POST">
+                                </div>
+                        <!-- Plot Info -->
+                        <div class="flex-1 flex flex-col p-4">
+                            <div class="flex items-center justify-between mb-2">
+                                <h3 class="text-lg font-bold text-gray-800 truncate">{{ $plot->title }}</h3>
+                                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 border border-yellow-200">
+                                    {{ ucfirst($plot->status) }}
+                                </span>
+                            </div>
+                            <div class="text-sm text-gray-500 mb-2 truncate">{{ $plot->location }}</div>
+                            <div class="flex items-center gap-2 mb-2">
+                                <span class="text-yellow-600 font-semibold">{{ number_format($plot->price) }} MWK</span>
+                                <span class="text-xs text-gray-400">/ {{ $plot->area }} sqm</span>
+                            </div>
+                            <div class="flex-1"></div>
+                            <div class="flex gap-2 mt-4">
+                                <a href="{{ route('admin.plots.show', $plot) }}" 
+                                   class="inline-flex items-center px-4 py-2 bg-white text-yellow-700 border border-yellow-300 rounded-lg font-semibold text-xs hover:bg-yellow-50 hover:text-yellow-900 transition-all duration-200">
+                                    <i class="fas fa-eye mr-1"></i> View
+                                </a>
+                                <a href="{{ route('admin.plots.edit', $plot) }}" 
+                                   class="inline-flex items-center px-4 py-2 bg-yellow-500 text-white rounded-lg font-semibold text-xs hover:bg-yellow-600 transition-all duration-200">
+                                    <i class="fas fa-edit mr-1"></i> Edit
+                                </a>
+                                <form action="{{ route('admin.plots.destroy', $plot) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this plot?');">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="p-2 rounded-full text-yellow-600 hover:bg-yellow-100 font-bold flex items-center" title="Unsave Plot">
-                                        <!-- Filled Bookmark Icon (Saved) -->
-                                        <svg class="h-5 w-5 mr-1" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                                            <path d="M5 4a2 2 0 012-2h6a2 2 0 012 2v14l-5-2.5L5 18V4z"></path>
-                                        </svg>
-                                        Saved
+                                    <button type="submit" class="inline-flex items-center px-4 py-2 bg-white text-red-600 border border-red-200 rounded-lg font-semibold text-xs hover:bg-red-50 hover:text-red-800 transition-all duration-200">
+                                        <i class="fas fa-trash mr-1"></i> Delete
                                     </button>
                                 </form>
-                            @else
-                                <form action="{{ route('saved-plots.store') }}" method="POST">
-                                    @csrf
-                                    <input type="hidden" name="plot_id" value="{{ $plot->id }}">
-                                    <button type="submit" class="p-2 rounded-full text-yellow-400 hover:bg-yellow-200 font-bold flex items-center" title="Save Plot">
-                                        <!-- Outline Bookmark Icon (Save) -->
-                                        <svg class="h-5 w-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"></path>
-                                        </svg>
-                                        Save
-                                    </button>
-                                </form>
-                            @endif
+                            </div>
                         </div>
                     </div>
                 @endforeach
             </div>
-            <!-- Pagination Links -->
-            <div class="mt-8 flex justify-center">
-                {{ $plots->appends(request()->query())->links() }}
+            <!-- Pagination -->
+            <div class="p-6">
+                {{ $plots->links() }}
             </div>
         @endif
     </div>

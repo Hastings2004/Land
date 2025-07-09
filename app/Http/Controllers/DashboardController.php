@@ -4,6 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Models\User;
+use App\Models\Plot;
+use App\Models\Reservation;
+use App\Models\Inquiries;
+use App\Models\Review;
+use App\Models\Payment;
 
 class DashboardController extends Controller
 {
@@ -13,7 +19,7 @@ class DashboardController extends Controller
      */
     public function index()
     {
-        $user = auth()->user();
+        $user = \Illuminate\Support\Facades\Auth::user();
 
         if ($user->isAdmin()) {
             return redirect()->route('admin.dashboard');
@@ -32,82 +38,56 @@ class DashboardController extends Controller
                 'totalUsers' => \App\Models\User::count(),
                 'totalReservations' => \App\Models\Reservation::count(),
                 'totalInquiries' => \App\Models\Inquiries::count(),
+                'newInquiries' => \App\Models\Inquiries::where('status', 'new')->count(),
                 'totalReviews' => \App\Models\Review::count(),
-            'totalRevenue' => \App\Models\Payment::sum('amount'),
             ];
 
-            // Revenue per month for the last 12 months
-            $revenueData = \App\Models\Payment::selectRaw('DATE_FORMAT(created_at, "%Y-%m") as month, SUM(amount) as total')
-                ->where('created_at', '>=', now()->subMonths(11)->startOfMonth())
-                ->groupBy('month')
-                ->orderBy('month')
+            // Plot status distribution
+            $statusData = \App\Models\Plot::selectRaw('status, COUNT(*) as count')
+                ->groupBy('status')
                 ->get();
-
-        $months = $totals = [];
-            $period = \Carbon\CarbonPeriod::create(now()->subMonths(11)->startOfMonth(), '1 month', now()->startOfMonth());
-            foreach ($period as $date) {
-                $month = $date->format('Y-m');
-                $months[] = $date->format('M Y');
-                $found = $revenueData->firstWhere('month', $month);
-                $totals[] = $found ? (float)$found->total : 0;
+            $statusLabels = $statusData->pluck('status')->toArray();
+            $statusCounts = $statusData->pluck('count')->toArray();
+            
+            // Fallback data if no status data exists
+            if (empty($statusLabels)) {
+                $statusLabels = ['No Data'];
+                $statusCounts = [1];
             }
 
-            // Plot category distribution
-            $categoryData = \App\Models\Plot::selectRaw('category, COUNT(*) as count')
-                ->groupBy('category')
+            // Inquiry status distribution
+            $inquiryStatusData = \App\Models\Inquiries::selectRaw('status, COUNT(*) as count')
+                ->groupBy('status')
                 ->get();
-            $categoryLabels = $categoryData->pluck('category')->toArray();
-            $categoryCounts = $categoryData->pluck('count')->toArray();
-
-            // Scatter plot data: price vs area
-            $scatterData = \App\Models\Plot::select('area_sqm', 'price')->get()->map(function($plot) {
-                return [
-                    'x' => (float)$plot->area_sqm,
-                    'y' => (float)$plot->price
-                ];
-            });
-
-            // New plots added per month (last 12 months)
-            $plotsData = \App\Models\Plot::selectRaw('DATE_FORMAT(created_at, "%Y-%m") as month, COUNT(*) as count')
-                ->where('created_at', '>=', now()->subMonths(11)->startOfMonth())
-                ->groupBy('month')
-                ->orderBy('month')
-                ->get();
-
-        $plotsMonths = $plotsCounts = [];
-            $plotsPeriod = \Carbon\CarbonPeriod::create(now()->subMonths(11)->startOfMonth(), '1 month', now()->startOfMonth());
-            foreach ($plotsPeriod as $date) {
-                $month = $date->format('Y-m');
-                $plotsMonths[] = $date->format('M Y');
-                $found = $plotsData->firstWhere('month', $month);
-                $plotsCounts[] = $found ? (int)$found->count : 0;
+            $inquiryStatusLabels = $inquiryStatusData->pluck('status')->toArray();
+            $inquiryStatusCounts = $inquiryStatusData->pluck('count')->toArray();
+            
+            // Fallback data if no inquiry status data exists
+            if (empty($inquiryStatusLabels)) {
+                $inquiryStatusLabels = ['No Data'];
+                $inquiryStatusCounts = [1];
             }
 
-            // Inquiries received per month (last 12 months)
-            $inquiriesData = \App\Models\Inquiries::selectRaw('DATE_FORMAT(created_at, "%Y-%m") as month, COUNT(*) as count')
-                ->where('created_at', '>=', now()->subMonths(11)->startOfMonth())
-                ->groupBy('month')
-                ->orderBy('month')
+            // Reservations status distribution
+            $reservationsData = \App\Models\Reservation::selectRaw('status, COUNT(*) as count')
+                ->groupBy('status')
                 ->get();
-
-        $inquiriesMonths = $inquiriesCounts = [];
-            $inquiriesPeriod = \Carbon\CarbonPeriod::create(now()->subMonths(11)->startOfMonth(), '1 month', now()->startOfMonth());
-            foreach ($inquiriesPeriod as $date) {
-                $month = $date->format('Y-m');
-                $inquiriesMonths[] = $date->format('M Y');
-                $found = $inquiriesData->firstWhere('month', $month);
-                $inquiriesCounts[] = $found ? (int)$found->count : 0;
+            $reservationsLabels = $reservationsData->pluck('status')->toArray();
+            $reservationsCounts = $reservationsData->pluck('count')->toArray();
+            
+            // Fallback data if no reservations data exists
+            if (empty($reservationsLabels)) {
+                $reservationsLabels = ['No Data'];
+                $reservationsCounts = [1];
             }
 
-        // Top 5 viewed plots
-            $topViewed = \App\Models\Plot::orderByDesc('views')->take(5)->get(['title', 'views']);
-            $topViewedLabels = $topViewed->pluck('title')->toArray();
-            $topViewedCounts = $topViewed->pluck('views')->toArray();
+        // Recent inquiries for admin dashboard
+        $recentInquiries = \App\Models\Inquiries::latest()->take(5)->get();
 
         return view('admin.dashboard', compact(
-            'stats', 'months', 'totals', 'categoryLabels', 'categoryCounts',
-            'scatterData', 'plotsMonths', 'plotsCounts', 'inquiriesMonths',
-            'inquiriesCounts', 'topViewedLabels', 'topViewedCounts'
+            'stats', 'statusLabels', 'statusCounts',
+            'inquiryStatusLabels', 'inquiryStatusCounts', 
+            'reservationsLabels', 'reservationsCounts', 'recentInquiries'
         ));
     }
 
@@ -116,7 +96,7 @@ class DashboardController extends Controller
      */
     public function customerDashboard()
     {
-        $user = auth()->user();
+        $user = \Illuminate\Support\Facades\Auth::user();
 
         $stats = [
             'savedPlots' => $user->savedPlots()->count(),
@@ -134,8 +114,167 @@ class DashboardController extends Controller
         // Recent inquiries
         $recentInquiries = \App\Models\Inquiries::where('email', $user->email)->latest()->take(5)->get();
 
+        // Recommended plots based on user preferences and market trends
+        $recommendedPlots = $this->getRecommendedPlots($user);
+
+        // Market insights data
+        $marketInsights = $this->getMarketInsights();
+
+        // Recent activity for the user
+        $recentActivity = $this->getRecentActivity($user);
+
         return view('customer.dashboard', compact(
-            'stats', 'recentSavedPlots', 'activeReservations', 'recentInquiries'
+            'stats', 'recentSavedPlots', 'activeReservations', 'recentInquiries',
+            'recommendedPlots', 'marketInsights', 'recentActivity'
         ));
+    }
+
+    /**
+     * Get recommended plots for the user
+     */
+    private function getRecommendedPlots($user)
+    {
+        // Always show the latest available plots uploaded by admins, not already saved by the user
+        $plots = \App\Models\Plot::where('status', 'available')
+            ->whereHas('user', function($q) {
+                $q->where('role', 'admin');
+            })
+            ->whereDoesntHave('savedByUsers', function($q) use ($user) {
+                $q->where('user_id', $user->id);
+            })
+            ->orderBy('created_at', 'desc')
+            ->take(6)
+            ->get();
+        return $plots;
+    }
+
+    /**
+     * Get market insights data
+     */
+    private function getMarketInsights()
+    {
+        // Calculate average price for plots uploaded by admins
+        $averagePrice = \App\Models\Plot::where('status', 'available')
+            ->whereHas('user', function($q) {
+                $q->where('role', 'admin');
+            })
+            ->avg('price') ?? 0;
+
+        // Get price change (compare current month vs last month) for admin plots
+        $currentMonthAvg = \App\Models\Plot::where('status', 'available')
+            ->whereHas('user', function($q) {
+                $q->where('role', 'admin');
+            })
+            ->whereMonth('created_at', now()->month)
+            ->avg('price') ?? 0;
+
+        $lastMonthAvg = \App\Models\Plot::where('status', 'available')
+            ->whereHas('user', function($q) {
+                $q->where('role', 'admin');
+            })
+            ->whereMonth('created_at', now()->subMonth()->month)
+            ->avg('price') ?? 0;
+
+        $priceChange = $lastMonthAvg > 0 ? (($currentMonthAvg - $lastMonthAvg) / $lastMonthAvg) * 100 : 0;
+
+        // Count new listings this week uploaded by admins
+        $newListingsThisWeek = \App\Models\Plot::where('status', 'available')
+            ->whereHas('user', function($q) {
+                $q->where('role', 'admin');
+            })
+            ->where('created_at', '>=', now()->subWeek())
+            ->count();
+
+        $newListingsLastWeek = \App\Models\Plot::where('status', 'available')
+            ->whereHas('user', function($q) {
+                $q->where('role', 'admin');
+            })
+            ->whereBetween('created_at', [now()->subWeeks(2), now()->subWeek()])
+            ->count();
+
+        $newListingsChange = $newListingsLastWeek > 0 ? (($newListingsThisWeek - $newListingsLastWeek) / $newListingsLastWeek) * 100 : 0;
+
+        // Calculate average days on market for admin plots
+        $avgDaysOnMarket = \App\Models\Plot::where('status', 'available')
+            ->whereHas('user', function($q) {
+                $q->where('role', 'admin');
+            })
+            ->whereNotNull('created_at')
+            ->get()
+            ->avg(function($plot) {
+                return $plot->created_at->diffInDays(now());
+            }) ?? 0;
+
+        $avgDaysOnMarketLastMonth = \App\Models\Plot::where('status', 'available')
+            ->whereHas('user', function($q) {
+                $q->where('role', 'admin');
+            })
+            ->whereNotNull('created_at')
+            ->where('created_at', '<=', now()->subMonth())
+            ->get()
+            ->avg(function($plot) {
+                return $plot->created_at->diffInDays(now()->subMonth());
+            }) ?? 0;
+
+        $daysOnMarketChange = $avgDaysOnMarketLastMonth > 0 ? (($avgDaysOnMarket - $avgDaysOnMarketLastMonth) / $avgDaysOnMarketLastMonth) * 100 : 0;
+
+        return [
+            'averagePrice' => number_format($averagePrice, 0),
+            'priceChange' => round($priceChange, 1),
+            'newListings' => $newListingsThisWeek,
+            'newListingsChange' => round($newListingsChange, 1),
+            'daysOnMarket' => round($avgDaysOnMarket),
+            'daysOnMarketChange' => round($daysOnMarketChange, 1),
+        ];
+    }
+
+    /**
+     * Get recent activity for the user
+     */
+    private function getRecentActivity($user)
+    {
+        $activities = collect();
+
+        // Recent saved plots
+        $recentSaved = $user->savedPlots()->latest()->take(2)->get();
+        foreach ($recentSaved as $plot) {
+            $activities->push([
+                'type' => 'saved_plot',
+                'message' => 'Plot saved successfully',
+                'time' => $plot->pivot->created_at ?? now(),
+                'icon' => 'check',
+                'color' => 'green'
+            ]);
+        }
+
+        // Recent inquiries
+        $recentInquiries = \App\Models\Inquiries::where('email', $user->email)
+            ->latest()
+            ->take(2)
+            ->get();
+        foreach ($recentInquiries as $inquiry) {
+            $activities->push([
+                'type' => 'inquiry',
+                'message' => 'Inquiry sent to agent',
+                'time' => $inquiry->created_at,
+                'icon' => 'envelope',
+                'color' => 'blue'
+            ]);
+        }
+
+        // Recent reservations
+        $recentReservations = $user->reservations()->latest()->take(2)->get();
+        foreach ($recentReservations as $reservation) {
+            $activities->push([
+                'type' => 'reservation',
+                'message' => 'Reservation confirmed',
+                'time' => $reservation->created_at,
+                'icon' => 'calendar',
+                'color' => 'purple'
+            ]);
+        }
+
+        // Sort by time and take the most recent 4
+        return $activities->sortByDesc('time')->take(4);
     }
 }

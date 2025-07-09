@@ -16,6 +16,14 @@ class CustomerPlotController extends Controller
     {
        $query = Plot::query();
 
+        // Only show plots uploaded by admins that are approved and available for customers
+        $query->whereHas('user', function($q) {
+                $q->where('role', 'admin');
+            })
+            ->where('status', '!=', 'pending')
+            ->where('status', '!=', 'rejected')
+            ->whereIn('status', ['available', 'reserved']);
+
         // Search
         if ($request->has('search')) {
             $query->where(function($q) use ($request) {
@@ -32,7 +40,7 @@ class CustomerPlotController extends Controller
 
         // Location filter
         if ($request->filled('location')) {
-            $query->where('location', $request->location);
+            $query->where('location', 'like', "%{$request->location}%");
         }
 
         // Price range filter
@@ -51,7 +59,7 @@ class CustomerPlotController extends Controller
             $query->where('area_sqm', '<=', $request->area_max);
         }
 
-        // Status filter
+        // Status filter (only available and reserved for customers)
         if ($request->filled('status')) {
             $query->where('status', $request->status);
         }
@@ -61,23 +69,66 @@ class CustomerPlotController extends Controller
             $query->where('is_new_listing', true);
         }
 
-        $plots = $query->latest()->paginate(9)->appends($request->except('page'));
+        // Get statistics for all approved plots (not filtered by search/filters)
+        $allPlotsQuery = Plot::whereHas('user', function($q) {
+                $q->where('role', 'admin');
+            })
+            ->where('status', '!=', 'pending')
+            ->where('status', '!=', 'rejected')
+            ->whereIn('status', ['available', 'reserved']);
 
-        // For dropdowns
+        $statistics = [
+            'total_plots' => $allPlotsQuery->count(),
+            'available_plots' => $allPlotsQuery->where('status', 'available')->count(),
+            'avg_price' => $allPlotsQuery->where('status', 'available')->avg('price') ?? 0,
+            'new_listings' => $allPlotsQuery->where('is_new_listing', true)->count(),
+        ];
+
+        // Order by newest first, then by views
+        $plots = $query->with(['plotImages' => function($q) {
+                        $q->orderBy('sort_order')->orderBy('is_primary', 'desc');
+                    }])
+                      ->orderBy('created_at', 'desc')
+                      ->orderBy('views', 'desc')
+                      ->paginate(9)
+                      ->appends($request->except('page'));
+
+        // For dropdowns - only show categories and locations from approved plots uploaded by admins
         $categories = ['residential', 'commercial', 'industrial'];
-        $locations = Plot::select('location')->distinct()->pluck('location');
-        $statuses = ['available', 'reserved', 'sold'];
+        $locations = Plot::whereHas('user', function($q) {
+                $q->where('role', 'admin');
+            })
+            ->where('status', '!=', 'pending')
+            ->where('status', '!=', 'rejected')
+            ->select('location')
+            ->distinct()
+            ->pluck('location');
+        $statuses = ['available', 'reserved'];
 
-        return view('customer.plots.index', compact('plots', 'categories', 'locations', 'statuses'));
+        return view('customer.plots.index', compact('plots', 'categories', 'locations', 'statuses', 'statistics'));
     }
     /**
      * Display the specified resource.
      */ 
     public function show(Plot $plot)
     {
+        // Check if plot was uploaded by an admin
+        if (!$plot->user || $plot->user->role !== 'admin') {
+            abort(404, 'Land plot not found or not available.');
+        }
+
+        // Check if plot is approved and available for customers
+        if ($plot->status === 'pending' || $plot->status === 'rejected') {
+            abort(404, 'Land plot not found or not available.');
+        }
+
+        // Check if plot is sold and user doesn't own it
         if ($plot->status === 'sold' && optional($plot->activeReservation)->user_id !== Auth::id()) {
             abort(404, 'Land plot not found or not available.');
         }
+
+        // Increment view count
+        $plot->increment('views');
 
         return view('customer.plots.show', compact('plot'));
     }

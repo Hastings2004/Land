@@ -10,6 +10,11 @@ class Plot extends Model
     /** @use HasFactory<\Database\Factories\PlotFactory> */
     use HasFactory;
     
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
     public function savedByUsers()
     {
         return $this->belongsToMany(User::class, 'saved_plots');
@@ -30,6 +35,21 @@ class Plot extends Model
         return $this->hasMany(Review::class);
     }
 
+    public function inquiries()
+    {
+        return $this->hasMany(Inquiries::class);
+    }
+
+    public function plotImages()
+    {
+        return $this->hasMany(PlotImage::class)->orderBy('sort_order');
+    }
+
+    public function primaryImage()
+    {
+        return $this->hasOne(PlotImage::class)->where('is_primary', true);
+    }
+
     protected $fillable = [
         'title',
         'description',
@@ -40,6 +60,7 @@ class Plot extends Model
         'is_new_listing',
         'category',
         'image_path',
+        'user_id',
     ];
     protected $casts = [
         'price' => 'decimal:2',

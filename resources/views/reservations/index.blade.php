@@ -48,7 +48,7 @@
                                     </td>
                                     <td class="px-6 py-4 border-b text-center">
                                         @if($reservation->status === 'active')
-                                            <form action="{{ route('reservations.destroy', $reservation->id) }}" method="POST">
+                                            <form action="{{ route('customer.reservations.destroy', $reservation->id) }}" method="POST">
                                                 @csrf
                                                 @method('DELETE')
                                                 <button type="submit" class="inline-block px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 font-semibold text-xs uppercase">Cancel</button>

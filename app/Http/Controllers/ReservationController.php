@@ -12,8 +12,21 @@ class ReservationController extends Controller
 {
     public function index()
     {
-        $reservations = Auth::user()->reservations()->with('plot')->latest()->paginate(10);
-        return view('customer.reservations.index', compact('reservations'));
+        $user = Auth::user();
+        $reservations = $user->reservations()->with('plot')->latest()->paginate(10);
+        
+        // Calculate real statistics for the customer
+        $stats = [
+            'total' => $user->reservations()->count(),
+            'active' => $user->reservations()->where('status', 'active')->count(),
+            'pending' => $user->reservations()->where('status', 'pending')->count(),
+            'approved' => $user->reservations()->where('status', 'approved')->count(),
+            'rejected' => $user->reservations()->where('status', 'rejected')->count(),
+            'expired' => $user->reservations()->where('status', 'expired')->count(),
+            'cancelled' => $user->reservations()->where('status', 'cancelled')->count(),
+        ];
+        
+        return view('customer.reservations.index', compact('reservations', 'stats'));
     }
 
     /**
@@ -22,7 +35,19 @@ class ReservationController extends Controller
     public function adminIndex()
     {
         $reservations = Reservation::with(['user', 'plot'])->latest()->paginate(15);
-        return view('admin.reservations.index', compact('reservations'));
+        
+        // Calculate real statistics for admin
+        $stats = [
+            'total' => Reservation::count(),
+            'active' => Reservation::where('status', 'active')->count(),
+            'pending' => Reservation::where('status', 'pending')->count(),
+            'approved' => Reservation::where('status', 'approved')->count(),
+            'rejected' => Reservation::where('status', 'rejected')->count(),
+            'expired' => Reservation::where('status', 'expired')->count(),
+            'cancelled' => Reservation::where('status', 'cancelled')->count(),
+        ];
+        
+        return view('admin.reservations.index', compact('reservations', 'stats'));
     }
 
     /**
@@ -78,7 +103,7 @@ class ReservationController extends Controller
         $plot->status = 'reserved';
         $plot->save();
 
-        return redirect()->route('reservations.index')->with('success', 'Plot reserved successfully! It will expire in 24 hours.');
+        return redirect()->route('customer.reservations.index')->with('success', 'Plot reserved successfully! It will expire in 24 hours.');
     }
 
     public function destroy(Reservation $reservation)

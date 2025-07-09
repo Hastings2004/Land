@@ -14,8 +14,8 @@ return new class extends Migration
         Schema::create('inquiries', function (Blueprint $table) {
             $table->id();
             $table->string("name");
-            $table->string("email")->unique();
-            $table->bigInteger("phone")->unique();
+            $table->string("email");
+            $table->bigInteger("phone")->nullable();
             $table->string("message");
             $table->foreignId("plot_id")->nullable()->constrained()->cascadeOnDelete();
             $table->enum("status", ["viewed", "new", "responded", "closed"])->default("new");

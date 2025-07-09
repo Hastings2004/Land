@@ -7,6 +7,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 class AuthController extends Controller
 {
 
@@ -70,9 +71,12 @@ class AuthController extends Controller
             // Automatically redirect based on user's actual role
             if($user->role === 'admin') {
                 return redirect()->route('admin.dashboard')->with('success', 'Welcome back, Admin!');
-            } else {
-                return redirect()->route('customer.dashboard')->with('success', 'Welcome back, ' . $user->username . '!');
-            }
+                    } else {
+            $successMessage = 'Welcome back, ' . $user->username . '!';
+            Log::info('Setting login success message: ' . $successMessage);
+            // Try session flash first, fallback to URL parameter
+            return redirect()->route('customer.dashboard')->with('success', $successMessage)->with('success_url', urlencode($successMessage));
+        }
 
         } else {
             return back()->withErrors([
@@ -85,6 +89,10 @@ class AuthController extends Controller
 
     //logout function
     public function logoutUser(Request $request){
+            // Get user info before logout for personalized message
+            $user = Auth::user();
+            $username = $user ? $user->username : 'User';
+            
             //logout user
             Auth::logout();
             //end the session
@@ -93,8 +101,19 @@ class AuthController extends Controller
             //regenerate CSRF token
             $request -> session()->regenerateToken();
 
-            //redirect to the home page
-            return redirect()->route('login')->with('success', 'You are logged out successfully');
+            //redirect to the home page with personalized message
+            $messages = [
+                'Goodbye, ' . $username . '! 👋 You have been logged out successfully. We hope to see you again soon!',
+                'See you later, ' . $username . '! ✨ Your session has ended. Come back anytime!',
+                'Farewell, ' . $username . '! 🌟 You are now logged out. Thanks for using ATSOGO!',
+                'Until next time, ' . $username . '! 🚀 You have been successfully logged out.',
+                'Take care, ' . $username . '! 💫 You are now logged out. We\'ll be here when you return!'
+            ];
+            
+            $randomMessage = $messages[array_rand($messages)];
+            Log::info('Setting logout success message: ' . $randomMessage);
+            // Try session flash first, fallback to URL parameter
+            return redirect()->route('login')->with('success', $randomMessage)->with('success_url', urlencode($randomMessage));
 
 }
 
