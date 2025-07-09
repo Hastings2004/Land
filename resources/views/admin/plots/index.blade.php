@@ -168,41 +168,31 @@
                         <!-- Plot Images Carousel -->
                         <div class="relative h-44 sm:h-48 md:h-52 bg-gray-100 overflow-hidden select-none">
                             @if($plot->plotImages->isNotEmpty())
-                                @if($plot->plotImages->count() === 1)
-                                    <!-- Single Image -->
-                                    <img src="{{ $plot->plotImages->first()->image_url }}" 
-                                         alt="Plot Image" 
-                                         class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105">
-                                @else
-                                    <!-- Multiple Images with Carousel -->
-                                    <div class="relative h-full" x-data="{ current: 0, total: {{ $plot->plotImages->take(3)->count() }} }" @mouseenter="if(total>1){interval=setInterval(()=>{current=(current+1)%total},2000)}" @mouseleave="if(total>1){clearInterval(interval);current=0}">
-                                        @foreach($plot->plotImages->take(3) as $index => $plotImage)
-                                            <img src="{{ $plotImage->image_url }}" 
-                                                 alt="Plot Image {{ $index + 1 }}" 
-                                                 class="absolute inset-0 w-full h-full object-cover transition-opacity duration-500" 
-                                                 :class="current === {{ $index }} ? 'opacity-100 z-10' : 'opacity-0 z-0'">
-                                        @endforeach
-                                        <!-- Only show image counter if more than 1 image -->
-                                        <div class="absolute bottom-2 right-2 bg-yellow-500 text-white text-xs px-2 py-1 rounded-full">
-                                            {{ $plot->plotImages->count() }} images
+                                <div class="relative w-full h-full">
+                                    @foreach($plot->plotImages as $index => $image)
+                                        <img src="{{ $image->image_url }}" alt="{{ $image->alt_text ?: $plot->title }}" class="carousel-img-{{ $plot->id }} absolute inset-0 w-full h-full object-cover transition-opacity duration-700 {{ $index === 0 ? 'opacity-100 z-10' : 'opacity-0 z-0' }}" data-index="{{ $index }}">
+                                    @endforeach
+                                    @if($plot->plotImages->count() > 1)
+                                        <button type="button" onclick="window.prevCarouselImage({{ $plot->id }})" class="absolute left-2 top-1/2 -translate-y-1/2 bg-yellow-500/80 hover:bg-yellow-600 text-white rounded-full p-2 shadow-lg z-20"><i class="fas fa-chevron-left"></i></button>
+                                        <button type="button" onclick="window.nextCarouselImage({{ $plot->id }})" class="absolute right-2 top-1/2 -translate-y-1/2 bg-yellow-500/80 hover:bg-yellow-600 text-white rounded-full p-2 shadow-lg z-20"><i class="fas fa-chevron-right"></i></button>
+                                        <div class="absolute bottom-2 left-1/2 -translate-x-1/2 flex space-x-2 z-20">
+                                            @foreach($plot->plotImages as $index => $image)
+                                                <span class="carousel-dot-{{ $plot->id }} w-2 h-2 rounded-full bg-white border-2 border-yellow-500 cursor-pointer {{ $index === 0 ? 'bg-yellow-500' : '' }}" data-index="{{ $index }}"></span>
+                                            @endforeach
                                         </div>
-                            </div>
-                        @endif
+                                    @endif
+                                </div>
                             @elseif($plot->image_path)
-                                <!-- Fallback for old single image -->
-                                <img src="{{ asset('storage/' . $plot->image_path) }}" 
-                                     alt="Plot Image" 
-                                     class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105">
+                                <img src="{{ asset('storage/' . $plot->image_path) }}" alt="Plot Image" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105">
                             @else
-                                <!-- No Image Placeholder -->
                                 <div class="w-full h-full flex items-center justify-center bg-yellow-50">
                                     <div class="text-center">
                                         <i class="fas fa-image text-yellow-300 text-3xl mb-2"></i>
-                                        <p class="text-yellow-400 font-semibold">No Image</p>
+                                        <p class="text-xs text-gray-400">No Image</p>
                                     </div>
                                 </div>
                             @endif
-                                </div>
+                        </div>
                         <!-- Plot Info -->
                         <div class="flex-1 flex flex-col p-4">
                             <div class="flex items-center justify-between mb-2">
@@ -245,3 +235,51 @@
         @endif
     </div>
 </x-dashboard-layout>
+<script>
+window.prevCarouselImage = function(plotId) {
+    const imgs = document.querySelectorAll('.carousel-img-' + plotId);
+    const dots = document.querySelectorAll('.carousel-dot-' + plotId);
+    let idx = Array.from(imgs).findIndex(img => img.classList.contains('opacity-100'));
+    imgs[idx].classList.remove('opacity-100', 'z-10');
+    imgs[idx].classList.add('opacity-0', 'z-0');
+    dots[idx].classList.remove('bg-yellow-500');
+    idx = (idx - 1 + imgs.length) % imgs.length;
+    imgs[idx].classList.add('opacity-100', 'z-10');
+    imgs[idx].classList.remove('opacity-0', 'z-0');
+    dots[idx].classList.add('bg-yellow-500');
+}
+window.nextCarouselImage = function(plotId) {
+    const imgs = document.querySelectorAll('.carousel-img-' + plotId);
+    const dots = document.querySelectorAll('.carousel-dot-' + plotId);
+    let idx = Array.from(imgs).findIndex(img => img.classList.contains('opacity-100'));
+    imgs[idx].classList.remove('opacity-100', 'z-10');
+    imgs[idx].classList.add('opacity-0', 'z-0');
+    dots[idx].classList.remove('bg-yellow-500');
+    idx = (idx + 1) % imgs.length;
+    imgs[idx].classList.add('opacity-100', 'z-10');
+    imgs[idx].classList.remove('opacity-0', 'z-0');
+    dots[idx].classList.add('bg-yellow-500');
+}
+document.addEventListener('DOMContentLoaded', function() {
+    @foreach($plots as $plot)
+    @if($plot->plotImages->count() > 1)
+    (function() {
+        const plotId = {{ $plot->id }};
+        const imgs = document.querySelectorAll('.carousel-img-' + plotId);
+        const dots = document.querySelectorAll('.carousel-dot-' + plotId);
+        dots.forEach((dot, i) => {
+            dot.onclick = function(e) {
+                imgs.forEach((img, j) => {
+                    img.classList.toggle('opacity-100', j === i);
+                    img.classList.toggle('z-10', j === i);
+                    img.classList.toggle('opacity-0', j !== i);
+                    img.classList.toggle('z-0', j !== i);
+                    dots[j].classList.toggle('bg-yellow-500', j === i);
+                });
+            };
+        });
+    })();
+    @endif
+    @endforeach
+});
+</script>

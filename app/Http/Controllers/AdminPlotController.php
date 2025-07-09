@@ -154,6 +154,7 @@ class AdminPlotController extends Controller
                     
                     // Create plot image record
                     $plot->plotImages()->create([
+                        'plot_id' => $plot->id,
                         'image_path' => $imagePath,
                         'alt_text' => $plot->title . ' - Image ' . $sortOrder,
                         'sort_order' => $sortOrder,
@@ -234,31 +235,33 @@ class AdminPlotController extends Controller
         $validated['user_id'] = $user->id;
         $plot->update($validated);
 
-        // Handle image uploads
-        if ($request->hasFile('images')) {
-            $sortOrder = $plot->plotImages()->max('sort_order') ?? 0;
-            
-            foreach ($request->file('images') as $image) {
-                $imagePath = $image->store('plots', 'public');
-                
-                $plot->plotImages()->create([
-                    'image_path' => $imagePath,
-                    'sort_order' => ++$sortOrder,
-                    'is_primary' => false,
-                ]);
-            }
-        }
-
-        // Handle removed images
+        // Remove images marked for removal
         if ($request->has('removed_images')) {
             foreach ($request->removed_images as $removedImagePath) {
                 $plotImage = $plot->plotImages()->where('image_path', $removedImagePath)->first();
                 if ($plotImage) {
                     // Delete the file from storage
-                    if (Storage::disk('public')->exists($removedImagePath)) {
-                        Storage::disk('public')->delete($removedImagePath);
+                    if (\Storage::disk('public')->exists($removedImagePath)) {
+                        \Storage::disk('public')->delete($removedImagePath);
                     }
                     $plotImage->delete();
+                }
+            }
+        }
+
+        // Only add new images (do not re-add existing images)
+        if ($request->hasFile('images')) {
+            $sortOrder = $plot->plotImages()->max('sort_order') ?? 0;
+            foreach ($request->file('images') as $image) {
+                if ($image->isValid()) {
+                    $imagePath = $image->store('plots', 'public');
+                    $plot->plotImages()->create([
+                        'plot_id' => $plot->id,
+                        'image_path' => $imagePath,
+                        'alt_text' => $plot->title . ' - Image ' . ($sortOrder + 1),
+                        'sort_order' => ++$sortOrder,
+                        'is_primary' => false,
+                    ]);
                 }
             }
         }

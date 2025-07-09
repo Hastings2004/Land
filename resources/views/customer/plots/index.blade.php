@@ -198,25 +198,29 @@
                     <!-- Plot Images Carousel -->
                     <div class="relative overflow-hidden">
                         <div class="plot-carousel-{{ $plot->id }} w-full h-48">
-                            @if($plot->plotImages->count() > 0)
-                                @foreach($plot->plotImages as $index => $image)
-                                    <div class="carousel-slide {{ $index === 0 ? 'active' : '' }} absolute inset-0 transition-opacity duration-500">
-                                        <img src="{{ $image->image_url }}" 
-                                             alt="{{ $image->alt_text ?: $plot->title }}"
-                                             class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
-                                    </div>
-                                @endforeach
-                            @elseif($plot->image_path)
-                                <div class="carousel-slide active absolute inset-0 transition-opacity duration-500">
-                                    <img src="{{ asset('storage/' . $plot->image_path) }}"
-                                         alt="{{ $plot->title }}"
-                                         class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
+                            @if($plot->plotImages->isNotEmpty())
+                                <div class="relative w-full h-full">
+                                    @foreach($plot->plotImages as $index => $image)
+                                        <img src="{{ $image->image_url }}" alt="{{ $image->alt_text ?: $plot->title }}" class="carousel-img-{{ $plot->id }} absolute inset-0 w-full h-full object-cover transition-opacity duration-700 {{ $index === 0 ? 'opacity-100 z-10' : 'opacity-0 z-0' }}" data-index="{{ $index }}">
+                                    @endforeach
+                                    @if($plot->plotImages->count() > 1)
+                                        <button type="button" onclick="window.prevCarouselImage({{ $plot->id }})" class="absolute left-2 top-1/2 -translate-y-1/2 bg-yellow-500/80 hover:bg-yellow-600 text-white rounded-full p-2 shadow-lg z-20"><i class="fas fa-chevron-left"></i></button>
+                                        <button type="button" onclick="window.nextCarouselImage({{ $plot->id }})" class="absolute right-2 top-1/2 -translate-y-1/2 bg-yellow-500/80 hover:bg-yellow-600 text-white rounded-full p-2 shadow-lg z-20"><i class="fas fa-chevron-right"></i></button>
+                                        <div class="absolute bottom-2 left-1/2 -translate-x-1/2 flex space-x-2 z-20">
+                                            @foreach($plot->plotImages as $index => $image)
+                                                <span class="carousel-dot-{{ $plot->id }} w-2 h-2 rounded-full bg-white border-2 border-yellow-500 cursor-pointer {{ $index === 0 ? 'bg-yellow-500' : '' }}" data-index="{{ $index }}"></span>
+                                            @endforeach
+                                        </div>
+                                    @endif
                                 </div>
+                            @elseif($plot->image_path)
+                                <img src="{{ asset('storage/' . $plot->image_path) }}" alt="Plot Image" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105">
                             @else
-                                <div class="carousel-slide active absolute inset-0 transition-opacity duration-500">
-                                    <img src="https://placehold.co/400x250"
-                                         alt="{{ $plot->title }}"
-                                         class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
+                                <div class="w-full h-full flex items-center justify-center bg-yellow-50">
+                                    <div class="text-center">
+                                        <i class="fas fa-image text-yellow-300 text-3xl mb-2"></i>
+                                        <p class="text-xs text-gray-400">No Image</p>
+                                    </div>
                                 </div>
                             @endif
                         </div>

@@ -316,6 +316,9 @@
             const dragArea = document.getElementById('drag-area');
             const fileInput = document.getElementById('image-upload');
             const previewContainer = document.getElementById('image-preview-container');
+            let filesArray = [];
+
+            // Drag-and-drop events
             ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
                 dragArea.addEventListener(eventName, preventDefaults, false);
             });
@@ -326,56 +329,80 @@
             function unhighlight(e) { dragArea.classList.remove('dragover'); }
             dragArea.addEventListener('drop', handleDrop, false);
             function handleDrop(e) { const dt = e.dataTransfer; const files = dt.files; handleFiles(files); }
-            fileInput.addEventListener('change', function() { handleFiles(this.files); });
-            function handleFiles(files) { [...files].forEach(uploadFile); }
-            function uploadFile(file) {
-                if (!file.type.startsWith('image/')) { showToast('Please select only image files', 'error'); return; }
-                if (file.size > 10 * 1024 * 1024) { showToast('File size must be less than 10MB', 'error'); return; }
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const preview = document.createElement('div');
-                    preview.className = 'image-preview group';
-                    preview.innerHTML = `
-                        <img src="${e.target.result}" alt="Preview">
-                        <button type="button" class="remove-image" onclick="removeImage(this)"><i class="fas fa-trash"></i></button>
-                        <input type="file" name="images[]" value="" style="display: none;">
-                    `;
-                    const fileInput = preview.querySelector('input[type="file"]');
-                    const dataTransfer = new DataTransfer();
-                    dataTransfer.items.add(file);
-                    fileInput.files = dataTransfer.files;
-                    previewContainer.appendChild(preview);
-                };
-                reader.readAsDataURL(file);
+            fileInput.addEventListener('change', function() { handleFiles(this.files); this.value = ''; });
+
+            function handleFiles(fileList) {
+                let validFiles = [];
+                for (let i = 0; i < fileList.length; i++) {
+                    const file = fileList[i];
+                    if (!file.type.startsWith('image/')) continue;
+                    if (file.size > 10 * 1024 * 1024) continue;
+                    // Prevent duplicates by name+size
+                    if (!filesArray.some(f => f.name === file.name && f.size === file.size)) {
+                        validFiles.push(file);
+                    }
+                }
+                filesArray = filesArray.concat(validFiles);
+                renderPreview();
             }
-            window.removeImage = function(button) { const preview = button.closest('.image-preview'); preview.remove(); };
-            window.removeExistingImage = function(button) { const preview = button.closest('.image-preview'); const hiddenInput = preview.querySelector('input[name="existing_images[]"]'); if (hiddenInput) { hiddenInput.name = 'removed_images[]'; } preview.remove(); };
-            // Auto-hide success message
+
+            function renderPreview() {
+                // Remove all previews of new images (keep existing images)
+                const previews = previewContainer.querySelectorAll('.image-preview[data-new]');
+                previews.forEach(p => p.remove());
+                filesArray.forEach((file, idx) => {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        const preview = document.createElement('div');
+                        preview.className = 'image-preview group';
+                        preview.setAttribute('data-new', '1');
+                        preview.innerHTML = `
+                            <img src="${e.target.result}" alt="Preview">
+                            <button type="button" class="remove-image" onclick="removeNewImage(${idx})"><i class="fas fa-trash"></i></button>
+                        `;
+                        previewContainer.appendChild(preview);
+                    };
+                    reader.readAsDataURL(file);
+                });
+                updateFileInput();
+            }
+
+            window.removeNewImage = function(idx) {
+                filesArray.splice(idx, 1);
+                renderPreview();
+            };
+
+            function updateFileInput() {
+                // Update the file input's file list to match filesArray
+                const dt = new DataTransfer();
+                filesArray.forEach(file => dt.items.add(file));
+                fileInput.files = dt.files;
+            }
+
+            window.removeExistingImage = function(button) {
+                const preview = button.closest('.image-preview');
+                const hiddenInput = preview.querySelector('input[name="existing_images[]"]');
+                if (hiddenInput) { hiddenInput.name = 'removed_images[]'; }
+                preview.remove();
+            };
+
+            // Success message logic remains unchanged
             const successMessage = document.getElementById('success-message');
             if (successMessage) {
-                // Add entrance animation
                 successMessage.style.opacity = '0';
                 successMessage.style.transform = 'translateY(-20px)';
                 setTimeout(() => {
                     successMessage.style.opacity = '1';
                     successMessage.style.transform = 'translateY(0)';
                 }, 100);
-                
-                // Auto-hide after 3 seconds
-                setTimeout(() => {
-                    hideSuccessMessage();
-                }, 3000);
+                setTimeout(() => { hideSuccessMessage(); }, 3000);
             }
-            
-            // Function to hide success message
             window.hideSuccessMessage = function() {
                 const message = document.getElementById('success-message');
                 if (message) {
                     message.style.transform = 'translateY(-20px)';
                     message.style.opacity = '0';
-                    setTimeout(() => {
-                        message.style.display = 'none';
-                    }, 500);
+                    setTimeout(() => { message.style.display = 'none'; }, 500);
                 }
             };
         });

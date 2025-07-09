@@ -35,10 +35,12 @@
                             </div>
                         @endif
                     </div>
-                @elseif($plot->image_path)
-                    <img src="{{ asset('storage/' . $plot->image_path) }}" alt="{{ $plot->title }}" class="w-full h-full object-cover">
                 @else
-                    <img src="https://placehold.co/1200x400" alt="{{ $plot->title }}" class="w-full h-full object-cover">
+                    @if($plot->image_path)
+                        <img src="{{ asset('storage/' . $plot->image_path) }}" alt="{{ $plot->title }}" class="w-full h-full object-cover">
+                    @else
+                        <img src="https://placehold.co/1200x400" alt="{{ $plot->title }}" class="w-full h-full object-cover">
+                    @endif
                 @endif
             </div>
             <div class="p-8 md:p-10">
