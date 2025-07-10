@@ -159,7 +159,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('/notifications/all', [NotificationController::class, 'getAll'])->name('notifications.all');
 
     // Admin notifications page (Blade view)
-    Route::get('/notifications/all/view', [NotificationController::class, 'showAll'])->name('admin.notifications.all.view');
+    Route::get('/notifications/all/view', [NotificationController::class, 'showAll'])->name('notifications.all.view');
 });
 
 // ========================================
@@ -205,7 +205,7 @@ Route::middleware(['auth', 'customer'])->prefix('customer')->name('customer.')->
     Route::get('/notifications/all', [NotificationController::class, 'getAll'])->name('notifications.all');
 
     // Customer notifications page (Blade view)
-    Route::get('/notifications/all/view', [NotificationController::class, 'showAll'])->name('customer.notifications.all.view');
+    Route::get('/notifications/all/view', [NotificationController::class, 'showAll'])->name('notifications.all.view');
 });
 
 // Legacy routes for backward compatibility (redirect to appropriate areas)

@@ -237,8 +237,9 @@
             to { opacity: 1; transform: translateY(0); }
         }
     </style>
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="flex h-screen overflow-hidden">
+<body class="flex h-screen overflow-hidden" data-user-role="{{ auth()->user()->role }}">
 
     @auth()
 
@@ -423,7 +424,11 @@
                         <!-- Notifications will be loaded here -->
                     </div>
                     <div class="p-4 border-t border-yellow-200 bg-yellow-50 rounded-b-2xl text-center">
-                        <a href="#" onclick="viewAllNotifications()" class="text-sm text-yellow-700 hover:text-yellow-900 font-semibold transition-all duration-200">View all notifications</a>
+                        @if(auth()->user()->isAdmin())
+                            <a href="{{ route('admin.notifications.all.view') }}" class="text-sm text-yellow-700 hover:text-yellow-900 font-semibold transition-all duration-200">View all notifications</a>
+                        @else
+                            <a href="{{ route('customer.notifications.all.view') }}" class="text-sm text-yellow-700 hover:text-yellow-900 font-semibold transition-all duration-200">View all notifications</a>
+                        @endif
                     </div>
                 </div>
 
@@ -603,19 +608,44 @@
                     }
                     notifications.forEach(notification => {
                         const item = document.createElement('div');
-                        item.className = 'flex items-start gap-3 p-4 bg-white hover:bg-yellow-50 transition-all duration-200 cursor-pointer rounded-xl shadow-sm mb-2';
+                        let icon = '🔔';
+                        let bg = 'bg-white';
+                        let border = '';
+                        let titleColor = 'text-gray-900';
+                        let messageColor = 'text-gray-600';
+                        if (notification.type === 'reservation_expiring') {
+                            icon = '<i class="fas fa-hourglass-half text-yellow-500"></i>';
+                            bg = 'bg-yellow-50';
+                            border = 'border-l-4 border-yellow-400';
+                            titleColor = 'text-yellow-800';
+                            messageColor = 'text-yellow-700';
+                        } else if (notification.type === 'new_plot') {
+                            icon = '<i class="fas fa-star text-green-500"></i>';
+                            bg = 'bg-green-50';
+                            border = 'border-l-4 border-green-400';
+                            titleColor = 'text-green-800';
+                            messageColor = 'text-green-700';
+                        } else if (notification.type === 'payment_due') {
+                            icon = '<i class="fas fa-money-bill-wave text-blue-500"></i>';
+                            bg = 'bg-blue-50';
+                            border = 'border-l-4 border-blue-400';
+                            titleColor = 'text-blue-800';
+                            messageColor = 'text-blue-700';
+                        } else if (notification.type === 'inquiry_received') {
+                            icon = '🚨';
+                        } else if (notification.type === 'inquiry_responded') {
+                            icon = '💬';
+                        }
+                        item.className = `flex items-start gap-3 p-4 ${bg} hover:bg-yellow-50 transition-all duration-200 cursor-pointer rounded-xl shadow-sm mb-2 ${border}`;
                         if (!notification.is_read) {
                             item.classList.add('ring-2', 'ring-yellow-300');
                         }
                         item.onclick = () => {
                             markAsRead(notification.id);
-                            // Redirect to inquiry if it's an inquiry notification
                             if (notification.inquiry_id) {
                                 window.location.href = `/inquiries/${notification.inquiry_id}`;
                             }
                         };
-                        const icon = notification.type === 'inquiry_received' ? '🚨' : 
-                                    notification.type === 'inquiry_responded' ? '💬' : '🔔';
                         item.innerHTML = `
                             <div class="flex-shrink-0 flex flex-col items-center pt-1">
                                 <span class="text-2xl">${icon}</span>
@@ -623,10 +653,10 @@
                                 </div>
                                 <div class="flex-1 min-w-0">
                                 <div class="flex items-center justify-between">
-                                    <p class="text-sm font-bold text-gray-900 mb-1">${notification.title}</p>
+                                    <p class="text-sm font-bold ${titleColor} mb-1">${notification.title}</p>
                                     <span class="text-xs text-gray-400 ml-2">${getTimeAgo(notification.created_at)}</span>
                                 </div>
-                                <p class="text-sm text-gray-600">${notification.message}</p>
+                                <p class="text-sm ${messageColor}">${notification.message}</p>
                             </div>
                         `;
                         list.appendChild(item);
@@ -719,19 +749,44 @@
                     }
                     notifications.forEach(notification => {
                         const item = document.createElement('div');
-                        item.className = 'flex items-start gap-3 p-4 bg-white hover:bg-yellow-50 transition-all duration-200 cursor-pointer rounded-xl shadow-sm mb-2';
+                        let icon = '🔔';
+                        let bg = 'bg-white';
+                        let border = '';
+                        let titleColor = 'text-gray-900';
+                        let messageColor = 'text-gray-600';
+                        if (notification.type === 'reservation_expiring') {
+                            icon = '<i class="fas fa-hourglass-half text-yellow-500"></i>';
+                            bg = 'bg-yellow-50';
+                            border = 'border-l-4 border-yellow-400';
+                            titleColor = 'text-yellow-800';
+                            messageColor = 'text-yellow-700';
+                        } else if (notification.type === 'new_plot') {
+                            icon = '<i class="fas fa-star text-green-500"></i>';
+                            bg = 'bg-green-50';
+                            border = 'border-l-4 border-green-400';
+                            titleColor = 'text-green-800';
+                            messageColor = 'text-green-700';
+                        } else if (notification.type === 'payment_due') {
+                            icon = '<i class="fas fa-money-bill-wave text-blue-500"></i>';
+                            bg = 'bg-blue-50';
+                            border = 'border-l-4 border-blue-400';
+                            titleColor = 'text-blue-800';
+                            messageColor = 'text-blue-700';
+                        } else if (notification.type === 'inquiry_received') {
+                            icon = '🚨';
+                        } else if (notification.type === 'inquiry_responded') {
+                            icon = '💬';
+                        }
+                        item.className = `flex items-start gap-3 p-4 ${bg} hover:bg-yellow-50 transition-all duration-200 cursor-pointer rounded-xl shadow-sm mb-2 ${border}`;
                         if (!notification.is_read) {
                             item.classList.add('ring-2', 'ring-yellow-300');
                         }
                         item.onclick = () => {
                             markAsRead(notification.id);
-                            // Redirect to inquiry if it's an inquiry notification
                             if (notification.inquiry_id) {
                                 window.location.href = `/inquiries/${notification.inquiry_id}`;
                             }
                         };
-                        const icon = notification.type === 'inquiry_received' ? '🚨' : 
-                                    notification.type === 'inquiry_responded' ? '💬' : '🔔';
                         item.innerHTML = `
                             <div class="flex-shrink-0 flex flex-col items-center pt-1">
                                 <span class="text-2xl">${icon}</span>
@@ -739,10 +794,10 @@
                                 </div>
                                 <div class="flex-1 min-w-0">
                                 <div class="flex items-center justify-between">
-                                    <p class="text-sm font-bold text-gray-900 mb-1">${notification.title}</p>
+                                    <p class="text-sm font-bold ${titleColor} mb-1">${notification.title}</p>
                                     <span class="text-xs text-gray-400 ml-2">${getTimeAgo(notification.created_at)}</span>
                                 </div>
-                                <p class="text-sm text-gray-600">${notification.message}</p>
+                                <p class="text-sm ${messageColor}">${notification.message}</p>
                             </div>
                         `;
                         list.appendChild(item);
@@ -1106,193 +1161,4 @@
             }
 
             // Show confirmation with better UI
-            const confirmed = confirm(`📞 Would you like to call ${phoneNumber}?`);
-            if (confirmed) {
-                showToastNotification('📞 Opening phone app...', 'info');
-                setTimeout(() => {
-                    window.location.href = 'tel:' + phoneNumber;
-                }, 500);
-            }
-        }
-
-        function sendEmail(email) {
-            // Add visual feedback
-            const event = window.event;
-            const target = event.target.closest('.contact-item');
-            
-            if (target) {
-                target.style.transform = 'scale(0.95)';
-                setTimeout(() => {
-                    target.style.transform = '';
-                }, 150);
-            }
-
-            // Show confirmation with better UI
-            const confirmed = confirm(`✉️ Would you like to send an email to ${email}?`);
-            if (confirmed) {
-                showToastNotification('✉️ Opening email app...', 'info');
-                setTimeout(() => {
-                    window.location.href = 'mailto:' + email + '?subject=ATSOGO Land Marketing Inquiry&body=Hello, I would like to inquire about your land marketing services.';
-                }, 500);
-            }
-        }
-
-        function openWebsite(url) {
-            // Add visual feedback
-            const event = window.event;
-            const target = event.target.closest('.contact-item, button');
-            
-            if (target) {
-                target.style.transform = 'scale(0.95)';
-                setTimeout(() => {
-                    target.style.transform = '';
-                }, 150);
-            }
-
-            showToastNotification('🌐 Opening website...', 'info');
-            setTimeout(() => {
-                window.open(url, '_blank');
-            }, 300);
-        }
-
-        function openContactModal() {
-            const modal = document.getElementById('contact-modal');
-            modal.classList.remove('hidden');
-            
-            // Set up character counter for message
-            const messageTextarea = document.getElementById('contact-message');
-            const messageCount = document.getElementById('message-count');
-            
-            messageTextarea.addEventListener('input', function() {
-                const length = this.value.length;
-                messageCount.textContent = length;
-                
-                if (length > 900) {
-                    messageCount.classList.add('text-red-500');
-                    messageCount.classList.remove('text-gray-500');
-                } else {
-                    messageCount.classList.remove('text-red-500');
-                    messageCount.classList.add('text-gray-500');
-                }
-            });
-            
-            // Auto-fill user info if available
-            const user = @json(auth()->user());
-            if (user) {
-                document.getElementById('contact-name').value = user.name || user.username || '';
-                document.getElementById('contact-email').value = user.email || '';
-            }
-        }
-
-        function closeContactModal() {
-            const modal = document.getElementById('contact-modal');
-            modal.classList.add('hidden');
-        }
-
-        function submitContactForm() {
-            // Clear previous errors
-            document.querySelectorAll('[id$="-error"]').forEach(el => {
-                el.classList.add('hidden');
-                el.textContent = '';
-            });
-            
-            const name = document.getElementById('contact-name').value.trim();
-            const email = document.getElementById('contact-email').value.trim();
-            const message = document.getElementById('contact-message').value.trim();
-            
-            let hasErrors = false;
-            
-            // Validate name
-            if (!name) {
-                document.getElementById('name-error').textContent = 'Name is required';
-                document.getElementById('name-error').classList.remove('hidden');
-                hasErrors = true;
-            } else if (name.length < 2) {
-                document.getElementById('name-error').textContent = 'Name must be at least 2 characters';
-                document.getElementById('name-error').classList.remove('hidden');
-                hasErrors = true;
-            }
-            
-            // Validate email
-            if (!email) {
-                document.getElementById('email-error').textContent = 'Email is required';
-                document.getElementById('email-error').classList.remove('hidden');
-                hasErrors = true;
-            } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-                document.getElementById('email-error').textContent = 'Please enter a valid email address';
-                document.getElementById('email-error').classList.remove('hidden');
-                hasErrors = true;
-            }
-            
-            // Validate message
-            if (!message) {
-                document.getElementById('message-error').textContent = 'Message is required';
-                document.getElementById('message-error').classList.remove('hidden');
-                hasErrors = true;
-            } else if (message.length < 10) {
-                document.getElementById('message-error').textContent = 'Message must be at least 10 characters';
-                document.getElementById('message-error').classList.remove('hidden');
-                hasErrors = true;
-            } else if (message.length > 1000) {
-                document.getElementById('message-error').textContent = 'Message must be less than 1000 characters';
-                document.getElementById('message-error').classList.remove('hidden');
-                hasErrors = true;
-            }
-            
-            if (hasErrors) {
-                return;
-            }
-            
-            // Show loading state
-            const submitBtn = document.querySelector('button[onclick="submitContactForm()"]');
-            const originalText = submitBtn.innerHTML;
-            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Sending...';
-            submitBtn.disabled = true;
-            
-            // Send form data to backend
-            fetch('{{ route("contact.submit") }}', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                },
-                body: JSON.stringify({
-                    name: name,
-                    email: email,
-                    message: message
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    showToastNotification(data.message, 'success');
-                    closeContactModal();
-                    
-                    // Clear form
-                    document.getElementById('contact-name').value = '';
-                    document.getElementById('contact-email').value = '';
-                    document.getElementById('contact-message').value = '';
-                } else {
-                    showToastNotification(data.message || 'Failed to send message', 'error');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                showToastNotification('Failed to send message. Please try again.', 'error');
-            })
-            .finally(() => {
-                // Reset button state
-                submitBtn.innerHTML = originalText;
-                submitBtn.disabled = false;
-            });
-        }
-
-        // Toggle Support Section
-
-    </script>
-    <!-- Alpine.js loaded last for reliability (DASHBOARD LAYOUT) -->
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-</body>
-</html>
-
-
+            const confirmed = confirm(`

@@ -7,6 +7,7 @@ use App\Models\Reservation;
 use App\Models\Plot;
 use Carbon\Carbon;
 use App\Notifications\ReservationExpiredNotification;
+use App\Models\Notification;
 
 class ExpireReservations extends Command
 {
@@ -16,6 +17,31 @@ class ExpireReservations extends Command
     public function handle()
     {
         $now = Carbon::now();
+        // Send expiring soon notifications (2 hours before expiry)
+        $expiringSoon = Reservation::where('status', 'active')
+            ->where('expires_at', '>', $now)
+            ->where('expires_at', '<=', $now->copy()->addHours(2))
+            ->get();
+        foreach ($expiringSoon as $reservation) {
+            // Only send if not already notified
+            $alreadyNotified = Notification::where('type', 'reservation_expiring')
+                ->where('user_id', $reservation->user_id)
+                ->where('data->reservation_id', $reservation->id)
+                ->exists();
+            if (!$alreadyNotified) {
+                Notification::create([
+                    'type' => 'reservation_expiring',
+                    'title' => '⏰ Reservation Expiring Soon',
+                    'message' => "Your reservation for plot '{$reservation->plot->title}' will expire at {$reservation->expires_at->format('M d, Y H:i')}. Please complete your payment.",
+                    'user_id' => $reservation->user_id,
+                    'data' => [
+                        'plot_id' => $reservation->plot_id,
+                        'reservation_id' => $reservation->id,
+                        'expires_at' => $reservation->expires_at,
+                    ]
+                ]);
+            }
+        }
         // Remove all SMS reminder logic
         // Only keep reservation expiry and notification logic
         $expiredReservations = Reservation::where('status', 'active')

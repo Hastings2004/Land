@@ -102,6 +102,41 @@
                             <p class="text-sm text-yellow-700">This reservation expires on {{ $plot->activeReservation->expires_at->format('M d, Y \a\t H:i A') }}.</p>
                             <a href="{{ route('customer.reservations.index') }}" class="mt-2 inline-block text-yellow-600 hover:underline">View My Reservations</a>
                         </div>
+                    @elseif($plot->status === 'reserved' && $plot->activeReservation)
+                        <div class="flex-1 text-center p-6 bg-gradient-to-br from-yellow-50 via-yellow-100 to-yellow-200 border-l-8 border-yellow-400 rounded-2xl shadow-lg">
+                            <div class="flex flex-col items-center justify-center gap-2 mb-2">
+                                <div class="w-14 h-14 flex items-center justify-center rounded-full bg-yellow-200 shadow-inner mb-2">
+                                    <i class="fas fa-clock text-yellow-500 text-3xl animate-pulse"></i>
+                                </div>
+                                <p class="font-bold text-yellow-800 text-lg flex items-center justify-center gap-2">
+                                    This plot is currently <span class="underline decoration-wavy decoration-yellow-500">reserved</span> by another customer.
+                                </p>
+                                <p class="text-yellow-700 text-base mt-1">It will become available in:</p>
+                                <div id="countdown" class="text-3xl font-extrabold text-yellow-700 tracking-widest bg-white/70 px-6 py-2 rounded-xl shadow-inner border border-yellow-200 mt-2 mb-1"></div>
+                                <p class="text-xs text-gray-500 mt-2">Reservation expires on <span class="font-semibold text-yellow-700">{{ $plot->activeReservation->expires_at->format('M d, Y \a\t H:i A') }}</span></p>
+                            </div>
+                            <div class="mt-2 text-sm text-gray-600 italic">If the reservation is not completed, you’ll have a chance to reserve or buy this plot when the timer ends.</div>
+                        </div>
+                        <script>
+                        document.addEventListener('DOMContentLoaded', function() {
+                            function updateCountdown() {
+                                const expiresAt = new Date(@json($plot->activeReservation->expires_at->format('Y-m-d H:i:s')));
+                                const now = new Date();
+                                let diff = Math.floor((expiresAt - now) / 1000);
+                                if (diff < 0) diff = 0;
+                                const hours = Math.floor(diff / 3600);
+                                const minutes = Math.floor((diff % 3600) / 60);
+                                const seconds = diff % 60;
+                                document.getElementById('countdown').textContent = `${hours}h ${minutes}m ${seconds}s`;
+                                if (diff > 0) {
+                                    setTimeout(updateCountdown, 1000);
+                                } else {
+                                    document.getElementById('countdown').textContent = 'Now!';
+                                }
+                            }
+                            updateCountdown();
+                        });
+                        </script>
                     @else
                         <div class="flex-1 text-center p-4 bg-gray-100 border border-gray-300 rounded-lg">
                             <p class="font-semibold text-gray-800">This plot is not available for reservation.</p>

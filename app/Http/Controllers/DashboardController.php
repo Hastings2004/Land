@@ -35,6 +35,9 @@ class DashboardController extends Controller
     {
             $stats = [
                 'totalPlots' => \App\Models\Plot::count(),
+                'availablePlots' => \App\Models\Plot::where('status', 'available')->count(),
+                'reservedPlots' => \App\Models\Plot::where('status', 'reserved')->count(),
+                'soldPlots' => \App\Models\Plot::where('status', 'sold')->count(),
                 'totalUsers' => \App\Models\User::count(),
                 'totalReservations' => \App\Models\Reservation::count(),
                 'totalInquiries' => \App\Models\Inquiries::count(),

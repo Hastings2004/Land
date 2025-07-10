@@ -17,10 +17,25 @@
             <i class="fas fa-chart-bar text-yellow-500 mr-2"></i>
             Key Statistics
         </h2>
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-6">
+            <div class="bg-white rounded-2xl shadow-lg p-6 border-l-4 border-blue-500">
+                <div class="text-3xl font-extrabold text-blue-600">{{ $stats['totalPlots'] }}</div>
+                <div class="text-gray-600 mt-2 font-semibold">Total Plots</div>
+            </div>
+            <div class="bg-white rounded-2xl shadow-lg p-6 border-l-4 border-green-500">
+                <div class="text-3xl font-extrabold text-green-600">{{ $stats['availablePlots'] }}</div>
+                <div class="text-gray-600 mt-2 font-semibold">Available</div>
+            </div>
+            <div class="bg-white rounded-2xl shadow-lg p-6 border-l-4 border-yellow-500">
+                <div class="text-3xl font-extrabold text-yellow-600">{{ $stats['reservedPlots'] }}</div>
+                <div class="text-gray-600 mt-2 font-semibold">Reserved</div>
+            </div>
+            <div class="bg-white rounded-2xl shadow-lg p-6 border-l-4 border-red-500">
+                <div class="text-3xl font-extrabold text-red-600">{{ $stats['soldPlots'] }}</div>
+                <div class="text-gray-600 mt-2 font-semibold">Sold</div>
+            </div>
             @php
                 $statsList = [
-                    ['label' => 'Total Plots', 'value' => $stats['totalPlots'], 'icon' => 'fa-map-marker-alt'],
                     ['label' => 'Total Users', 'value' => $stats['totalUsers'], 'icon' => 'fa-users'],
                     ['label' => 'Reservations', 'value' => $stats['totalReservations'], 'icon' => 'fa-calendar-check'],
                     ['label' => 'Inquiries', 'value' => $stats['totalInquiries'], 'icon' => 'fa-comments'],
