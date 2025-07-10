@@ -48,8 +48,6 @@ class DashboardController extends Controller
                 ->get();
             $statusLabels = $statusData->pluck('status')->toArray();
             $statusCounts = $statusData->pluck('count')->toArray();
-            
-            // Fallback data if no status data exists
             if (empty($statusLabels)) {
                 $statusLabels = ['No Data'];
                 $statusCounts = [1];
@@ -61,8 +59,6 @@ class DashboardController extends Controller
                 ->get();
             $inquiryStatusLabels = $inquiryStatusData->pluck('status')->toArray();
             $inquiryStatusCounts = $inquiryStatusData->pluck('count')->toArray();
-            
-            // Fallback data if no inquiry status data exists
             if (empty($inquiryStatusLabels)) {
                 $inquiryStatusLabels = ['No Data'];
                 $inquiryStatusCounts = [1];
@@ -74,12 +70,28 @@ class DashboardController extends Controller
                 ->get();
             $reservationsLabels = $reservationsData->pluck('status')->toArray();
             $reservationsCounts = $reservationsData->pluck('count')->toArray();
-            
-            // Fallback data if no reservations data exists
             if (empty($reservationsLabels)) {
                 $reservationsLabels = ['No Data'];
                 $reservationsCounts = [1];
             }
+
+        // Most viewed plots (top 5)
+        $mostViewedPlots = \App\Models\Plot::orderByDesc('views')->take(5)->get();
+
+        // Plots with most reservations (top 5)
+        $plotsMostReservations = \App\Models\Plot::withCount('reservations')
+            ->orderByDesc('reservations_count')
+            ->take(5)
+            ->get();
+
+        // Average time to sale (in days)
+        $soldPlots = \App\Models\Plot::where('status', 'sold')->whereNotNull('created_at')->whereNotNull('updated_at')->get();
+        $avgTimeToSale = $soldPlots->count() > 0
+            ? round($soldPlots->map(function($plot) { return $plot->updated_at->diffInDays($plot->created_at); })->avg(), 2)
+            : null;
+
+        // Recent sales (last 5 sold plots)
+        $recentSales = \App\Models\Plot::where('status', 'sold')->latest('updated_at')->take(5)->get();
 
         // Recent inquiries for admin dashboard
         $recentInquiries = \App\Models\Inquiries::latest()->take(5)->get();
@@ -87,7 +99,8 @@ class DashboardController extends Controller
         return view('admin.dashboard', compact(
             'stats', 'statusLabels', 'statusCounts',
             'inquiryStatusLabels', 'inquiryStatusCounts', 
-            'reservationsLabels', 'reservationsCounts', 'recentInquiries'
+            'reservationsLabels', 'reservationsCounts', 'recentInquiries',
+            'mostViewedPlots', 'plotsMostReservations', 'avgTimeToSale', 'recentSales'
         ));
     }
 
@@ -134,17 +147,35 @@ class DashboardController extends Controller
      */
     private function getRecommendedPlots($user)
     {
-        // Always show the latest available plots uploaded by admins, not already saved by the user
-        $plots = \App\Models\Plot::where('status', 'available')
-            ->whereHas('user', function($q) {
-                $q->where('role', 'admin');
-            })
-            ->whereDoesntHave('savedByUsers', function($q) use ($user) {
-                $q->where('user_id', $user->id);
-            })
-            ->orderBy('created_at', 'desc')
-            ->take(6)
-            ->get();
+        // Get IDs of plots the user has reserved or saved
+        $reservedPlotIds = $user->reservations()->pluck('plot_id')->toArray();
+        $savedPlotIds = $user->savedPlots()->pluck('plots.id')->toArray();
+        $excludeIds = array_unique(array_merge($reservedPlotIds, $savedPlotIds));
+
+        // Get locations and price range from user's saved/reserved plots
+        $userPlots = \App\Models\Plot::whereIn('id', $excludeIds)->get();
+        $locations = $userPlots->pluck('location')->unique()->toArray();
+        $minPrice = $userPlots->min('price') ?? 0;
+        $maxPrice = $userPlots->max('price') ?? 0;
+
+        // Recommend available plots in similar locations or price range, not already reserved/saved
+        $query = \App\Models\Plot::where('status', 'available')
+            ->whereNotIn('id', $excludeIds);
+        if (!empty($locations)) {
+            $query->whereIn('location', $locations);
+        }
+        if ($minPrice && $maxPrice && $minPrice !== $maxPrice) {
+            $query->whereBetween('price', [max(0, $minPrice - 500000), $maxPrice + 500000]);
+        }
+        // Fallback: if no user history, show latest available plots
+        $plots = $query->orderBy('created_at', 'desc')->take(6)->get();
+        if ($plots->isEmpty()) {
+            $plots = \App\Models\Plot::where('status', 'available')
+                ->whereNotIn('id', $excludeIds)
+                ->orderBy('created_at', 'desc')
+                ->take(6)
+                ->get();
+        }
         return $plots;
     }
 

@@ -1,0 +1,47 @@
+Slide 1: Demonstrating System Intelligence
+- Atsogo Estate Agency Real Estate Management System
+- Automated Plot Status Management
+- No Manual Status Changes by Admins
+
+Slide 2: What Makes the System Intelligent?
+- Plot status is managed automatically by the system
+- Admins cannot set or override status manually
+- Status changes based on real-world events (reservation, payment, expiry)
+
+Slide 3: Automatic Status Change Scenarios
+- Reservation: Status changes to 'reserved' automatically
+- Payment: Status changes to 'sold' automatically
+- Expiry: Status reverts to 'available' if not paid in time
+- Cancellation: Status returns to 'available' if reservation is cancelled
+
+Slide 4: Admin Experience
+- No 'Status' dropdown in plot edit form
+- Backend ignores any manual status update attempts
+- Admins focus on content, not status management
+
+Slide 5: Customer Experience
+- Customers see real-time status updates
+- Cannot reserve or buy already sold/reserved plots
+- Receive notifications for reservation expiry, payment deadlines, and status changes
+
+Slide 6: Behind the Scenes (Automation)
+- Scheduled tasks handle reservation expiry
+- Payment triggers status updates and cancels other reservations
+- All logic handled by the system, not by users
+
+Slide 7: Demonstration Steps
+- Reserve a plot as a customer: status becomes 'reserved'
+- Let reservation expire: status returns to 'available'
+- Make payment: status becomes 'sold', others cancelled
+- Attempt manual status change: system ignores it
+
+Slide 8: Key Benefits
+- Reduces human error
+- Ensures fairness and transparency
+- Saves admin time
+- Demonstrates true system intelligence
+
+Slide 9: Questions & Next Steps
+- Ready to see a live demo?
+- Any questions about the automation?
+- Thank you! 

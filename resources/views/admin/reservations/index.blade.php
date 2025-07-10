@@ -29,7 +29,6 @@
                 </div>
             </div>
         </div>
-
         <div class="bg-white rounded-xl shadow-lg p-6 border-l-4 border-green-500">
             <div class="flex items-center justify-between">
                 <div>
@@ -41,24 +40,33 @@
                 </div>
             </div>
         </div>
-
-        <div class="bg-white rounded-xl shadow-lg p-6 border-l-4 border-yellow-500">
+        <div class="bg-white rounded-xl shadow-lg p-6 border-l-4 border-blue-500">
             <div class="flex items-center justify-between">
                 <div>
-                    <div class="text-2xl font-bold text-yellow-600">{{ $stats['pending'] }}</div>
-                    <div class="text-gray-600 text-sm font-semibold">Pending</div>
+                    <div class="text-2xl font-bold text-blue-600">{{ $stats['completed'] }}</div>
+                    <div class="text-gray-600 text-sm font-semibold">Completed</div>
                 </div>
-                <div class="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center">
-                    <i class="fas fa-clock text-yellow-600 text-xl"></i>
+                <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                    <i class="fas fa-thumbs-up text-blue-600 text-xl"></i>
                 </div>
             </div>
         </div>
-
+        <div class="bg-white rounded-xl shadow-lg p-6 border-l-4 border-gray-500">
+            <div class="flex items-center justify-between">
+                <div>
+                    <div class="text-2xl font-bold text-gray-600">{{ $stats['expired'] }}</div>
+                    <div class="text-gray-600 text-sm font-semibold">Expired</div>
+                </div>
+                <div class="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center">
+                    <i class="fas fa-hourglass-end text-gray-600 text-xl"></i>
+                </div>
+            </div>
+        </div>
         <div class="bg-white rounded-xl shadow-lg p-6 border-l-4 border-red-500">
             <div class="flex items-center justify-between">
                 <div>
-                    <div class="text-2xl font-bold text-red-600">{{ $stats['expired'] }}</div>
-                    <div class="text-gray-600 text-sm font-semibold">Expired</div>
+                    <div class="text-2xl font-bold text-red-600">{{ $stats['cancelled'] }}</div>
+                    <div class="text-gray-600 text-sm font-semibold">Cancelled</div>
                 </div>
                 <div class="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center">
                     <i class="fas fa-times-circle text-red-600 text-xl"></i>
@@ -113,10 +121,26 @@
                                     </div>
                                 </td>
                                 <td class="px-6 py-4">
-                                    <div>
-                                        <div class="text-sm font-medium text-gray-900">{{ $reservation->plot->title }}</div>
-                                        <div class="text-sm text-gray-500">{{ $reservation->plot->location }}</div>
-                                        <div class="text-xs text-gray-400">Price: ${{ number_format($reservation->plot->price) }}</div>
+                                    <div class="flex items-start space-x-4">
+                                        <img src="{{ $reservation->plot->plotImages && $reservation->plot->plotImages->count() > 0 ? $reservation->plot->plotImages->first()->image_url : ($reservation->plot->image_path ? asset('storage/' . $reservation->plot->image_path) : 'https://placehold.co/300x200') }}"
+                                             alt="{{ $reservation->plot->title }}"
+                                             class="w-72 h-48 object-cover rounded-lg shadow-sm">
+                                        <div>
+                                            <div class="text-sm font-medium text-gray-900 mb-1">{{ $reservation->plot->title }}</div>
+                                            <div class="flex items-center mb-1">
+                                                <i class="fas fa-map-marker-alt text-yellow-500 mr-2"></i>
+                                                <span class="text-gray-600">{{ $reservation->plot->location }}</span>
+                                            </div>
+                                            <div class="flex items-center mb-1">
+                                                <i class="fas fa-ruler-combined text-yellow-500 mr-2"></i>
+                                                <span class="text-gray-600">Area: {{ number_format($reservation->plot->area_sqm, 2) }} sqm</span>
+                                            </div>
+                                            <div class="flex items-center mb-1">
+                                                <i class="fas fa-tag text-yellow-500 mr-2"></i>
+                                                <span class="text-gray-600">Category: {{ ucfirst($reservation->plot->category) }}</span>
+                                            </div>
+                                            <div class="text-xs text-gray-400">Price: MWK {{ number_format($reservation->plot->price, 2) }}</div>
+                                        </div>
                                     </div>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
@@ -125,20 +149,29 @@
                                             <i class="fas fa-check-circle mr-1"></i>
                                             Active
                                         </span>
-                                    @elseif($reservation->status === 'pending')
-                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
-                                            <i class="fas fa-clock mr-1"></i>
-                                            Pending
-                                        </span>
-                                    @elseif($reservation->status === 'approved')
+                                        @php
+                                            $minutesLeft = $reservation->expires_at ? now()->diffInMinutes($reservation->expires_at, false) : null;
+                                        @endphp
+                                        @if($minutesLeft !== null && $minutesLeft <= 120 && $minutesLeft > 0)
+                                            <div class="mt-1 text-xs text-red-600 font-semibold flex items-center">
+                                                <i class="fas fa-exclamation-triangle mr-1"></i>
+                                                Grace period: {{ $minutesLeft }} minutes left to pay!
+                                            </div>
+                                        @endif
+                                        @if($minutesLeft !== null && $minutesLeft > 0)
+                                            <div class="mt-1 text-xs text-gray-500">
+                                                Time left: {{ $minutesLeft }} minutes
+                                            </div>
+                                        @endif
+                                    @elseif($reservation->status === 'completed')
                                         <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
                                             <i class="fas fa-thumbs-up mr-1"></i>
-                                            Approved
+                                            Completed
                                         </span>
-                                    @elseif($reservation->status === 'rejected')
+                                    @elseif($reservation->status === 'cancelled')
                                         <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
                                             <i class="fas fa-times-circle mr-1"></i>
-                                            Rejected
+                                            Cancelled
                                         </span>
                                     @elseif($reservation->status === 'expired')
                                         <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">

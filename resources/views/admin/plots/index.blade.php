@@ -201,7 +201,10 @@
                                     {{ ucfirst($plot->status) }}
                                 </span>
                             </div>
-                            <div class="text-sm text-gray-500 mb-2 truncate">{{ $plot->location }}</div>
+                            <p class="text-base text-gray-600 flex items-center">
+                                    <i class="fas fa-location-dot text-yellow-600 mr-2"></i>
+                                    {{ $plot->location }}
+                                </p>
                             <div class="flex items-center gap-2 mb-2">
                                 <span class="text-yellow-600 font-semibold">{{ number_format($plot->price) }} MWK</span>
                                 <span class="text-xs text-gray-400">/ {{ $plot->area }} sqm</span>

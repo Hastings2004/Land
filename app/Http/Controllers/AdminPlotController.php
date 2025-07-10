@@ -222,7 +222,6 @@ class AdminPlotController extends Controller
             'price' => 'required|numeric|min:0',
             'area_sqm' => 'required|numeric|min:0',
             'location' => 'required|string|max:255',
-            'status' => 'required|in:available,sold,pending',
             'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:5120', // 5MB max
             'existing_images' => 'array',
             'removed_images' => 'array',
@@ -231,8 +230,9 @@ class AdminPlotController extends Controller
         // Handle the is_new_listing checkbox
         $validated['is_new_listing'] = $request->has('is_new_listing');
 
-        // Update the plot with the validated data
+        // Update the plot with the validated data (EXCLUDE status)
         $validated['user_id'] = $user->id;
+        unset($validated['status']); // Ensure status is not updated manually
         $plot->update($validated);
 
         // Remove images marked for removal

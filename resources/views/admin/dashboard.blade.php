@@ -145,6 +145,71 @@
         </div>
     </div>
 
+    <!-- Advanced Analytics Section -->
+    <div class="mb-8">
+        <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+            <i class="fas fa-lightbulb text-yellow-500 mr-2"></i>
+            Advanced Insights
+        </h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <!-- Most Viewed Plots -->
+            <div class="bg-white rounded-xl shadow p-6">
+                <h3 class="text-lg font-semibold text-gray-800 mb-2 flex items-center">
+                    <i class="fas fa-eye text-yellow-500 mr-2"></i> Most Viewed Plots
+                </h3>
+                <ul class="space-y-2">
+                    @foreach($mostViewedPlots as $plot)
+                        <li class="flex justify-between items-center text-sm">
+                            <span class="font-medium text-gray-700">{{ $plot->title }}</span>
+                            <span class="text-yellow-600 font-bold">{{ $plot->views }} views</span>
+                        </li>
+                    @endforeach
+                </ul>
+            </div>
+            <!-- Plots with Most Reservations -->
+            <div class="bg-white rounded-xl shadow p-6">
+                <h3 class="text-lg font-semibold text-gray-800 mb-2 flex items-center">
+                    <i class="fas fa-users text-yellow-500 mr-2"></i> Most Reserved Plots
+                </h3>
+                <ul class="space-y-2">
+                    @foreach($plotsMostReservations as $plot)
+                        <li class="flex justify-between items-center text-sm">
+                            <span class="font-medium text-gray-700">{{ $plot->title }}</span>
+                            <span class="text-yellow-600 font-bold">{{ $plot->reservations_count }} reservations</span>
+                        </li>
+                    @endforeach
+                </ul>
+            </div>
+            <!-- Average Time to Sale -->
+            <div class="bg-white rounded-xl shadow p-6">
+                <h3 class="text-lg font-semibold text-gray-800 mb-2 flex items-center">
+                    <i class="fas fa-clock text-yellow-500 mr-2"></i> Avg. Time to Sale
+                </h3>
+                <div class="text-2xl font-bold text-yellow-600">
+                    @if($avgTimeToSale !== null)
+                        {{ $avgTimeToSale }} days
+                    @else
+                        <span class="text-gray-400 text-base">No data</span>
+                    @endif
+                </div>
+            </div>
+            <!-- Recent Sales -->
+            <div class="bg-white rounded-xl shadow p-6">
+                <h3 class="text-lg font-semibold text-gray-800 mb-2 flex items-center">
+                    <i class="fas fa-handshake text-yellow-500 mr-2"></i> Recent Sales
+                </h3>
+                <ul class="space-y-2">
+                    @foreach($recentSales as $plot)
+                        <li class="flex justify-between items-center text-sm">
+                            <span class="font-medium text-gray-700">{{ $plot->title }}</span>
+                            <span class="text-gray-500">{{ $plot->updated_at->format('M d, Y') }}</span>
+                        </li>
+                    @endforeach
+                </ul>
+            </div>
+        </div>
+    </div>
+
     <!-- Charts JavaScript -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>

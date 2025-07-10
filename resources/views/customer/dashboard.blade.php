@@ -375,23 +375,32 @@
                     @if($activeReservations->count() > 0)
                         <div class="space-y-4">
                             @foreach($activeReservations as $reservation)
-                            <div class="p-4 bg-gradient-to-r from-green-50 to-green-100 rounded-xl border-l-4 border-green-500">
-                                    <div class="flex items-center space-x-3 mb-3">
-                                        <img src="{{ $reservation->plot->image_path ? asset('storage/' . $reservation->plot->image_path) : 'https://placehold.co/60x60' }}"
+                                <div class="p-4 bg-gradient-to-r from-green-50 to-green-100 rounded-xl border-l-4 border-green-500">
+                                    <div class="flex items-center space-x-4 mb-3">
+                                        <img src="{{ $reservation->plot->plotImages && $reservation->plot->plotImages->count() > 0 ? $reservation->plot->plotImages->first()->image_url : ($reservation->plot->image_path ? asset('storage/' . $reservation->plot->image_path) : 'https://placehold.co/300x200') }}"
                                              alt="{{ $reservation->plot->title }}"
-                                             class="w-12 h-12 object-cover rounded-lg">
+                                             class="w-72 h-48 object-cover rounded-lg">
                                         <div class="flex-1">
-                                            <h4 class="font-semibold text-gray-900">{{ $reservation->plot->title }}</h4>
-                                            <p class="text-sm text-gray-600">{{ $reservation->plot->location }}</p>
+                                            <h4 class="font-semibold text-gray-900 text-lg mb-1">{{ $reservation->plot->title }}</h4>
+                                            <div class="flex items-center mb-1">
+                                                <i class="fas fa-map-marker-alt text-yellow-500 mr-2"></i>
+                                                <span class="text-gray-600">{{ $reservation->plot->location }}</span>
+                                            </div>
+                                            <div class="flex items-center mb-1">
+                                                <i class="fas fa-ruler-combined text-yellow-500 mr-2"></i>
+                                                <span class="text-gray-600">Area: {{ number_format($reservation->plot->area_sqm, 2) }} sqm</span>
+                                            </div>
+                                            <div class="flex items-center mb-1">
+                                                <i class="fas fa-tag text-yellow-500 mr-2"></i>
+                                                <span class="text-gray-600">Category: {{ ucfirst($reservation->plot->category) }}</span>
+                                            </div>
+                                            <p class="text-lg font-bold text-yellow-600 mb-1">MWK {{ number_format($reservation->plot->price, 2) }}</p>
+                                            <p class="text-xs text-gray-500">Expires: {{ $reservation->expires_at->format('M d, Y') }} ({{ $reservation->expires_at->diffForHumans() }})</p>
                                         </div>
                                     </div>
-                                    <div class="flex items-center justify-between">
-                                        <div class="text-sm">
-                                            <p class="text-gray-600">Expires: {{ $reservation->expires_at->format('M d, Y') }}</p>
-                                        <p class="text-green-600 font-semibold">{{ $reservation->expires_at->diffForHumans() }}</p>
-                                        </div>
+                                    <div class="flex items-center justify-end">
                                         <a href="{{ route('customer.plots.show', $reservation->plot->id) }}"
-                                       class="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded-lg text-sm font-medium transition-colors">
+                                           class="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded-lg text-sm font-medium transition-colors">
                                             View
                                         </a>
                                     </div>
@@ -421,6 +430,59 @@
             <button onclick="closeSavePlotModal()" class="px-6 py-2 bg-yellow-500 text-white rounded-lg font-bold hover:bg-yellow-600 transition">OK</button>
         </div>
     </div>
+
+    <!-- Footer Section -->
+    <footer class="w-full bg-white border-t border-yellow-200 mt-12 py-10 px-4 rounded-b-3xl shadow-lg">
+        <div class="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-10 md:gap-8">
+            <!-- About Us -->
+            <div class="flex flex-col h-full">
+                <h3 class="text-xl font-bold text-yellow-700 mb-3 flex items-center gap-2">
+                    <i class="fas fa-building text-yellow-500"></i> About Us
+                </h3>
+                <p class="text-gray-700 mb-2 font-semibold">Atsogo Estate Agent</p>
+                <p class="text-gray-600 text-sm flex-1">Atsogo Estate Agent is a registered real estate agent whose core purpose is to bridge the gap between prospective clients and property owners. We are committed to being the best, most trusted, reliable, and professional estate agent.</p>
+            </div>
+            <!-- What We Do -->
+            <div class="flex flex-col h-full">
+                <h3 class="text-xl font-bold text-yellow-700 mb-3 flex items-center gap-2">
+                    <i class="fas fa-tasks text-yellow-500"></i> What We Do
+                </h3>
+                <ul class="list-disc list-inside text-gray-600 text-sm space-y-2 flex-1">
+                    <li><span class="font-semibold text-gray-800">Property Management:</span> We manage properties on behalf of owners, including valuing, lease agreements, rental collections, maintenance, and marketing the property to let.</li>
+                </ul>
+            </div>
+            <!-- Opening Hours -->
+            <div class="flex flex-col h-full">
+                <h3 class="text-xl font-bold text-yellow-700 mb-3 flex items-center gap-2">
+                    <i class="fas fa-clock text-yellow-500"></i> Opening Hours
+                </h3>
+                <ul class="text-gray-600 text-sm space-y-2 flex-1">
+                    <li><span class="font-semibold text-gray-800">Mon - Tues:</span> 8:00 am - 5:00 pm</li>
+                    <li><span class="font-semibold text-gray-800">Wednes - Fri:</span> 8:00 am - 5:00 pm</li>
+                    <li><span class="font-semibold text-gray-800">Sat:</span> 8:00 am - 12:00 pm</li>
+                    <li><span class="font-semibold text-gray-800">Sun:</span> <span class="text-red-500 font-bold">CLOSED</span></li>
+                </ul>
+            </div>
+            <!-- Contact & Social -->
+            <div class="flex flex-col h-full">
+                <h3 class="text-xl font-bold text-yellow-700 mb-3 flex items-center gap-2">
+                    <i class="fas fa-address-book text-yellow-500"></i> Contact & Social
+                </h3>
+                <ul class="text-gray-600 text-sm space-y-2 mb-4 flex-1">
+                    <li class="flex items-start"><i class="fas fa-map-marker-alt text-yellow-500 mr-2 mt-1"></i> <span>Area 47 sector 4, Mazengera street, gate No 25, Lilongwe.</span></li>
+                    <li class="flex items-center"><i class="fas fa-phone-alt text-yellow-500 mr-2"></i> <a href="tel:+265888052362" class="hover:text-yellow-700 transition">+265 888 052 362</a></li>
+                    <li class="flex items-center"><i class="fas fa-envelope text-yellow-500 mr-2"></i> <a href="mailto:info@atsogo.mw" class="hover:text-yellow-700 transition">info@atsogo.mw</a></li>
+                </ul>
+                <div class="flex space-x-4 mt-2">
+                    <a href="https://www.facebook.com/atsogoestate" target="_blank" rel="noopener" class="bg-yellow-500 hover:bg-yellow-600 text-white rounded-full w-9 h-9 flex items-center justify-center transition transform hover:scale-110 shadow" title="Facebook"><i class="fab fa-facebook-f"></i></a>
+                    <a href="https://twitter.com/atsogoestate" target="_blank" rel="noopener" class="bg-yellow-500 hover:bg-yellow-600 text-white rounded-full w-9 h-9 flex items-center justify-center transition transform hover:scale-110 shadow" title="Twitter"><i class="fab fa-twitter"></i></a>
+                    <a href="https://www.instagram.com/atsogoestate" target="_blank" rel="noopener" class="bg-yellow-500 hover:bg-yellow-600 text-white rounded-full w-9 h-9 flex items-center justify-center transition transform hover:scale-110 shadow" title="Instagram"><i class="fab fa-instagram"></i></a>
+                    <a href="https://www.linkedin.com/company/atsogoestate" target="_blank" rel="noopener" class="bg-yellow-500 hover:bg-yellow-600 text-white rounded-full w-9 h-9 flex items-center justify-center transition transform hover:scale-110 shadow" title="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+                </div>
+            </div>
+        </div>
+        <div class="mt-8 text-center text-xs text-gray-400">&copy; {{ date('Y') }} Atsogo Estate Agent. All rights reserved.</div>
+    </footer>
 
     <style>
         .quick-action-card {
@@ -601,10 +663,8 @@
 
         // Navigation function with loading state
         function navigateTo(url) {
-            showNotification('Navigating...', 'info');
-            setTimeout(() => {
-                window.location.href = url;
-            }, 500);
+            // Removed 'Navigating...' notification
+            window.location.href = url;
         }
 
         // Time-based greeting and emoji

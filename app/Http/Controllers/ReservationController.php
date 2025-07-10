@@ -7,6 +7,7 @@ use App\Models\Reservation;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
+use App\Notifications\ReservationCancelledNotification;
 
 class ReservationController extends Controller
 {
@@ -14,18 +15,14 @@ class ReservationController extends Controller
     {
         $user = Auth::user();
         $reservations = $user->reservations()->with('plot')->latest()->paginate(10);
-        
-        // Calculate real statistics for the customer
+        // Only use allowed statuses
         $stats = [
             'total' => $user->reservations()->count(),
             'active' => $user->reservations()->where('status', 'active')->count(),
-            'pending' => $user->reservations()->where('status', 'pending')->count(),
-            'approved' => $user->reservations()->where('status', 'approved')->count(),
-            'rejected' => $user->reservations()->where('status', 'rejected')->count(),
+            'completed' => $user->reservations()->where('status', 'completed')->count(),
             'expired' => $user->reservations()->where('status', 'expired')->count(),
             'cancelled' => $user->reservations()->where('status', 'cancelled')->count(),
         ];
-        
         return view('customer.reservations.index', compact('reservations', 'stats'));
     }
 
@@ -35,18 +32,13 @@ class ReservationController extends Controller
     public function adminIndex()
     {
         $reservations = Reservation::with(['user', 'plot'])->latest()->paginate(15);
-        
-        // Calculate real statistics for admin
         $stats = [
             'total' => Reservation::count(),
             'active' => Reservation::where('status', 'active')->count(),
-            'pending' => Reservation::where('status', 'pending')->count(),
-            'approved' => Reservation::where('status', 'approved')->count(),
-            'rejected' => Reservation::where('status', 'rejected')->count(),
+            'completed' => Reservation::where('status', 'completed')->count(),
             'expired' => Reservation::where('status', 'expired')->count(),
             'cancelled' => Reservation::where('status', 'cancelled')->count(),
         ];
-        
         return view('admin.reservations.index', compact('reservations', 'stats'));
     }
 
@@ -55,7 +47,7 @@ class ReservationController extends Controller
      */
     public function approve(Reservation $reservation)
     {
-        $reservation->status = 'approved';
+        $reservation->status = 'completed'; // Use allowed ENUM value
         $reservation->save();
 
         return back()->with('success', 'Reservation approved successfully.');
@@ -68,6 +60,9 @@ class ReservationController extends Controller
     {
         $reservation->status = 'rejected';
         $reservation->save();
+
+        // Notify the user
+        $reservation->user->notify(new ReservationCancelledNotification($reservation->plot->title));
 
         // Update the plot status back to available
         $plot = $reservation->plot;
@@ -116,11 +111,43 @@ class ReservationController extends Controller
         $reservation->status = 'cancelled';
         $reservation->save();
 
+        // Notify the user
+        $reservation->user->notify(new ReservationCancelledNotification($reservation->plot->title));
+
         // Update the plot status back to available
         $plot = $reservation->plot;
         $plot->status = 'available';
         $plot->save();
 
         return back()->with('success', 'Reservation cancelled successfully.');
+    }
+
+    /**
+     * Handle a request to buy a reserved plot (grace period logic)
+     */
+    public function requestToBuy(Request $request)
+    {
+        $plot = Plot::findOrFail($request->plot_id);
+        $activeReservation = $plot->activeReservation;
+        $graceMinutes = 120; // 2 hours
+
+        if ($activeReservation) {
+            $now = now();
+            $currentExpires = $activeReservation->expires_at;
+            $newExpires = $now->copy()->addMinutes($graceMinutes);
+            // Only update if the new grace period is later than current expires_at
+            if ($currentExpires->lt($newExpires)) {
+                $activeReservation->expires_at = $newExpires;
+                $activeReservation->save();
+            }
+            // Notify the reserver
+            $activeReservation->user->notify(
+                new \App\Notifications\GracePeriodNotification($plot->title, $graceMinutes)
+            );
+            // Optionally, notify admin here
+            return back()->with('info', 'The current reserver has been notified and given a 2-hour grace period to pay.');
+        }
+        // If not reserved, allow the user to proceed to reserve or buy
+        return back()->with('success', 'This plot is available. You can proceed to reserve or buy.');
     }
 }

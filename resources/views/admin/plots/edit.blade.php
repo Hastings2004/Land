@@ -269,24 +269,16 @@
 
                 <!-- Status & Listing -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div class="form-section">
-                        <label for="status" class="form-label">Status</label>
-                        <select name="status" id="status" required class="form-select">
-                    <option value="available" {{ old('status', $plot->status) == 'available' ? 'selected' : '' }}>Available</option>
-                    <option value="sold" {{ old('status', $plot->status) == 'sold' ? 'selected' : '' }}>Sold</option>
-                            <option value="pending" {{ old('status', $plot->status) == 'pending' ? 'selected' : '' }}>Pending</option>
-                </select>
-                        @error('status')<div class="form-error">{{ $message }}</div>@enderror
-            </div>
+                    <!-- Status field removed: status is managed automatically by the system -->
                     <div class="form-section">
                         <label class="form-label">Listing Type</label>
                         <label style="display:flex;align-items:center;gap:0.5rem;">
                             <input type="checkbox" name="is_new_listing" id="is_new_listing" value="1" {{ old('is_new_listing', $plot->is_new_listing) ? 'checked' : '' }} class="form-checkbox">
                             <span style="color:#b45309;font-weight:500;">New Listing</span>
-                </label>
+                        </label>
                         @error('is_new_listing')<div class="form-error">{{ $message }}</div>@enderror
                     </div>
-            </div>
+                </div>
 
                 <!-- Actions -->
                 <div class="form-actions">
