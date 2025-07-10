@@ -7,6 +7,8 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use App\Notifications\NewPlotNotification;
+use App\Models\User;
 
 class AdminPlotController extends Controller
 {
@@ -142,6 +144,12 @@ class AdminPlotController extends Controller
         // Create the plot first
         $validatedData['user_id'] = $user->id;
         $plot = Plot::create($validatedData);
+
+        // Notify all customers about the new plot
+        $customers = User::where('role', 'customer')->get();
+        foreach ($customers as $customer) {
+            $customer->notify(new NewPlotNotification($plot));
+        }
 
         // Handle multiple image uploads
         if ($request->hasFile('images')) {

@@ -20,7 +20,7 @@
                     <p class="text-yellow-500 text-lg font-medium italic mb-3 leading-relaxed" id="quote">
                         "The best investment you can make is in yourself."
                     </p>
-                    <p class="text-gray-700 font-bold text-base" id="quote-author">
+                    <p class="text-gray-800 font-bold text-base" id="quote-author">
                         Warren Buffett
                     </p>
             </div>
@@ -33,45 +33,45 @@
             <div class="bg-white rounded-2xl shadow-lg p-6 border border-yellow-200 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 cursor-pointer metrics-card" onclick="window.location.href='{{ route('customer.saved-plots.index') }}'">
                 <div class="flex items-center justify-between mb-4">
                     <div class="p-3 bg-gradient-to-br from-yellow-100 to-yellow-200 rounded-xl">
-                            <i class="fas fa-bookmark text-yellow-600 text-2xl"></i>
+                            <i class="fas fa-bookmark text-yellow-500 text-2xl"></i>
                         </div>
                     <div class="text-right">
-                        <div class="text-3xl font-bold text-yellow-600 metrics-number" id="saved-plots-count">{{ $stats['savedPlots'] }}</div>
+                        <div class="text-3xl font-bold text-yellow-500 metrics-number" id="saved-plots-count">{{ $stats['savedPlots'] }}</div>
                         <div class="text-xs text-yellow-500 font-medium">Saved</div>
                     </div>
                 </div>
-                <h3 class="text-lg font-semibold text-gray-800 mb-2">Saved Plots</h3>
-                <p class="text-gray-600 text-sm">Your favorite land investments</p>
+                <h3 class="text-lg font-semibold text-gray-900 mb-2">Saved Plots</h3>
+                <p class="text-gray-700 text-sm">Your favorite land investments</p>
                 </div>
 
                 <!-- Reservations Card -->
             <div class="bg-white rounded-2xl shadow-lg p-6 border border-yellow-200 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 cursor-pointer metrics-card" onclick="window.location.href='{{ route('customer.reservations.index') }}'">
                 <div class="flex items-center justify-between mb-4">
                     <div class="p-3 bg-gradient-to-br from-green-100 to-green-200 rounded-xl">
-                        <i class="fas fa-calendar-check text-green-600 text-2xl"></i>
+                        <i class="fas fa-calendar-check text-green-700 text-2xl"></i>
                         </div>
                     <div class="text-right">
-                        <div class="text-3xl font-bold text-green-600 metrics-number" id="reservations-count">{{ $stats['reservations'] }}</div>
-                        <div class="text-xs text-green-500 font-medium">Active</div>
+                        <div class="text-3xl font-bold text-green-800 metrics-number" id="reservations-count">{{ $stats['reservations'] }}</div>
+                        <div class="text-xs text-green-800 font-medium">Active</div>
                     </div>
                 </div>
-                <h3 class="text-lg font-semibold text-gray-800 mb-2">Reservations</h3>
-                <p class="text-gray-600 text-sm">Your current bookings</p>
+                <h3 class="text-lg font-semibold text-gray-900 mb-2">Reservations</h3>
+                <p class="text-gray-700 text-sm">Your current bookings</p>
                 </div>
 
                 <!-- Inquiries Card -->
             <div class="bg-white rounded-2xl shadow-lg p-6 border border-yellow-200 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 cursor-pointer metrics-card" onclick="window.location.href='{{ route('customer.inquiries.index') }}'">
                 <div class="flex items-center justify-between mb-4">
                     <div class="p-3 bg-gradient-to-br from-blue-100 to-blue-200 rounded-xl">
-                        <i class="fas fa-envelope text-blue-600 text-2xl"></i>
+                        <i class="fas fa-envelope text-blue-700 text-2xl"></i>
                         </div>
                     <div class="text-right">
-                        <div class="text-3xl font-bold text-blue-600 metrics-number" id="inquiries-count">{{ $stats['inquiries'] }}</div>
-                        <div class="text-xs text-blue-500 font-medium">Sent</div>
+                        <div class="text-3xl font-bold text-blue-800 metrics-number" id="inquiries-count">{{ $stats['inquiries'] }}</div>
+                        <div class="text-xs text-blue-800 font-medium">Sent</div>
                     </div>
                 </div>
-                <h3 class="text-lg font-semibold text-gray-800 mb-2">Inquiries</h3>
-                <p class="text-gray-600 text-sm">Your messages to agents</p>
+                <h3 class="text-lg font-semibold text-gray-900 mb-2">Inquiries</h3>
+                <p class="text-gray-700 text-sm">Your messages to agents</p>
             </div>
             </div>
 
@@ -90,8 +90,8 @@
                     <div class="p-4 bg-gradient-to-br from-yellow-100 to-yellow-200 rounded-xl mb-3 group-hover:from-yellow-200 group-hover:to-yellow-300 transition-all duration-300">
                         <i class="fas fa-search text-yellow-500 text-2xl group-hover:scale-110 transition-transform duration-300"></i>
                     </div>
-                    <h4 class="font-semibold text-gray-800 text-sm mb-1 group-hover:text-yellow-600 transition-colors duration-300">Browse Plots</h4>
-                    <p class="text-gray-500 text-xs">Find your perfect land</p>
+                    <h4 class="font-semibold text-gray-900 text-sm mb-1 group-hover:text-yellow-500 transition-colors duration-300">Browse Plots</h4>
+                    <p class="text-gray-700 text-xs">Find your perfect land</p>
                     <div class="mt-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                         <i class="fas fa-arrow-right text-yellow-500 text-xs"></i>
                     </div>
@@ -102,8 +102,8 @@
                     <div class="p-4 bg-gradient-to-br from-yellow-100 to-yellow-200 rounded-xl mb-3 group-hover:from-yellow-200 group-hover:to-yellow-300 transition-all duration-300">
                         <i class="fas fa-plus text-yellow-500 text-2xl group-hover:scale-110 transition-transform duration-300"></i>
                     </div>
-                    <h4 class="font-semibold text-gray-800 text-sm mb-1 group-hover:text-yellow-600 transition-colors duration-300">New Inquiry</h4>
-                    <p class="text-gray-500 text-xs">Ask about properties</p>
+                    <h4 class="font-semibold text-gray-900 text-sm mb-1 group-hover:text-yellow-500 transition-colors duration-300">New Inquiry</h4>
+                    <p class="text-gray-700 text-xs">Ask about properties</p>
                     <div class="mt-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                         <i class="fas fa-arrow-right text-yellow-500 text-xs"></i>
                     </div>
@@ -114,8 +114,8 @@
                     <div class="p-4 bg-gradient-to-br from-yellow-100 to-yellow-200 rounded-xl mb-3 group-hover:from-yellow-200 group-hover:to-yellow-300 transition-all duration-300">
                         <i class="fas fa-user text-yellow-500 text-2xl group-hover:scale-110 transition-transform duration-300"></i>
                     </div>
-                    <h4 class="font-semibold text-gray-800 text-sm mb-1 group-hover:text-yellow-600 transition-colors duration-300">My Profile</h4>
-                    <p class="text-gray-500 text-xs">Update information</p>
+                    <h4 class="font-semibold text-gray-900 text-sm mb-1 group-hover:text-yellow-500 transition-colors duration-300">My Profile</h4>
+                    <p class="text-gray-700 text-xs">Update information</p>
                     <div class="mt-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                         <i class="fas fa-arrow-right text-yellow-500 text-xs"></i>
                     </div>
@@ -126,8 +126,8 @@
                     <div class="p-4 bg-gradient-to-br from-yellow-100 to-yellow-200 rounded-xl mb-3 group-hover:from-yellow-200 group-hover:to-yellow-300 transition-all duration-300">
                         <i class="fas fa-headset text-yellow-500 text-2xl group-hover:scale-110 transition-transform duration-300"></i>
                     </div>
-                    <h4 class="font-semibold text-gray-800 text-sm mb-1 group-hover:text-yellow-600 transition-colors duration-300">Support</h4>
-                    <p class="text-gray-500 text-xs">Get help</p>
+                    <h4 class="font-semibold text-gray-900 text-sm mb-1 group-hover:text-yellow-500 transition-colors duration-300">Support</h4>
+                    <p class="text-gray-700 text-xs">Get help</p>
                     <div class="mt-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                         <i class="fas fa-arrow-right text-yellow-500 text-xs"></i>
                     </div>
@@ -142,7 +142,7 @@
                     <i class="fas fa-star text-yellow-500 mr-3 animate-pulse"></i>
                     Recommended Plots
                 </h3>
-                <a href="{{ route('customer.plots.index') }}" class="text-yellow-600 hover:text-yellow-700 text-sm font-medium flex items-center group-hover:scale-105 transition-all duration-300">
+                <a href="{{ route('customer.plots.index') }}" class="text-yellow-500 hover:text-yellow-500 text-sm font-medium flex items-center group-hover:scale-105 transition-all duration-300">
                     View All <i class="fas fa-arrow-right ml-1 group-hover:translate-x-1 transition-transform duration-300"></i>
                 </a>
             </div>
@@ -156,7 +156,7 @@
                         <div class="recommended-plot-card bg-gradient-to-br from-yellow-50 to-yellow-100 rounded-xl p-4 border border-yellow-200 hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 group cursor-pointer" 
                              onclick="window.location.href='{{ route('customer.plots.show', $plot->id) }}'">
                             <!-- Plot Image Carousel -->
-                            <div class="relative mb-4 overflow-hidden rounded-lg">
+                            <div class="relative mb-4 overflow-hidden rounded-lg h-48 md:h-52 lg:h-48">
                                 @if($plot->plotImages && $plot->plotImages->count() > 1)
                                     <div class="carousel relative w-full h-48 md:h-52 lg:h-48" data-plot-id="{{ $plot->id }}">
                                         @foreach($plot->plotImages as $index => $image)
@@ -199,14 +199,17 @@
                                 <!-- Quick Action Overlay -->
                                 <div class="absolute bottom-3 left-3 right-3 opacity-100 transition-all duration-300 transform translate-y-2 group-hover:translate-y-0 z-20">
                                     <div class="flex space-x-2">
-                                        <button id="save-btn-{{ $plot->id }}"
-                                                onclick="event.stopPropagation(); savePlotUI({{ $plot->id }}, this)"
-                                                class="flex-1 px-3 py-2 rounded-lg font-medium text-sm transition-all duration-300 flex items-center justify-center shadow-lg
+                                        <form action="{{ route('customer.saved-plots.store') }}" method="POST" class="flex-1" onsubmit="event.stopPropagation();">
+                                            @csrf
+                                            <input type="hidden" name="plot_id" value="{{ $plot->id }}">
+                                            <button type="submit"
+                                                class="w-full px-3 py-2 rounded-lg font-medium text-sm transition-all duration-300 flex items-center justify-center shadow-lg
                                                 {{ $isSaved ? 'bg-green-500 text-white cursor-not-allowed' : 'bg-yellow-500 hover:bg-yellow-600 text-white' }}"
                                                 {{ $isSaved ? 'disabled' : '' }}>
-                                            <i class="fas {{ $isSaved ? 'fa-check' : 'fa-bookmark' }} mr-1"></i>
-                                            <span>{{ $isSaved ? 'Saved' : 'Save' }}</span>
-                                        </button>
+                                                <i class="fas {{ $isSaved ? 'fa-check' : 'fa-bookmark' }} mr-1"></i>
+                                                <span>{{ $isSaved ? 'Saved' : 'Save' }}</span>
+                                            </button>
+                                        </form>
                                         <button onclick="event.stopPropagation(); sharePlot({{ $plot->id }})" 
                                                 class="bg-white hover:bg-gray-100 text-gray-700 px-3 py-2 rounded-lg font-medium text-sm transition-all duration-300 flex items-center justify-center shadow-lg">
                                             <i class="fas fa-share-alt"></i>
@@ -216,7 +219,7 @@
                             </div>
                             <!-- Plot Details -->
                             <div class="space-y-3">
-                                <h4 class="font-bold text-gray-900 text-lg group-hover:text-yellow-600 transition-colors duration-300 line-clamp-2">
+                                <h4 class="font-bold text-gray-900 text-lg group-hover:text-yellow-500 transition-colors duration-300 line-clamp-2">
                                     {{ $plot->title }}
                                 </h4>
                                 <p class="text-sm text-gray-600 flex items-center line-clamp-1">
@@ -236,12 +239,12 @@
                                 <!-- Admin Name -->
                                 {{-- <div class="flex items-center text-xs text-gray-500">
                                     <i class="fas fa-user-shield text-yellow-500 mr-1"></i>
-                                    Posted by: <span class="ml-1 font-semibold text-yellow-700">{{ $plot->admin->name ?? 'Admin' }}</span>
+                                    Posted by: <span class="ml-1 font-semibold text-yellow-500">{{ $plot->admin->name ?? 'Admin' }}</span>
                                 </div> --}}
                                 <!-- Price Section -->
                                 <div class="flex items-center justify-between pt-3 border-t border-yellow-200">
                                     <div class="flex-1">
-                                        <p class="text-2xl font-bold text-yellow-600 group-hover:scale-105 transition-transform duration-300">K{{ number_format($plot->price) }}</p>
+                                        <p class="text-2xl font-bold text-yellow-500 group-hover:scale-105 transition-transform duration-300">K{{ number_format($plot->price) }}</p>
                                         <p class="text-xs text-gray-500">Total Price</p>
                                     </div>
                                     <!-- Status Indicator -->
@@ -265,7 +268,7 @@
                                         <i class="fas fa-star text-yellow-500 mt-1"></i>
                                         <div>
                                             <div class="flex items-center gap-1">
-                                                <span class="font-semibold text-yellow-700 text-sm">{{ $review->user->name ?? 'Customer' }}</span>
+                                                <span class="font-semibold text-yellow-500 text-sm">{{ $review->user->name ?? 'Customer' }}</span>
                                                 <span class="text-xs text-gray-400">&middot; {{ $review->created_at->diffForHumans() }}</span>
                                             </div>
                                             <div class="flex items-center mb-1">
@@ -291,7 +294,7 @@
                     </div>
                     <p class="text-gray-500 text-lg mb-2">No recommended plots available</p>
                     <p class="text-gray-400 text-sm mb-6">Start exploring plots to get personalized recommendations!</p>
-                    <a href="{{ route('customer.plots.index') }}" class="inline-block bg-yellow-500 hover:bg-yellow-600 text-white px-6 py-3 rounded-lg font-medium transition-all duration-300 transform hover:scale-105 shadow-lg">
+                    <a href="{{ route('customer.plots.index') }}" class="inline-block bg-yellow-500 hover:bg-yellow-500 text-white px-6 py-3 rounded-lg font-medium transition-all duration-300 transform hover:scale-105 shadow-lg">
                         <i class="fas fa-search mr-2"></i>
                         Browse All Plots
                     </a>
@@ -308,7 +311,7 @@
                             <i class="fas fa-bookmark text-yellow-500 mr-3"></i>
                             Recent Saved Plots
                         </h3>
-                        <a href="{{ route('customer.saved-plots.index') }}" class="text-yellow-600 hover:text-yellow-700 text-sm font-medium flex items-center">
+                        <a href="{{ route('customer.saved-plots.index') }}" class="text-yellow-500 hover:text-yellow-500 text-sm font-medium flex items-center">
                             View All <i class="fas fa-arrow-right ml-1"></i>
                         </a>
                     </div>
@@ -329,7 +332,7 @@
                                     <div class="flex-1">
                                         <h4 class="font-semibold text-gray-900 text-lg">{{ $plot->title }}</h4>
                                         @if(Str::contains($plot->location, 'Area'))
-                                            <p class="text-sm text-yellow-700 font-bold flex items-center mb-1">
+                                            <p class="text-sm text-yellow-500 font-bold flex items-center mb-1">
                                                 <i class="fas fa-map-marker-alt text-yellow-500 mr-1"></i>
                                                 {{ collect(explode(',', $plot->location))->filter(fn($part) => Str::contains($part, 'Area'))->implode(', ') }}
                                             </p>
@@ -338,10 +341,10 @@
                                             <i class="fas fa-map-marker-alt text-yellow-500 mr-1"></i>
                                             {{ $plot->location }}
                                         </p>
-                                        <p class="text-lg font-bold text-yellow-600">K{{ number_format($plot->price) }}</p>
+                                        <p class="text-lg font-bold text-yellow-500">K{{ number_format($plot->price) }}</p>
                                     </div>
                                     <a href="{{ route('customer.plots.show', $plot->id) }}"
-                                       class="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-lg font-medium transition-colors">
+                                       class="bg-yellow-500 hover:bg-yellow-500 text-white px-4 py-2 rounded-lg font-medium transition-colors">
                                         View
                                     </a>
                                 </div>
@@ -354,7 +357,7 @@
                             </div>
                             <p class="text-gray-500 text-lg">No saved plots yet</p>
                             <p class="text-gray-400 text-sm">Start exploring and save your favorite plots!</p>
-                        <a href="{{ route('customer.plots.index') }}" class="mt-4 inline-block bg-yellow-500 hover:bg-yellow-600 text-white px-6 py-2 rounded-lg font-medium transition-colors">
+                        <a href="{{ route('customer.plots.index') }}" class="mt-4 inline-block bg-yellow-500 hover:bg-yellow-500 text-white px-6 py-2 rounded-lg font-medium transition-colors">
                             Browse Plots
                         </a>
                         </div>
@@ -394,7 +397,7 @@
                                                 <i class="fas fa-tag text-yellow-500 mr-2"></i>
                                                 <span class="text-gray-600">Category: {{ ucfirst($reservation->plot->category) }}</span>
                                             </div>
-                                            <p class="text-lg font-bold text-yellow-600 mb-1">MWK {{ number_format($reservation->plot->price, 2) }}</p>
+                                            <p class="text-lg font-bold text-yellow-500 mb-1">MWK {{ number_format($reservation->plot->price, 2) }}</p>
                                             <p class="text-xs text-gray-500">Expires: {{ $reservation->expires_at->format('M d, Y') }} ({{ $reservation->expires_at->diffForHumans() }})</p>
                                         </div>
                                     </div>
@@ -436,7 +439,7 @@
         <div class="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-10 md:gap-8">
             <!-- About Us -->
             <div class="flex flex-col h-full">
-                <h3 class="text-xl font-bold text-yellow-700 mb-3 flex items-center gap-2">
+                <h3 class="text-xl font-bold text-yellow-500 mb-3 flex items-center gap-2">
                     <i class="fas fa-building text-yellow-500"></i> About Us
                 </h3>
                 <p class="text-gray-700 mb-2 font-semibold">Atsogo Estate Agent</p>
@@ -444,7 +447,7 @@
             </div>
             <!-- What We Do -->
             <div class="flex flex-col h-full">
-                <h3 class="text-xl font-bold text-yellow-700 mb-3 flex items-center gap-2">
+                <h3 class="text-xl font-bold text-yellow-500 mb-3 flex items-center gap-2">
                     <i class="fas fa-tasks text-yellow-500"></i> What We Do
                 </h3>
                 <ul class="list-disc list-inside text-gray-600 text-sm space-y-2 flex-1">
@@ -453,7 +456,7 @@
             </div>
             <!-- Opening Hours -->
             <div class="flex flex-col h-full">
-                <h3 class="text-xl font-bold text-yellow-700 mb-3 flex items-center gap-2">
+                <h3 class="text-xl font-bold text-yellow-500 mb-3 flex items-center gap-2">
                     <i class="fas fa-clock text-yellow-500"></i> Opening Hours
                 </h3>
                 <ul class="text-gray-600 text-sm space-y-2 flex-1">
@@ -465,19 +468,19 @@
             </div>
             <!-- Contact & Social -->
             <div class="flex flex-col h-full">
-                <h3 class="text-xl font-bold text-yellow-700 mb-3 flex items-center gap-2">
+                <h3 class="text-xl font-bold text-yellow-500 mb-3 flex items-center gap-2">
                     <i class="fas fa-address-book text-yellow-500"></i> Contact & Social
                 </h3>
                 <ul class="text-gray-600 text-sm space-y-2 mb-4 flex-1">
                     <li class="flex items-start"><i class="fas fa-map-marker-alt text-yellow-500 mr-2 mt-1"></i> <span>Area 47 sector 4, Mazengera street, gate No 25, Lilongwe.</span></li>
-                    <li class="flex items-center"><i class="fas fa-phone-alt text-yellow-500 mr-2"></i> <a href="tel:+265888052362" class="hover:text-yellow-700 transition">+265 888 052 362</a></li>
-                    <li class="flex items-center"><i class="fas fa-envelope text-yellow-500 mr-2"></i> <a href="mailto:info@atsogo.mw" class="hover:text-yellow-700 transition">info@atsogo.mw</a></li>
+                    <li class="flex items-center"><i class="fas fa-phone-alt text-yellow-500 mr-2"></i> <a href="tel:+265888052362" class="hover:text-yellow-500 transition">+265 888 052 362</a></li>
+                    <li class="flex items-center"><i class="fas fa-envelope text-yellow-500 mr-2"></i> <a href="mailto:info@atsogo.mw" class="hover:text-yellow-500 transition">info@atsogo.mw</a></li>
                 </ul>
                 <div class="flex space-x-4 mt-2">
-                    <a href="https://www.facebook.com/atsogoestate" target="_blank" rel="noopener" class="bg-yellow-500 hover:bg-yellow-600 text-white rounded-full w-9 h-9 flex items-center justify-center transition transform hover:scale-110 shadow" title="Facebook"><i class="fab fa-facebook-f"></i></a>
-                    <a href="https://twitter.com/atsogoestate" target="_blank" rel="noopener" class="bg-yellow-500 hover:bg-yellow-600 text-white rounded-full w-9 h-9 flex items-center justify-center transition transform hover:scale-110 shadow" title="Twitter"><i class="fab fa-twitter"></i></a>
-                    <a href="https://www.instagram.com/atsogoestate" target="_blank" rel="noopener" class="bg-yellow-500 hover:bg-yellow-600 text-white rounded-full w-9 h-9 flex items-center justify-center transition transform hover:scale-110 shadow" title="Instagram"><i class="fab fa-instagram"></i></a>
-                    <a href="https://www.linkedin.com/company/atsogoestate" target="_blank" rel="noopener" class="bg-yellow-500 hover:bg-yellow-600 text-white rounded-full w-9 h-9 flex items-center justify-center transition transform hover:scale-110 shadow" title="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+                    <a href="https://www.facebook.com/atsogoestate" target="_blank" rel="noopener" class="bg-yellow-500 hover:bg-yellow-500 text-white rounded-full w-9 h-9 flex items-center justify-center transition transform hover:scale-110 shadow" title="Facebook"><i class="fab fa-facebook-f"></i></a>
+                    <a href="https://twitter.com/atsogoestate" target="_blank" rel="noopener" class="bg-yellow-500 hover:bg-yellow-500 text-white rounded-full w-9 h-9 flex items-center justify-center transition transform hover:scale-110 shadow" title="Twitter"><i class="fab fa-twitter"></i></a>
+                    <a href="https://www.instagram.com/atsogoestate" target="_blank" rel="noopener" class="bg-yellow-500 hover:bg-yellow-500 text-white rounded-full w-9 h-9 flex items-center justify-center transition transform hover:scale-110 shadow" title="Instagram"><i class="fab fa-instagram"></i></a>
+                    <a href="https://www.linkedin.com/company/atsogoestate" target="_blank" rel="noopener" class="bg-yellow-500 hover:bg-yellow-500 text-white rounded-full w-9 h-9 flex items-center justify-center transition transform hover:scale-110 shadow" title="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
                 </div>
             </div>
         </div>

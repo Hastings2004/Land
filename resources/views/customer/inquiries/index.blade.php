@@ -10,8 +10,8 @@
 
     <!-- Page Header -->
     <div class="mb-8 text-center">
-        <div class="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-yellow-400 to-yellow-500 rounded-2xl shadow-xl mb-4 transform rotate-3 hover:rotate-0 transition-transform duration-300">
-            <i class="fas fa-envelope text-white text-xl"></i>
+        <div class="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-yellow-400 to-yellow-500 rounded-2xl shadow-xl mb-4 mx-auto">
+            <i class="fas fa-envelope text-yellow-500 text-3xl"></i>
         </div>
         <h1 class="text-3xl font-bold text-gray-800 mb-2">My Inquiries</h1>
         <p class="text-gray-600">Track your land investment questions</p>

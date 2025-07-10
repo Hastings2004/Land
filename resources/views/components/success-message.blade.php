@@ -4,7 +4,7 @@
     <!-- Session ID: {{ session()->getId() }} -->
     <!-- All session data: {{ json_encode(session()->all()) }} -->
     <div id="success-message" class="fixed top-4 right-4 z-50 max-w-sm w-full transform transition-all duration-500 ease-in-out opacity-0 translate-x-full">
-        <div class="bg-gradient-to-r from-green-400 to-green-500 rounded-2xl shadow-2xl border border-green-300 p-6 relative overflow-hidden">
+        <div class="bg-green-600 p-6 rounded-2xl shadow-2xl relative overflow-hidden">
             <!-- Background Pattern -->
             <div class="absolute inset-0 bg-gradient-to-br from-green-300/20 to-transparent"></div>
             <div class="absolute top-0 right-0 w-20 h-20 bg-green-300/10 rounded-full -translate-y-10 translate-x-10"></div>
@@ -25,7 +25,7 @@
                     <!-- Message Content -->
                     <div class="flex-1 min-w-0">
                         <h3 class="text-lg font-bold text-white mb-1">Success!</h3>
-                        <p class="text-green-100 text-sm leading-relaxed">{{ session('success') }}</p>
+                        <p class="text-white text-sm leading-relaxed">{{ session('success') }}</p>
                     </div>
                     
                     <!-- Close Button -->

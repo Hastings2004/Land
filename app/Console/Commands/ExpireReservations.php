@@ -63,6 +63,14 @@ class ExpireReservations extends Command
             }
         }
 
+        // Archive expired reservations older than 7 days
+        $toArchive = Reservation::where('status', 'expired')
+            ->where('expires_at', '<', now()->subDays(7))
+            ->get();
+        foreach ($toArchive as $reservation) {
+            $reservation->delete(); // Soft delete
+        }
+
         $this->info('Expired reservations processed successfully.');
     }
 } 

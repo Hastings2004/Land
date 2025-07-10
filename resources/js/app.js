@@ -246,4 +246,171 @@ document.addEventListener('DOMContentLoaded', function() {
         window.location.href = document.body.dataset.userRole === 'admin' ? '/admin/notifications' : '/customer/notifications';
     };
     // --- END: Notification Bell Interactivity ---
+
+    // Auto-advance customer plot carousels
+    document.querySelectorAll('[class^="plot-carousel-"]').forEach(function(carousel) {
+        const plotIdMatch = carousel.className.match(/plot-carousel-(\d+)/);
+        if (!plotIdMatch) return;
+        const plotId = plotIdMatch[1];
+        const slides = carousel.querySelectorAll('.carousel-slide');
+        if (slides.length <= 1) return;
+        let currentIndex = 0;
+        setInterval(() => {
+            slides.forEach((slide, i) => {
+                slide.classList.toggle('active', i === currentIndex);
+                slide.classList.toggle('opacity-100', i === currentIndex);
+                slide.classList.toggle('z-10', i === currentIndex);
+                slide.classList.toggle('opacity-0', i !== currentIndex);
+                slide.classList.toggle('z-0', i !== currentIndex);
+            });
+            // Update dots if present
+            const dots = document.querySelectorAll('.carousel-dot-' + plotId);
+            dots.forEach((dot, i) => {
+                dot.classList.toggle('bg-yellow-500', i === currentIndex);
+            });
+            // Update counter if present
+            const counter = document.querySelector('.image-counter-' + plotId);
+            if (counter) counter.textContent = currentIndex + 1;
+            currentIndex = (currentIndex + 1) % slides.length;
+        }, 4000);
+    });
+
+    // Auto-advance for plot details page carousel
+    const carousel = document.getElementById('carousel');
+    if (carousel) {
+        const images = carousel.querySelectorAll('.carousel-img');
+        const dots = carousel.querySelectorAll('.carousel-dot');
+        if (images.length > 1) {
+            let currentIndex = 0;
+            setInterval(() => {
+                images.forEach((img, i) => {
+                    img.classList.toggle('opacity-100', i === currentIndex);
+                    img.classList.toggle('z-10', i === currentIndex);
+                    img.classList.toggle('opacity-0', i !== currentIndex);
+                    img.classList.toggle('z-0', i !== currentIndex);
+                });
+                dots.forEach((dot, i) => {
+                    dot.classList.toggle('bg-yellow-500', i === currentIndex);
+                    dot.classList.toggle('bg-white', i !== currentIndex);
+                });
+                currentIndex = (currentIndex + 1) % images.length;
+            }, 4000);
+        }
+    }
+
+    // Auto-advance for admin plot details page carousel
+    const adminCarousel = document.getElementById('admin-carousel');
+    if (adminCarousel) {
+        const images = adminCarousel.querySelectorAll('.admin-carousel-img');
+        const dots = adminCarousel.querySelectorAll('.admin-carousel-dot');
+        if (images.length > 1) {
+            let currentIndex = 0;
+            setInterval(() => {
+                images.forEach((img, i) => {
+                    img.classList.toggle('opacity-100', i === currentIndex);
+                    img.classList.toggle('z-10', i === currentIndex);
+                    img.classList.toggle('opacity-0', i !== currentIndex);
+                    img.classList.toggle('z-0', i !== currentIndex);
+                });
+                dots.forEach((dot, i) => {
+                    dot.classList.toggle('bg-yellow-500', i === currentIndex);
+                    dot.classList.toggle('bg-white', i !== currentIndex);
+                });
+                currentIndex = (currentIndex + 1) % images.length;
+            }, 4000);
+        }
+    }
 });
+
+// Make quick actions work globally
+window.navigateTo = function(url) {
+    window.location.href = url;
+};
+window.contactSupport = function() {
+    const modal = document.getElementById('contact-modal');
+    if (modal) {
+        modal.classList.remove('hidden');
+    }
+};
+
+// Support modal logic
+window.closeContactModal = function() {
+    const modal = document.getElementById('contact-modal');
+    if (modal) {
+        modal.classList.add('hidden');
+    }
+};
+window.submitContactForm = function() {
+    const name = document.getElementById('contact-name');
+    const email = document.getElementById('contact-email');
+    const message = document.getElementById('contact-message');
+    let valid = true;
+    // Simple validation
+    if (!name.value.trim()) {
+        document.getElementById('name-error').textContent = 'Name is required.';
+        document.getElementById('name-error').classList.remove('hidden');
+        valid = false;
+    } else {
+        document.getElementById('name-error').classList.add('hidden');
+    }
+    if (!email.value.trim() || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email.value)) {
+        document.getElementById('email-error').textContent = 'Valid email is required.';
+        document.getElementById('email-error').classList.remove('hidden');
+        valid = false;
+    } else {
+        document.getElementById('email-error').classList.add('hidden');
+    }
+    if (!message.value.trim()) {
+        document.getElementById('message-error').textContent = 'Message is required.';
+        document.getElementById('message-error').classList.remove('hidden');
+        valid = false;
+    } else {
+        document.getElementById('message-error').classList.add('hidden');
+    }
+    if (!valid) return;
+    // Simulate sending (show loading, then success)
+    const sendBtn = document.querySelector('#contact-modal button[onclick="submitContactForm()"]');
+    if (sendBtn) {
+        sendBtn.disabled = true;
+        sendBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Sending...';
+    }
+    setTimeout(() => {
+        if (sendBtn) {
+            sendBtn.disabled = false;
+            sendBtn.innerHTML = '<i class="fas fa-paper-plane mr-2"></i>Send Message';
+        }
+        alert('Your message has been sent! Support will contact you soon.');
+        window.closeContactModal();
+        // Optionally clear fields
+        name.value = '';
+        email.value = '';
+        message.value = '';
+        document.getElementById('message-count').textContent = '0';
+    }, 1200);
+};
+
+// Carousel navigation for customer plots
+window.prevCarouselImage = function(plotId) {
+    const imgs = document.querySelectorAll('.carousel-img-' + plotId);
+    const dots = document.querySelectorAll('.carousel-dot-' + plotId);
+    let idx = Array.from(imgs).findIndex(img => img.classList.contains('opacity-100'));
+    imgs[idx].classList.remove('opacity-100', 'z-10');
+    imgs[idx].classList.add('opacity-0', 'z-0');
+    dots[idx].classList.remove('bg-yellow-500');
+    idx = (idx - 1 + imgs.length) % imgs.length;
+    imgs[idx].classList.add('opacity-100', 'z-10');
+    imgs[idx].classList.remove('opacity-0', 'z-0');
+    dots[idx].classList.add('bg-yellow-500');
+}
+window.nextCarouselImage = function(plotId) {
+    const imgs = document.querySelectorAll('.carousel-img-' + plotId);
+    const dots = document.querySelectorAll('.carousel-dot-' + plotId);
+    let idx = Array.from(imgs).findIndex(img => img.classList.contains('opacity-100'));
+    imgs[idx].classList.remove('opacity-100', 'z-10');
+    imgs[idx].classList.add('opacity-0', 'z-0');
+    dots[idx].classList.remove('bg-yellow-500');
+    idx = (idx + 1) % imgs.length;
+    imgs[idx].classList.add('opacity-100', 'z-10');
+    imgs[idx].classList.remove('opacity-0', 'z-0');
+    dots[idx].classList.add('bg-yellow-500');
+}

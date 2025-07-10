@@ -10,8 +10,8 @@
 
     <!-- Page Header -->
     <div class="mb-8 text-center">
-        <div class="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-yellow-400 to-yellow-500 rounded-2xl shadow-xl mb-4 transform rotate-3 hover:rotate-0 transition-transform duration-300">
-            <i class="fas fa-envelope-open text-white text-xl"></i>
+        <div class="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-yellow-400 to-yellow-500 rounded-2xl shadow-xl mb-4 mx-auto animate-bounce-in">
+            <i class="fas fa-envelope text-yellow-500 text-3xl"></i>
         </div>
         <h1 class="text-3xl font-bold text-gray-800 mb-2">Inquiry Details</h1>
         <p class="text-gray-600">View your inquiry information and responses</p>
@@ -47,14 +47,14 @@
     <div class="mb-8">
         @switch($inquiry->status)
             @case('new')
-                <div class="bg-blue-50 border border-blue-200 text-blue-800 p-4 rounded-xl">
+                <div class="bg-white border border-green-400 text-green-800 p-4 rounded-xl">
                     <div class="flex items-center">
-                        <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center mr-3">
+                        <div class="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center mr-3">
                             <i class="fas fa-clock text-white text-sm"></i>
                         </div>
                         <div>
                             <h3 class="text-sm font-bold">New Inquiry</h3>
-                            <p class="text-blue-600 text-xs">Your inquiry has been received and is awaiting review</p>
+                            <p class="text-green-600 text-xs">Your inquiry has been received and is awaiting review</p>
                         </div>
                     </div>
                 </div>
@@ -117,13 +117,16 @@
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <!-- Inquiry Details Card -->
         <div class="lg:col-span-2">
-            <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
+            <div class="bg-white rounded-2xl shadow-lg overflow-hidden transition-transform duration-300 hover:scale-[1.01]">
                 <!-- Card Header -->
-                <div class="bg-yellow-50 border-b border-yellow-200 px-6 py-3">
+                <div class="bg-yellow-50 border-b border-yellow-200 px-6 py-3 flex items-center justify-between">
                     <h2 class="text-lg font-bold text-yellow-800 flex items-center">
-                        <i class="fas fa-file-alt mr-3 text-yellow-600"></i>
+                        <i class="fas fa-file-alt mr-3 text-yellow-600" title="Inquiry Information"></i>
                         Inquiry Information
                     </h2>
+                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-700 border border-yellow-300" title="Status: {{ ucfirst($inquiry->status) }}">
+                        <i class="fas fa-info-circle mr-1"></i> {{ ucfirst($inquiry->status) }}
+                    </span>
                 </div>
 
                 <!-- Card Content -->
@@ -138,9 +141,17 @@
 
                     <!-- Message -->
                     <div class="mb-6">
-                        <label class="block text-sm font-semibold text-gray-700 mb-2 uppercase tracking-wide">Your Message</label>
-                        <div class="bg-gray-50 rounded-xl p-6 border border-gray-200">
-                            <div class="text-gray-900 whitespace-pre-wrap leading-relaxed">{{ $inquiry->message }}</div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2 uppercase tracking-wide flex items-center gap-2">
+                            <i class="fas fa-comment-dots text-yellow-500 text-lg"></i>
+                            Your Message
+                        </label>
+                        <div class="bg-yellow-50 rounded-2xl p-6 border-l-4 border-yellow-400 shadow-sm flex items-start gap-3">
+                            <div class="w-10 h-10 flex items-center justify-center rounded-full bg-yellow-200 shadow-inner mr-2">
+                                <i class="fas fa-user text-yellow-600 text-xl"></i>
+                            </div>
+                            <div class="text-gray-900 whitespace-pre-wrap leading-relaxed text-base font-medium">
+                                {{ $inquiry->message }}
+                            </div>
                         </div>
                     </div>
 
@@ -194,17 +205,17 @@
                 <div class="p-6 space-y-4">
                     <div>
                         <label class="block text-sm font-semibold text-gray-700 mb-1">Email</label>
-                        <div class="text-gray-900 flex items-center">
+                        <div class="text-gray-900 flex items-center gap-2">
                             <i class="fas fa-envelope text-yellow-500 mr-2"></i>
-                            {{ $inquiry->email }}
+                            <span>{{ $inquiry->email }}</span>
                         </div>
                     </div>
                     @if($inquiry->phone)
                     <div>
                         <label class="block text-sm font-semibold text-gray-700 mb-1">Phone</label>
-                        <div class="text-gray-900 flex items-center">
+                        <div class="text-gray-900 flex items-center gap-2">
                             <i class="fas fa-phone text-yellow-500 mr-2"></i>
-                            {{ $inquiry->phone }}
+                            <span>{{ $inquiry->phone }}</span>
                         </div>
                     </div>
                     @endif
@@ -220,9 +231,10 @@
                     </h3>
                 </div>
                 <div class="p-6">
-                    <div class="space-y-4">
+                    <div class="space-y-4 relative">
+                        <div class="absolute left-1.5 top-2 bottom-2 w-0.5 bg-gray-200 hidden lg:block"></div>
                         <div class="flex items-start">
-                            <div class="w-3 h-3 bg-yellow-500 rounded-full mt-2 mr-3"></div>
+                            <div class="w-3 h-3 bg-yellow-500 rounded-full mt-2 mr-3" title="Inquiry Submitted"></div>
                             <div>
                                 <div class="font-semibold text-gray-900">Inquiry Submitted</div>
                                 <div class="text-sm text-gray-600">{{ $inquiry->created_at->format('M d, Y \a\t g:i A') }}</div>
@@ -230,8 +242,8 @@
                         </div>
                         @if($inquiry->updated_at != $inquiry->created_at)
                         <div class="flex items-start">
-                            <div class="w-3 h-3 bg-blue-500 rounded-full mt-2 mr-3"></div>
-                        <div>
+                            <div class="w-3 h-3 bg-blue-500 rounded-full mt-2 mr-3" title="Last Updated"></div>
+                            <div>
                                 <div class="font-semibold text-gray-900">Last Updated</div>
                                 <div class="text-sm text-gray-600">{{ $inquiry->updated_at->format('M d, Y \a\t g:i A') }}</div>
                             </div>
@@ -239,8 +251,8 @@
                         @endif
                         @if($inquiry->admin_response)
                         <div class="flex items-start">
-                            <div class="w-3 h-3 bg-green-500 rounded-full mt-2 mr-3"></div>
-                        <div>
+                            <div class="w-3 h-3 bg-green-500 rounded-full mt-2 mr-3" title="Response Received"></div>
+                            <div>
                                 <div class="font-semibold text-gray-900">Response Received</div>
                                 <div class="text-sm text-gray-600">Admin has responded</div>
                             </div>
@@ -260,12 +272,12 @@
                 </div>
                 <div class="p-6 space-y-3">
                     <a href="{{ route('customer.inquiries.create') }}"
-                       class="w-full inline-flex items-center justify-center px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition-colors duration-200 font-semibold">
+                       class="w-full inline-flex items-center justify-center px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 focus:ring-2 focus:ring-yellow-400 transition-colors duration-200 font-semibold">
                         <i class="fas fa-plus mr-2"></i>
                         New Inquiry
                     </a>
                     <a href="{{ route('customer.inquiries.index') }}"
-                       class="w-full inline-flex items-center justify-center px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors duration-200 font-semibold">
+                       class="w-full inline-flex items-center justify-center px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 focus:ring-2 focus:ring-gray-400 transition-colors duration-200 font-semibold">
                         <i class="fas fa-list mr-2"></i>
                         All Inquiries
                     </a>
@@ -312,5 +324,13 @@
                 }, 3000);
             });
         });
+        // Copy to clipboard utility
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(function() {
+                alert('Copied: ' + text);
+            }, function(err) {
+                alert('Failed to copy: ' + err);
+            });
+        }
     </script>
 </x-dashboard-layout> 

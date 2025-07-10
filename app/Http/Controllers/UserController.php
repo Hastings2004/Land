@@ -7,6 +7,7 @@ use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
+use App\Notifications\ProfileUpdatedNotification;
 
 class UserController extends Controller
 {
@@ -71,6 +72,10 @@ class UserController extends Controller
                     'phone_number' => $user->phone_number
                 ]
             ]);
+            // Notify the user (in-app notification)
+            if ($updated) {
+                $user->notify(new ProfileUpdatedNotification());
+            }
             
             if ($updated) {
                 return redirect()->route('profile.edit')->with('success', 'Profile updated successfully!');

@@ -9,11 +9,32 @@
                 Back
             </a>
         </div>
-        <div class="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-yellow-400 to-amber-500 rounded-2xl shadow-xl mb-4 transform rotate-3 hover:rotate-0 transition-transform duration-300">
-            <i class="fas fa-calendar-check text-white text-xl"></i>
+        <!-- Section Icon -->
+        <div class="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-yellow-400 to-amber-500 rounded-2xl shadow-xl mb-4 mx-auto">
+            <i class="fas fa-calendar-check text-yellow-900 text-3xl"></i>
         </div>
         <h1 class="text-3xl font-bold text-gray-800 mb-2">Reservations Management</h1>
         <p class="text-gray-600">Manage all plot reservations</p>
+    </div>
+
+    <!-- Search & Filter Bar -->
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6 px-2">
+        <form action="{{ route('admin.reservations.index') }}" method="GET" class="flex flex-1 gap-2">
+            <div class="relative flex-1">
+                <input type="text" name="search" value="{{ request('search') }}" placeholder="Search by customer, plot, or status..." class="w-full pl-10 pr-4 py-3 border border-yellow-200 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-yellow-400 transition-all duration-200" />
+                <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-yellow-500"></i>
+            </div>
+            <select name="status" class="px-3 py-2 border border-yellow-200 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-yellow-400 text-sm">
+                <option value="">All Statuses</option>
+                <option value="active" @if(request('status')=='active') selected @endif>Active</option>
+                <option value="completed" @if(request('status')=='completed') selected @endif>Completed</option>
+                <option value="expired" @if(request('status')=='expired') selected @endif>Expired</option>
+                <option value="cancelled" @if(request('status')=='cancelled') selected @endif>Cancelled</option>
+            </select>
+            <button type="submit" class="px-6 py-3 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 focus:ring-2 focus:ring-yellow-400 transition-all duration-200 shadow-md">
+                <i class="fas fa-search"></i>
+            </button>
+        </form>
     </div>
 
     <!-- Statistics Cards -->
@@ -75,7 +96,7 @@
         </div>
     </div>
 
-    <!-- Reservations Table -->
+    <!-- Reservations Table/Card Responsive -->
     <div class="bg-white rounded-xl shadow-lg overflow-hidden">
         <div class="px-6 py-4 border-b border-gray-200">
             <h2 class="text-xl font-bold text-gray-800 flex items-center">
@@ -85,34 +106,25 @@
         </div>
 
         @if($reservations->count() > 0)
-            <div class="overflow-x-auto">
+            <!-- Desktop Table -->
+            <div class="hidden md:block overflow-x-auto">
                 <table class="w-full">
                     <thead class="bg-gray-50">
                         <tr>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Customer
-                            </th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Plot Details
-                            </th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Status
-                            </th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Date
-                            </th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Actions
-                            </th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Customer</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Plot Details</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                         </tr>
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200">
                         @foreach($reservations as $reservation)
-                            <tr class="hover:bg-gray-50 transition-colors duration-200">
+                            <tr class="hover:bg-yellow-50 transition-colors duration-200">
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <div class="flex items-center">
-                                        <div class="w-10 h-10 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center text-white font-bold text-sm">
-                                            {{ strtoupper(substr($reservation->user->name, 0, 1)) }}
+                                        <div class="w-10 h-10 bg-yellow-400 rounded-full flex items-center justify-center text-yellow-900 font-bold text-sm ring-2 ring-yellow-200">
+                                            {{ strtoupper(substr($reservation->user->name ?: $reservation->user->email, 0, 1)) }}
                                         </div>
                                         <div class="ml-3">
                                             <div class="text-sm font-medium text-gray-900">{{ $reservation->user->name }}</div>
@@ -124,7 +136,7 @@
                                     <div class="flex items-start space-x-4">
                                         <img src="{{ $reservation->plot->plotImages && $reservation->plot->plotImages->count() > 0 ? $reservation->plot->plotImages->first()->image_url : ($reservation->plot->image_path ? asset('storage/' . $reservation->plot->image_path) : 'https://placehold.co/300x200') }}"
                                              alt="{{ $reservation->plot->title }}"
-                                             class="w-72 h-48 object-cover rounded-lg shadow-sm">
+                                             class="w-40 h-28 object-cover rounded-lg shadow-sm">
                                         <div>
                                             <div class="text-sm font-medium text-gray-900 mb-1">{{ $reservation->plot->title }}</div>
                                             <div class="flex items-center mb-1">
@@ -149,9 +161,7 @@
                                             <i class="fas fa-check-circle mr-1"></i>
                                             Active
                                         </span>
-                                        @php
-                                            $minutesLeft = $reservation->expires_at ? now()->diffInMinutes($reservation->expires_at, false) : null;
-                                        @endphp
+                                        @php $minutesLeft = $reservation->expires_at ? now()->diffInMinutes($reservation->expires_at, false) : null; @endphp
                                         @if($minutesLeft !== null && $minutesLeft <= 120 && $minutesLeft > 0)
                                             <div class="mt-1 text-xs text-red-600 font-semibold flex items-center">
                                                 <i class="fas fa-exclamation-triangle mr-1"></i>
@@ -199,19 +209,19 @@
                                             <form action="{{ route('admin.reservations.approve', $reservation) }}" method="POST" class="inline">
                                                 @csrf
                                                 @method('PUT')
-                                                <button type="submit" class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-yellow-500 text-white hover:bg-yellow-600 focus:ring-2 focus:ring-yellow-400 transition-all duration-200" title="Approve">
+                                                <button type="submit" class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-yellow-500 text-white hover:bg-yellow-600 focus:ring-2 focus:ring-yellow-400 transition-all duration-200" title="Approve Reservation">
                                                     <i class="fas fa-check"></i>
                                                 </button>
                                             </form>
                                             <form action="{{ route('admin.reservations.reject', $reservation) }}" method="POST" class="inline">
                                                 @csrf
                                                 @method('PUT')
-                                                <button type="submit" class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-red-500 text-white hover:bg-red-600 focus:ring-2 focus:ring-red-200 transition-all duration-200" title="Reject">
+                                                <button type="submit" class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-red-500 text-white hover:bg-red-600 focus:ring-2 focus:ring-red-200 transition-all duration-200" title="Reject Reservation">
                                                     <i class="fas fa-times"></i>
                                                 </button>
                                             </form>
                                         @endif
-                                        <a href="{{ route('admin.plots.show', $reservation->plot) }}" class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-blue-500 text-white hover:bg-blue-600 focus:ring-2 focus:ring-blue-200 transition-all duration-200" title="View Plot">
+                                        <a href="{{ route('admin.plots.show', $reservation->plot) }}" class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-blue-500 text-white hover:bg-blue-600 focus:ring-2 focus:ring-blue-200 transition-all duration-200" title="View Plot Details">
                                             <i class="fas fa-eye"></i>
                                         </a>
                                     </div>
@@ -221,7 +231,70 @@
                     </tbody>
                 </table>
             </div>
-
+            <!-- Mobile Card View -->
+            <div class="md:hidden space-y-4 p-4">
+                @foreach($reservations as $reservation)
+                    <div class="bg-white rounded-xl shadow-md border border-yellow-100 p-4 flex flex-col gap-3">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 bg-yellow-400 rounded-full flex items-center justify-center text-yellow-900 font-bold text-sm ring-2 ring-yellow-200">
+                                {{ strtoupper(substr($reservation->user->name ?: $reservation->user->email, 0, 1)) }}
+                            </div>
+                            <div>
+                                <div class="text-sm font-medium text-gray-900">{{ $reservation->user->name }}</div>
+                                <div class="text-xs text-gray-500">{{ $reservation->user->email }}</div>
+                            </div>
+                        </div>
+                        <div class="flex gap-3">
+                            <img src="{{ $reservation->plot->plotImages && $reservation->plot->plotImages->count() > 0 ? $reservation->plot->plotImages->first()->image_url : ($reservation->plot->image_path ? asset('storage/' . $reservation->plot->image_path) : 'https://placehold.co/300x200') }}" alt="{{ $reservation->plot->title }}" class="w-24 h-16 object-cover rounded-lg shadow-sm">
+                            <div>
+                                <div class="text-sm font-medium text-gray-900 mb-1">{{ $reservation->plot->title }}</div>
+                                <div class="flex items-center mb-1 text-xs"><i class="fas fa-map-marker-alt text-yellow-500 mr-1"></i>{{ $reservation->plot->location }}</div>
+                                <div class="flex items-center mb-1 text-xs"><i class="fas fa-ruler-combined text-yellow-500 mr-1"></i>Area: {{ number_format($reservation->plot->area_sqm, 2) }} sqm</div>
+                                <div class="flex items-center mb-1 text-xs"><i class="fas fa-tag text-yellow-500 mr-1"></i>Category: {{ ucfirst($reservation->plot->category) }}</div>
+                                <div class="text-xs text-gray-400">Price: MWK {{ number_format($reservation->plot->price, 2) }}</div>
+                            </div>
+                        </div>
+                        <div class="flex flex-wrap gap-2 items-center">
+                            @if($reservation->status === 'active')
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800"><i class="fas fa-check-circle mr-1"></i>Active</span>
+                            @elseif($reservation->status === 'completed')
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800"><i class="fas fa-thumbs-up mr-1"></i>Completed</span>
+                            @elseif($reservation->status === 'cancelled')
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800"><i class="fas fa-times-circle mr-1"></i>Cancelled</span>
+                            @elseif($reservation->status === 'expired')
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800"><i class="fas fa-hourglass-end mr-1"></i>Expired</span>
+                            @else
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">{{ ucfirst($reservation->status) }}</span>
+                            @endif
+                        </div>
+                        <div class="flex gap-2 mt-2">
+                            @if($reservation->status === 'active')
+                                <form action="{{ route('admin.reservations.approve', $reservation) }}" method="POST" class="inline">
+                                    @csrf
+                                    @method('PUT')
+                                    <button type="submit" class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-yellow-500 text-white hover:bg-yellow-600 focus:ring-2 focus:ring-yellow-400 transition-all duration-200" title="Approve Reservation">
+                                        <i class="fas fa-check"></i>
+                                    </button>
+                                </form>
+                                <form action="{{ route('admin.reservations.reject', $reservation) }}" method="POST" class="inline">
+                                    @csrf
+                                    @method('PUT')
+                                    <button type="submit" class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-red-500 text-white hover:bg-red-600 focus:ring-2 focus:ring-red-200 transition-all duration-200" title="Reject Reservation">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </form>
+                            @endif
+                            <a href="{{ route('admin.plots.show', $reservation->plot) }}" class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-blue-500 text-white hover:bg-blue-600 focus:ring-2 focus:ring-blue-200 transition-all duration-200" title="View Plot Details">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                        </div>
+                        <div class="text-xs text-gray-400 mt-2">Reserved: {{ $reservation->created_at->format('M d, Y g:i A') }}</div>
+                        @if($reservation->expires_at)
+                            <div class="text-xs text-gray-400">Expires: {{ $reservation->expires_at->format('M d, Y g:i A') }}</div>
+                        @endif
+                    </div>
+                @endforeach
+            </div>
             <!-- Pagination -->
             <div class="px-6 py-4 border-t border-gray-200">
                 {{ $reservations->links() }}
@@ -232,12 +305,12 @@
                     <i class="fas fa-calendar-times text-gray-400 text-3xl"></i>
                 </div>
                 <h3 class="text-lg font-medium text-gray-900 mb-2">No Reservations Found</h3>
-                <p class="text-gray-500">There are no reservations to display at the moment.</p>
+                <p class="text-gray-500">There are no reservations to display at the moment. Try adjusting your search or filters.</p>
             </div>
         @endif
     </div>
 
-    <!-- Success Message -->
+    <!-- Success Message Toast -->
     @if(session('success'))
         <div id="successToast" class="fixed top-4 right-4 z-50 transform translate-x-full transition-transform duration-500 ease-in-out">
             <div class="bg-gradient-to-r from-green-500 to-emerald-600 text-white px-6 py-4 rounded-xl shadow-2xl border-l-4 border-green-400 max-w-sm">
@@ -251,7 +324,7 @@
                         <p class="text-sm font-semibold">{{ session('success') }}</p>
                     </div>
                     <div class="ml-4 flex-shrink-0">
-                        <button onclick="closeSuccessToast()" class="text-white hover:text-green-100 transition-colors duration-200">
+                        <button onclick="closeSuccessToast()" class="text-white hover:text-green-100 transition-colors duration-200" aria-label="Close success message">
                             <i class="fas fa-times"></i>
                         </button>
                     </div>
@@ -269,14 +342,12 @@
                 setTimeout(() => {
                     toast.classList.remove('translate-x-full');
                 }, 100);
-                
                 // Auto-hide after 3 seconds
                 setTimeout(() => {
                     closeSuccessToast();
                 }, 3000);
             }
         });
-        
         function closeSuccessToast() {
             const toast = document.getElementById('successToast');
             if (toast) {

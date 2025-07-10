@@ -9,7 +9,7 @@
     <!-- Page Header -->
     <div class="mb-8 text-center">
         <div class="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-yellow-400 to-yellow-500 rounded-2xl shadow-xl mb-4 transform rotate-3 hover:rotate-0 transition-transform duration-300">
-            <i class="fas fa-calendar-check text-white text-xl"></i>
+            <i class="fas fa-calendar-check text-yellow-500 text-xl"></i>
         </div>
         <h1 class="text-3xl font-bold text-gray-800 mb-2">My Reservations</h1>
         <p class="text-gray-600">Track your land plot reservations</p>

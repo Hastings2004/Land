@@ -201,7 +201,7 @@
                             @if($plot->plotImages->isNotEmpty())
                                 <div class="relative w-full h-full">
                                     @foreach($plot->plotImages as $index => $image)
-                                        <img src="{{ $image->image_url }}" alt="{{ $image->alt_text ?: $plot->title }}" class="carousel-img-{{ $plot->id }} absolute inset-0 w-full h-full object-cover transition-opacity duration-700 {{ $index === 0 ? 'opacity-100 z-10' : 'opacity-0 z-0' }}" data-index="{{ $index }}">
+                                        <img src="{{ $image->image_url }}" alt="{{ $image->alt_text ?: $plot->title }}" class="carousel-img-{{ $plot->id }} carousel-slide absolute inset-0 w-full h-full object-cover transition-opacity duration-700 {{ $index === 0 ? 'opacity-100 z-10 active' : 'opacity-0 z-0' }}" data-index="{{ $index }}">
                                     @endforeach
                                     @if($plot->plotImages->count() > 1)
                                         <button type="button" onclick="window.prevCarouselImage({{ $plot->id }})" class="absolute left-2 top-1/2 -translate-y-1/2 bg-yellow-500/80 hover:bg-yellow-600 text-white rounded-full p-2 shadow-lg z-20"><i class="fas fa-chevron-left"></i></button>
@@ -327,7 +327,7 @@
                         
                         <!-- Price -->
                         <div class="flex items-center justify-between mb-4">
-                            <span class="text-2xl font-bold text-yellow-600">MK{{ number_format($plot->price) }}</span>
+                            <span class="text-2xl font-bold text-yellow-500">MK{{ number_format($plot->price) }}</span>
                             <span class="text-sm text-gray-500">{{ $plot->created_at->format('M d, Y') }}</span>
                         </div>
 
@@ -335,7 +335,7 @@
                         <div class="flex space-x-3">
                             <a href="{{ route('customer.plots.show', $plot->id) }}" 
                                class="flex-1 bg-yellow-500 text-white py-2 px-4 rounded-lg hover:bg-yellow-600 transition-colors duration-200 text-center font-semibold text-sm">
-                                <i class="fas fa-eye mr-2"></i>View Details
+                                <i class="fas fa-eye text-white mr-2"></i>View Details
                             </a>
                             <a href="{{ route('customer.inquiries.create') }}?plot_id={{ $plot->id }}" 
                                class="flex-1 bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition-colors duration-200 text-center font-semibold text-sm">

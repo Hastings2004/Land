@@ -275,10 +275,10 @@
                         <label style="display:flex;align-items:center;gap:0.5rem;">
                             <input type="checkbox" name="is_new_listing" id="is_new_listing" value="1" {{ old('is_new_listing', $plot->is_new_listing) ? 'checked' : '' }} class="form-checkbox">
                             <span style="color:#b45309;font-weight:500;">New Listing</span>
-                        </label>
+                </label>
                         @error('is_new_listing')<div class="form-error">{{ $message }}</div>@enderror
                     </div>
-                </div>
+            </div>
 
                 <!-- Actions -->
                 <div class="form-actions">

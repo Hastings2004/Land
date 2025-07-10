@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 use App\Notifications\ReservationCancelledNotification;
+use App\Notifications\ReservationPaidNotification;
 
 class ReservationController extends Controller
 {
@@ -97,6 +98,9 @@ class ReservationController extends Controller
         // Update the plot status
         $plot->status = 'reserved';
         $plot->save();
+
+        // Notify the customer of reservation
+        $user->notify(new ReservationPaidNotification($plot->title));
 
         return redirect()->route('customer.reservations.index')->with('success', 'Plot reserved successfully! It will expire in 24 hours.');
     }

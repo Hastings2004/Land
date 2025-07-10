@@ -15,6 +15,7 @@
     <x-logout-success-message />
     
     <main>
+        <x-success-message />
         {{ $slot }}
     </main>
 

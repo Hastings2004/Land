@@ -7,32 +7,32 @@
         <div class="inline-flex items-center justify-center w-16 h-16 bg-yellow-500 rounded-2xl shadow-xl mb-4">
             <i class="fas fa-chart-line text-white text-2xl"></i>
         </div>
-        <h1 class="text-3xl font-bold text-gray-800 mb-2">Admin Dashboard</h1>
-        <p class="text-gray-500">Welcome back! Here's your overview</p>
+        <h1 class="text-3xl font-bold text-gray-900 mb-2">Admin Dashboard</h1>
+        <p class="text-gray-700">Welcome back! Here's your overview</p>
     </div>
 
     <!-- Statistics Section -->
     <div class="mb-8">
-        <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+        <h2 class="text-xl font-bold text-gray-900 mb-4 flex items-center">
             <i class="fas fa-chart-bar text-yellow-500 mr-2"></i>
             Key Statistics
         </h2>
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-6">
             <div class="bg-white rounded-2xl shadow-lg p-6 border-l-4 border-blue-500">
-                <div class="text-3xl font-extrabold text-blue-600">{{ $stats['totalPlots'] }}</div>
-                <div class="text-gray-600 mt-2 font-semibold">Total Plots</div>
+                <div class="text-3xl font-extrabold text-yellow-500">{{ $stats['totalPlots'] }}</div>
+                <div class="text-gray-800 mt-2 font-semibold">Total Plots</div>
             </div>
             <div class="bg-white rounded-2xl shadow-lg p-6 border-l-4 border-green-500">
-                <div class="text-3xl font-extrabold text-green-600">{{ $stats['availablePlots'] }}</div>
-                <div class="text-gray-600 mt-2 font-semibold">Available</div>
+                <div class="text-3xl font-extrabold text-yellow-500">{{ $stats['availablePlots'] }}</div>
+                <div class="text-gray-800 mt-2 font-semibold">Available</div>
             </div>
             <div class="bg-white rounded-2xl shadow-lg p-6 border-l-4 border-yellow-500">
-                <div class="text-3xl font-extrabold text-yellow-600">{{ $stats['reservedPlots'] }}</div>
-                <div class="text-gray-600 mt-2 font-semibold">Reserved</div>
+                <div class="text-3xl font-extrabold text-yellow-500">{{ $stats['reservedPlots'] }}</div>
+                <div class="text-gray-800 mt-2 font-semibold">Reserved</div>
             </div>
             <div class="bg-white rounded-2xl shadow-lg p-6 border-l-4 border-red-500">
-                <div class="text-3xl font-extrabold text-red-600">{{ $stats['soldPlots'] }}</div>
-                <div class="text-gray-600 mt-2 font-semibold">Sold</div>
+                <div class="text-3xl font-extrabold text-yellow-500">{{ $stats['soldPlots'] }}</div>
+                <div class="text-gray-800 mt-2 font-semibold">Sold</div>
             </div>
             @php
                 $statsList = [
@@ -47,8 +47,8 @@
                 <div class="bg-white rounded-xl shadow p-6 border-l-4 border-yellow-500 transition-transform transform hover:-translate-y-1 hover:shadow-lg">
                     <div class="flex items-center justify-between">
                         <div>
-                            <div class="text-2xl font-bold text-yellow-600">{{ $stat['value'] }}</div>
-                            <div class="text-gray-600 text-sm font-semibold">{{ $stat['label'] }}</div>
+                            <div class="text-2xl font-bold text-yellow-500">{{ $stat['value'] }}</div>
+                            <div class="text-gray-800 text-sm font-semibold">{{ $stat['label'] }}</div>
                         </div>
                         <div class="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center">
                             <i class="fas {{ $stat['icon'] }} text-yellow-500 text-xl"></i>
@@ -61,14 +61,14 @@
 
     <!-- Charts Section -->
     <div class="mb-8">
-        <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+        <h2 class="text-xl font-bold text-gray-900 mb-4 flex items-center">
             <i class="fas fa-chart-pie text-yellow-500 mr-2"></i>
             Analytics & Insights
         </h2>
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
             <!-- Plot Status Distribution -->
             <div class="bg-white rounded-xl shadow p-6">
-                <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
                     <i class="fas fa-chart-pie text-yellow-500 mr-2"></i>
                     Plot Status Distribution
                 </h3>
@@ -78,7 +78,7 @@
             </div>
             <!-- Inquiry Status Distribution -->
             <div class="bg-white rounded-xl shadow p-6">
-                <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
                     <i class="fas fa-chart-doughnut text-yellow-500 mr-2"></i>
                     Inquiry Status Distribution
                 </h3>
@@ -91,7 +91,7 @@
 
     <!-- Quick Actions Section -->
     <div class="mb-8">
-        <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+        <h2 class="text-xl font-bold text-gray-900 mb-4 flex items-center">
             <i class="fas fa-bolt text-yellow-500 mr-2"></i>
             Quick Actions
         </h2>
@@ -99,39 +99,39 @@
             <a href="{{ route('admin.plots.create') }}" 
                class="flex flex-col items-center p-6 bg-yellow-50 rounded-xl hover:bg-yellow-100 transition-all duration-200 transform hover:-translate-y-1 shadow">
                 <i class="fas fa-plus text-yellow-500 text-3xl mb-3"></i>
-                <span class="text-sm font-semibold text-yellow-800">Add Plot</span>
+                <span class="text-sm font-semibold text-yellow-500">Add Plot</span>
             </a>
             <a href="{{ route('admin.plots.index') }}" 
                class="flex flex-col items-center p-6 bg-yellow-50 rounded-xl hover:bg-yellow-100 transition-all duration-200 transform hover:-translate-y-1 shadow">
                 <i class="fas fa-list text-yellow-500 text-3xl mb-3"></i>
-                <span class="text-sm font-semibold text-yellow-800">View Plots</span>
+                <span class="text-sm font-semibold text-yellow-500">View Plots</span>
             </a>
             <a href="{{ route('admin.inquiries.index') }}" 
                class="flex flex-col items-center p-6 bg-yellow-50 rounded-xl hover:bg-yellow-100 transition-all duration-200 transform hover:-translate-y-1 shadow">
                 <i class="fas fa-comments text-yellow-500 text-3xl mb-3"></i>
-                <span class="text-sm font-semibold text-yellow-800">Inquiries</span>
+                <span class="text-sm font-semibold text-yellow-500">Inquiries</span>
             </a>
             <a href="{{ route('admin.users.index') }}" 
                class="flex flex-col items-center p-6 bg-yellow-50 rounded-xl hover:bg-yellow-100 transition-all duration-200 transform hover:-translate-y-1 shadow">
                 <i class="fas fa-users text-yellow-500 text-3xl mb-3"></i>
-                <span class="text-sm font-semibold text-yellow-800">Users</span>
+                <span class="text-sm font-semibold text-yellow-500">Users</span>
             </a>
         </div>
     </div>
 
     <!-- Recent Activity Section -->
     <div class="mb-8">
-        <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+        <h2 class="text-xl font-bold text-gray-900 mb-4 flex items-center">
             <i class="fas fa-clock text-yellow-500 mr-2"></i>
             Recent Activity
         </h2>
         <div class="bg-white rounded-xl shadow p-6">
             <div class="flex items-center justify-between mb-4">
-                <h3 class="text-lg font-semibold text-gray-800 flex items-center">
+                <h3 class="text-lg font-semibold text-gray-900 flex items-center">
                     <i class="fas fa-comments text-yellow-500 mr-2"></i>
                     Recent Inquiries
                 </h3>
-                <a href="{{ route('admin.inquiries.index') }}" class="text-yellow-600 hover:text-yellow-700 text-sm font-semibold">
+                <a href="{{ route('admin.inquiries.index') }}" class="text-yellow-500 hover:text-yellow-600 text-sm font-semibold">
                     View All
                 </a>
             </div>
@@ -142,11 +142,11 @@
                             <i class="fas fa-user text-yellow-500"></i>
                         </div>
                         <div class="flex-1">
-                            <div class="font-semibold text-gray-800">{{ $inquiry->name }}</div>
-                            <div class="text-sm text-gray-600">{{ Str::limit($inquiry->message, 50) }}</div>
-                            <div class="text-xs text-gray-500 mt-1">{{ $inquiry->created_at->diffForHumans() }}</div>
+                            <div class="font-semibold text-gray-900">{{ $inquiry->name }}</div>
+                            <div class="text-sm text-gray-800">{{ Str::limit($inquiry->message, 50) }}</div>
+                            <div class="text-xs text-gray-700 mt-1">{{ $inquiry->created_at->diffForHumans() }}</div>
                         </div>
-                        <span class="px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800">
+                        <span class="px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-500">
                             {{ ucfirst($inquiry->status) }}
                         </span>
                     </div>
@@ -162,62 +162,62 @@
 
     <!-- Advanced Analytics Section -->
     <div class="mb-8">
-        <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+        <h2 class="text-xl font-bold text-gray-900 mb-4 flex items-center">
             <i class="fas fa-lightbulb text-yellow-500 mr-2"></i>
             Advanced Insights
         </h2>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <!-- Most Viewed Plots -->
             <div class="bg-white rounded-xl shadow p-6">
-                <h3 class="text-lg font-semibold text-gray-800 mb-2 flex items-center">
+                <h3 class="text-lg font-semibold text-gray-900 mb-2 flex items-center">
                     <i class="fas fa-eye text-yellow-500 mr-2"></i> Most Viewed Plots
                 </h3>
                 <ul class="space-y-2">
                     @foreach($mostViewedPlots as $plot)
                         <li class="flex justify-between items-center text-sm">
-                            <span class="font-medium text-gray-700">{{ $plot->title }}</span>
-                            <span class="text-yellow-600 font-bold">{{ $plot->views }} views</span>
+                            <span class="font-medium text-gray-800">{{ $plot->title }}</span>
+                            <span class="text-yellow-500 font-bold">{{ $plot->views }} views</span>
                         </li>
                     @endforeach
                 </ul>
             </div>
             <!-- Plots with Most Reservations -->
             <div class="bg-white rounded-xl shadow p-6">
-                <h3 class="text-lg font-semibold text-gray-800 mb-2 flex items-center">
+                <h3 class="text-lg font-semibold text-gray-900 mb-2 flex items-center">
                     <i class="fas fa-users text-yellow-500 mr-2"></i> Most Reserved Plots
                 </h3>
                 <ul class="space-y-2">
                     @foreach($plotsMostReservations as $plot)
                         <li class="flex justify-between items-center text-sm">
-                            <span class="font-medium text-gray-700">{{ $plot->title }}</span>
-                            <span class="text-yellow-600 font-bold">{{ $plot->reservations_count }} reservations</span>
+                            <span class="font-medium text-gray-800">{{ $plot->title }}</span>
+                            <span class="text-yellow-500 font-bold">{{ $plot->reservations_count }} reservations</span>
                         </li>
                     @endforeach
                 </ul>
             </div>
             <!-- Average Time to Sale -->
             <div class="bg-white rounded-xl shadow p-6">
-                <h3 class="text-lg font-semibold text-gray-800 mb-2 flex items-center">
+                <h3 class="text-lg font-semibold text-gray-900 mb-2 flex items-center">
                     <i class="fas fa-clock text-yellow-500 mr-2"></i> Avg. Time to Sale
                 </h3>
-                <div class="text-2xl font-bold text-yellow-600">
+                <div class="text-2xl font-bold text-yellow-500">
                     @if($avgTimeToSale !== null)
                         {{ $avgTimeToSale }} days
                     @else
-                        <span class="text-gray-400 text-base">No data</span>
+                        <span class="text-gray-500 text-base">No data</span>
                     @endif
                 </div>
             </div>
             <!-- Recent Sales -->
             <div class="bg-white rounded-xl shadow p-6">
-                <h3 class="text-lg font-semibold text-gray-800 mb-2 flex items-center">
+                <h3 class="text-lg font-semibold text-gray-900 mb-2 flex items-center">
                     <i class="fas fa-handshake text-yellow-500 mr-2"></i> Recent Sales
                 </h3>
                 <ul class="space-y-2">
                     @foreach($recentSales as $plot)
                         <li class="flex justify-between items-center text-sm">
-                            <span class="font-medium text-gray-700">{{ $plot->title }}</span>
-                            <span class="text-gray-500">{{ $plot->updated_at->format('M d, Y') }}</span>
+                            <span class="font-medium text-gray-800">{{ $plot->title }}</span>
+                            <span class="text-yellow-500">{{ $plot->updated_at->format('M d, Y') }}</span>
                         </li>
                     @endforeach
                 </ul>

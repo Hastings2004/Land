@@ -11,8 +11,8 @@
             </div>
             
             <div class="text-center">
-                <div class="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-yellow-400 via-yellow-500 to-yellow-600 rounded-full shadow-2xl mb-4 transform hover:scale-105 transition-transform duration-300">
-                    <i class="fas fa-envelope text-white text-2xl"></i>
+                <div class="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-yellow-100 via-yellow-200 to-yellow-300 rounded-full shadow-2xl mb-4 transform hover:scale-105 transition-transform duration-300">
+                    <i class="fas fa-comments text-yellow-300 text-4xl"></i>
                 </div>
                 <h1 class="text-3xl font-bold text-gray-800 mb-2">Send Us an Inquiry</h1>
                 <p class="text-gray-600 text-lg max-w-md mx-auto">We'd love to hear from you and help you find your perfect plot in Malawi</p>
@@ -143,17 +143,13 @@
                                     <div class="flex flex-col sm:flex-row gap-3 mt-6">
                                         <button type="submit"
                                                 id="submitBtn"
-                                                class="flex-1 group relative overflow-hidden inline-flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-yellow-500 to-yellow-600 text-white rounded-xl font-bold text-base hover:from-yellow-600 hover:to-yellow-700 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl">
-                                            <div class="absolute inset-0 bg-gradient-to-r from-yellow-400 to-yellow-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                                            <i class="fas fa-paper-plane relative z-10"></i>
-                                            <span class="relative z-10">Send Inquiry</span>
-                                            <div class="hidden relative z-10" id="loadingSpinner">
-                                                <i class="fas fa-spinner fa-spin"></i>
-                                            </div>
+                                                class="flex-1 inline-flex items-center justify-center gap-2 px-6 py-3 bg-yellow-500 text-white rounded-xl font-bold text-base hover:bg-yellow-600 transition-all duration-300 transform hover:scale-105 shadow-lg">
+                                            <i class="fas fa-comment-dots text-xl animate-bounce"></i>
+                                            <span>Send Inquiry</span>
                                         </button>
                                         
                                         <a href="{{ route('customer.inquiries.index') }}"
-                                           class="inline-flex items-center justify-center gap-2 px-6 py-3 bg-gray-100 text-gray-700 rounded-xl font-semibold hover:bg-gray-200 transition-all duration-300">
+                                           class="inline-flex items-center justify-center gap-2 px-6 py-3 bg-yellow-100 text-yellow-700 rounded-xl font-semibold hover:bg-yellow-200 hover:text-yellow-900 transition-all duration-300">
                                             <i class="fas fa-times"></i>
                                             Cancel
                                         </a>
@@ -341,76 +337,6 @@
             if (e.target === this) {
                 closeErrorModal();
             }
-        });
-
-        // Enhanced form submission with loading state and success modal
-        const form = document.getElementById('inquiryForm');
-        const submitBtn = document.getElementById('submitBtn');
-        const loadingSpinner = document.getElementById('loadingSpinner');
-        const submitText = submitBtn.querySelector('span');
-        const submitIcon = submitBtn.querySelector('i');
-
-        form.addEventListener('submit', function(e) {
-            e.preventDefault();
-            submitBtn.disabled = true;
-            submitText.textContent = 'Sending...';
-            submitIcon.style.display = 'none';
-            loadingSpinner.classList.remove('hidden');
-            submitBtn.classList.add('opacity-75');
-            // Submit the form using fetch
-            const formData = new FormData(form);
-            fetch(form.action, {
-                method: 'POST',
-                body: formData,
-                headers: {
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-                    'Accept': 'application/json'
-                }
-            })
-            .then(async response => {
-                // Reset button state
-                submitBtn.disabled = false;
-                submitText.textContent = 'Send Inquiry';
-                submitIcon.style.display = 'block';
-                loadingSpinner.classList.add('hidden');
-                submitBtn.classList.remove('opacity-75');
-                let data;
-                try {
-                    data = await response.json();
-                } catch (e) {
-                    showErrorModal('Unexpected server response. Please try again.');
-                    return;
-                }
-                if (response.ok && data.success) {
-                    // Show success modal
-                    showSuccessModal();
-                    
-                    // Reset form
-                    form.reset();
-                    charCount.textContent = '0';
-                    messageCharCount.textContent = '0';
-                    
-                    // Auto-redirect to inquiries list after 3 seconds
-                    setTimeout(() => {
-                        window.location.href = '{{ route("customer.inquiries.index") }}';
-                    }, 3000);
-                } else if (response.status === 422 && data.errors) {
-                    // Validation errors
-                    const messages = Object.values(data.errors).flat();
-                    showErrorModal(messages);
-                } else {
-                    // Other errors
-                    showErrorModal(data.message || 'Error sending inquiry. Please try again.');
-                }
-            })
-            .catch(() => {
-                submitBtn.disabled = false;
-                submitText.textContent = 'Send Inquiry';
-                submitIcon.style.display = 'block';
-                loadingSpinner.classList.add('hidden');
-                submitBtn.classList.remove('opacity-75');
-                showErrorModal('Error sending inquiry. Please try again.');
-            });
         });
 
         // Initialize counters

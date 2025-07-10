@@ -10,6 +10,8 @@ use App\Http\Requests\UpdateInquiriesRequest;
 use Illuminate\Http\Request; // Import generic Request for index method if no specific Form Request for it
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use App\Notifications\InquirySentNotification;
+use App\Notifications\InquiryRespondedNotification;
 
 class InquiriesController extends Controller
 {
@@ -83,54 +85,74 @@ class InquiriesController extends Controller
 
     public function customerStore(Request $request)
     {
-        $validatedData = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|max:255',
-            'phone' => 'nullable|string|max:20',
-            'message' => 'required|string',
-            'plot_id' => 'nullable|exists:plots,id',
-        ]);
-
-        // Ensure the email matches the logged-in user's email
-        $user = Auth::user();
-        $validatedData['email'] = $user->email;
-        
-        // Debug: Log the inquiry creation
-        \Illuminate\Support\Facades\Log::info('Creating inquiry for user: ' . $user->email);
-
-        // Create the inquiry
-        $inquiry = Inquiries::create($validatedData);
-        
-        // Debug: Log the created inquiry
-        \Illuminate\Support\Facades\Log::info('Created inquiry ID: ' . $inquiry->id . ' for email: ' . $inquiry->email);
-
-        // Create immediate notification for admin
-        Notification::create([
-            'type' => 'inquiry_received',
-            'title' => '🚨 New Inquiry Received',
-            'message' => "New inquiry from {$validatedData['name']} ({$validatedData['email']}) - {$validatedData['message']}",
-            'inquiry_id' => $inquiry->id,
-            'data' => [
-                'customer_name' => $validatedData['name'],
-                'customer_email' => $validatedData['email'],
-                'customer_phone' => $validatedData['phone'],
-                'inquiry_message' => $validatedData['message'],
-                'plot_id' => $validatedData['plot_id'] ?? null,
-                'inquiry_id' => $inquiry->id
-            ]
-        ]);
-
-        // Return JSON response for AJAX requests
-        if ($request->expectsJson()) {
-            return response()->json([
-                'success' => true,
-                'message' => 'Your inquiry has been sent successfully!',
-                'inquiry_id' => $inquiry->id
+        try {
+            $validatedData = $request->validate([
+                'name' => 'required|string|max:255',
+                'email' => 'required|email|max:255',
+                'phone' => 'nullable|string|max:20',
+                'message' => 'required|string',
+                'plot_id' => 'nullable|exists:plots,id',
             ]);
-        }
 
-        return redirect()->route('customer.inquiries.index')
-            ->with('success', 'Your inquiry has been sent successfully!');
+            // Ensure the email matches the logged-in user's email
+            $user = Auth::user();
+            $validatedData['email'] = $user->email;
+            
+            // Debug: Log the inquiry creation
+            \Log::info('Creating inquiry for user: ' . $user->email);
+
+            // Create the inquiry
+            $inquiry = Inquiries::create($validatedData);
+            \Log::info('Created inquiry ID: ' . $inquiry->id . ' for email: ' . $inquiry->email);
+
+            // Create immediate notification for admin
+            Notification::create([
+                'type' => 'inquiry_received',
+                'title' => '🚨 New Inquiry Received',
+                'message' => "New inquiry from {$validatedData['name']} ({$validatedData['email']}) - {$validatedData['message']}",
+                'inquiry_id' => $inquiry->id,
+                'data' => [
+                    'customer_name' => $validatedData['name'],
+                    'customer_email' => $validatedData['email'],
+                    'customer_phone' => $validatedData['phone'],
+                    'inquiry_message' => $validatedData['message'],
+                    'plot_id' => $validatedData['plot_id'] ?? null,
+                    'inquiry_id' => $inquiry->id
+                ]
+            ]);
+
+            // Notify the customer (in-app notification)
+            $user->notify(new InquirySentNotification($inquiry));
+
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Your inquiry has been sent successfully!',
+                    'inquiry_id' => $inquiry->id
+                ]);
+            }
+
+            return redirect()->route('customer.inquiries.index')
+                ->with('success', 'Your inquiry has been sent successfully!');
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'errors' => $e->errors(),
+                    'message' => 'Validation failed.'
+                ], 422);
+            }
+            throw $e;
+        } catch (\Exception $e) {
+            \Log::error('Inquiry submission error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'An unexpected error occurred. Please try again later.'
+                ], 500);
+            }
+            return redirect()->back()->with('error', 'An unexpected error occurred. Please try again later.');
+        }
     }
 
     public function customerShow(Inquiries $inquiry)
@@ -186,18 +208,11 @@ class InquiriesController extends Controller
 
         // If status changed to 'responded' and admin added a response, notify customer
         if ($oldStatus !== 'responded' && $validatedData['status'] === 'responded' && !empty($validatedData['admin_response'])) {
-            Notification::create([
-                'type' => 'inquiry_responded',
-                'title' => '💬 Response to Your Inquiry',
-                'message' => "Admin has responded to your inquiry: {$inquiry->name}",
-                'email' => $inquiry->email,
-                'inquiry_id' => $inquiry->id,
-                'data' => [
-                    'inquiry_subject' => $inquiry->name,
-                    'admin_response' => $validatedData['admin_response'],
-                    'inquiry_id' => $inquiry->id
-                ]
-            ]);
+            // Find the user by email
+            $user = \App\Models\User::where('email', $inquiry->email)->first();
+            if ($user) {
+                $user->notify(new InquiryRespondedNotification($inquiry));
+            }
         }
 
         return redirect()->route('admin.inquiries.index')

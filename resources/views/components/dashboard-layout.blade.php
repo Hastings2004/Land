@@ -7,7 +7,7 @@
     <title>{{env(key: 'APP_NAME')}}</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <style>
         body {
             font-family: 'Inter', sans-serif;
@@ -403,51 +403,14 @@
             <button class="p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-300" onclick="toggleSidebar()">
                 <i class="fas fa-bars text-xl"></i>
             </button>
-
-            <!-- Notification Bell -->
-            <div class="relative flex items-center space-x-4">
-                <div class="relative cursor-pointer" onclick="toggleNotifications()">
-                    <i class="fas fa-bell text-xl text-gray-600 hover:text-yellow-500 transition-colors"></i>
-                    <span id="notification-dot" class="absolute -top-1.5 -right-1.5 h-3 w-3 bg-yellow-500 rounded-full border-2 border-white hidden"></span>
-                </div>
-
-                <!-- Notifications Dropdown -->
-                <div id="notifications-dropdown" class="absolute right-0 mt-12 w-96 max-w-full bg-white rounded-2xl shadow-2xl z-50 hidden border border-yellow-200 animate-fade-in">
-                    <div class="p-4 border-b border-yellow-200 bg-gradient-to-r from-yellow-50 to-yellow-100 rounded-t-2xl flex items-center justify-between">
-                        <div class="flex items-center gap-2">
-                            <i class="fas fa-bell text-yellow-500 text-xl"></i>
-                            <h3 class="text-lg font-bold text-yellow-700">Notifications</h3>
-                        </div>
-                        <button onclick="markAllAsRead()" class="text-xs px-3 py-1 bg-yellow-100 text-yellow-700 rounded-lg hover:bg-yellow-200 hover:text-yellow-800 font-semibold transition-all duration-200">Mark all read</button>
-                    </div>
-                    <div id="notifications-list" class="max-h-96 overflow-y-auto divide-y divide-yellow-50">
-                        <!-- Notifications will be loaded here -->
-                    </div>
-                    <div class="p-4 border-t border-yellow-200 bg-yellow-50 rounded-b-2xl text-center">
-                        @if(auth()->user()->isAdmin())
-                            <a href="{{ route('admin.notifications.all.view') }}" class="text-sm text-yellow-700 hover:text-yellow-900 font-semibold transition-all duration-200">View all notifications</a>
-                        @else
-                            <a href="{{ route('customer.notifications.all.view') }}" class="text-sm text-yellow-700 hover:text-yellow-900 font-semibold transition-all duration-200">View all notifications</a>
-                        @endif
-                    </div>
-                </div>
-
-                <!-- User Profile -->
-                <div class="relative flex items-center space-x-2 cursor-pointer group" tabindex="0">
-                    <img src="https://placehold.co/40x40/FFD700/FFFFFF?text={{ strtoupper(substr(auth()->user()->username, 0, 2)) }}" alt="User Avatar" class="w-10 h-10 rounded-full border-2 border-yellow-500">
-                    <span class="font-semibold hidden sm:block">{{ auth()->user()->username }}</span>
-                    <i class="fas fa-chevron-down text-gray-500 ml-1"></i>
-                    <div class="absolute left-0 mt-12 w-40 bg-white rounded-md shadow-lg z-50 hidden group-focus:block group-hover:block">
-                        <a href="{{ route('logout') }}" onclick="event.preventDefault(); showLogoutModal();" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Logout</a>
-                    </div>
-                </div>
-            </div>
+            <h1 class="text-lg font-bold text-gray-800">{{ env('APP_NAME') }}</h1>
         </header>
 
         <!-- Success Message Component -->
         <x-success-message />
 
         <main class="p-6 flex-1">
+            <x-success-message />
             {{ $slot }}
         </main>
     @endauth
@@ -553,17 +516,27 @@
             
             <div class="modal-buttons mt-6">
                 <button onclick="submitContactForm()" 
-                        class="px-6 py-3 bg-gradient-to-r from-yellow-500 to-orange-500 text-white rounded-lg hover:from-yellow-600 hover:to-orange-600 font-medium transition-all duration-300 transform hover:scale-105">
+                        class="px-6 py-3 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 font-medium transition-all duration-300 transform hover:scale-105">
                     <i class="fas fa-paper-plane mr-2"></i>
                     Send Message
                 </button>
                 <button onclick="closeContactModal()" 
-                        class="px-6 py-3 bg-gray-300 text-gray-800 rounded-lg hover:bg-gray-400 font-medium transition-all duration-300">
+                        class="px-6 py-3 bg-yellow-100 text-yellow-700 rounded-lg hover:bg-yellow-200 hover:text-yellow-900 font-medium transition-all duration-300">
                     Cancel
                 </button>
             </div>
         </div>
     </div>
+
+    <script>
+        function redirectToNotifications() {
+            @if(auth()->user()->isAdmin())
+                window.location.href = "{{ route('admin.notifications.all.view') }}";
+            @else
+                window.location.href = "{{ route('customer.notifications.all.view') }}";
+            @endif
+        }
+    </script>
 
     <script>
         // Notification functionality
@@ -608,38 +581,47 @@
                     }
                     notifications.forEach(notification => {
                         const item = document.createElement('div');
-                        let icon = '🔔';
+                        let icon = '<i class="fas fa-bell text-yellow-500"></i>';
                         let bg = 'bg-white';
                         let border = '';
                         let titleColor = 'text-gray-900';
-                        let messageColor = 'text-gray-600';
+                        let messageColor = 'text-gray-700';
                         if (notification.type === 'reservation_expiring') {
                             icon = '<i class="fas fa-hourglass-half text-yellow-500"></i>';
                             bg = 'bg-yellow-50';
                             border = 'border-l-4 border-yellow-400';
-                            titleColor = 'text-yellow-800';
-                            messageColor = 'text-yellow-700';
+                            titleColor = 'text-yellow-900';
+                            messageColor = 'text-yellow-800';
                         } else if (notification.type === 'new_plot') {
                             icon = '<i class="fas fa-star text-green-500"></i>';
                             bg = 'bg-green-50';
                             border = 'border-l-4 border-green-400';
-                            titleColor = 'text-green-800';
-                            messageColor = 'text-green-700';
+                            titleColor = 'text-green-900';
+                            messageColor = 'text-green-800';
                         } else if (notification.type === 'payment_due') {
                             icon = '<i class="fas fa-money-bill-wave text-blue-500"></i>';
                             bg = 'bg-blue-50';
                             border = 'border-l-4 border-blue-400';
-                            titleColor = 'text-blue-800';
-                            messageColor = 'text-blue-700';
+                            titleColor = 'text-blue-900';
+                            messageColor = 'text-blue-800';
                         } else if (notification.type === 'inquiry_received') {
-                            icon = '🚨';
+                            icon = '<i class="fas fa-envelope text-pink-500"></i>';
+                            bg = 'bg-pink-50';
+                            border = 'border-l-4 border-pink-400';
+                            titleColor = 'text-pink-900';
+                            messageColor = 'text-pink-800';
                         } else if (notification.type === 'inquiry_responded') {
-                            icon = '💬';
+                            icon = '<i class="fas fa-comment-dots text-purple-500"></i>';
+                            bg = 'bg-purple-50';
+                            border = 'border-l-4 border-purple-400';
+                            titleColor = 'text-purple-900';
+                            messageColor = 'text-purple-800';
                         }
-                        item.className = `flex items-start gap-3 p-4 ${bg} hover:bg-yellow-50 transition-all duration-200 cursor-pointer rounded-xl shadow-sm mb-2 ${border}`;
+                        item.className = `flex items-start gap-3 p-4 ${bg} hover:bg-yellow-100 transition-all duration-200 cursor-pointer rounded-xl shadow-sm mb-2 ${border} ring-1 ring-yellow-100`;
                         if (!notification.is_read) {
-                            item.classList.add('ring-2', 'ring-yellow-300');
+                            item.classList.add('ring-2', 'ring-yellow-400', 'shadow-md');
                         }
+                        item.style.wordBreak = 'break-word';
                         item.onclick = () => {
                             markAsRead(notification.id);
                             if (notification.inquiry_id) {
@@ -649,14 +631,14 @@
                         item.innerHTML = `
                             <div class="flex-shrink-0 flex flex-col items-center pt-1">
                                 <span class="text-2xl">${icon}</span>
-                                <span class="text-xs text-yellow-400 mt-1">${notification.is_read ? '' : '•'}</span>
+                                <span class="text-xs text-yellow-500 mt-1 font-bold">${notification.is_read ? '' : '•'}</span>
                                 </div>
                                 <div class="flex-1 min-w-0">
                                 <div class="flex items-center justify-between">
-                                    <p class="text-sm font-bold ${titleColor} mb-1">${notification.title}</p>
-                                    <span class="text-xs text-gray-400 ml-2">${getTimeAgo(notification.created_at)}</span>
+                                    <p class="text-base font-bold ${titleColor} mb-1" style="line-height:1.2;">${notification.title}</p>
+                                    <span class="text-xs text-gray-400 ml-2 whitespace-nowrap">${getTimeAgo(notification.created_at)}</span>
                                 </div>
-                                <p class="text-sm ${messageColor}">${notification.message}</p>
+                                <p class="text-sm ${messageColor} leading-snug" style="word-break:break-word;">${notification.message}</p>
                             </div>
                         `;
                         list.appendChild(item);

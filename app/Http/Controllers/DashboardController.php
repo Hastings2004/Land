@@ -173,11 +173,11 @@ class DashboardController extends Controller
         // Fallback: if no user history, show latest available plots
         $plots = $query->orderBy('created_at', 'desc')->take(6)->get();
         if ($plots->isEmpty()) {
-            $plots = \App\Models\Plot::where('status', 'available')
+        $plots = \App\Models\Plot::where('status', 'available')
                 ->whereNotIn('id', $excludeIds)
-                ->orderBy('created_at', 'desc')
-                ->take(6)
-                ->get();
+            ->orderBy('created_at', 'desc')
+            ->take(6)
+            ->get();
         }
         return $plots;
     }
