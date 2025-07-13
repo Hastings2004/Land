@@ -178,6 +178,12 @@
                                         </a>
                                         
                                         @if($reservation->status === 'active')
+                                            <form action="{{ route('customer.reservations.pay', $reservation) }}" method="POST" class="inline-block">
+                                                @csrf
+                                                <button type="submit" class="inline-flex items-center px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600 font-semibold text-xs uppercase transition">
+                                                    <i class="fas fa-credit-card mr-2"></i> Pay Now
+                                                </button>
+                                            </form>
                                             <form action="{{ route('customer.reservations.destroy', $reservation) }}" method="POST" class="inline">
                                                 @csrf
                                                 @method('DELETE')

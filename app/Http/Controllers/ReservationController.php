@@ -15,13 +15,13 @@ class ReservationController extends Controller
     public function index()
     {
         $user = Auth::user();
-        $reservations = $user->reservations()->with('plot')->latest()->paginate(10);
+        $reservations = $user->reservations()->withTrashed()->with('plot')->latest()->paginate(10);
         // Only use allowed statuses
         $stats = [
-            'total' => $user->reservations()->count(),
+            'total' => $user->reservations()->withTrashed()->count(),
             'active' => $user->reservations()->where('status', 'active')->count(),
             'completed' => $user->reservations()->where('status', 'completed')->count(),
-            'expired' => $user->reservations()->where('status', 'expired')->count(),
+            'expired' => $user->reservations()->withTrashed()->where('status', 'expired')->count(),
             'cancelled' => $user->reservations()->where('status', 'cancelled')->count(),
         ];
         return view('customer.reservations.index', compact('reservations', 'stats'));
@@ -32,12 +32,12 @@ class ReservationController extends Controller
      */
     public function adminIndex()
     {
-        $reservations = Reservation::with(['user', 'plot'])->latest()->paginate(15);
+        $reservations = Reservation::withTrashed()->with(['user', 'plot'])->latest()->paginate(15);
         $stats = [
-            'total' => Reservation::count(),
+            'total' => Reservation::withTrashed()->count(),
             'active' => Reservation::where('status', 'active')->count(),
             'completed' => Reservation::where('status', 'completed')->count(),
-            'expired' => Reservation::where('status', 'expired')->count(),
+            'expired' => Reservation::withTrashed()->where('status', 'expired')->count(),
             'cancelled' => Reservation::where('status', 'cancelled')->count(),
         ];
         return view('admin.reservations.index', compact('reservations', 'stats'));
@@ -153,5 +153,15 @@ class ReservationController extends Controller
         }
         // If not reserved, allow the user to proceed to reserve or buy
         return back()->with('success', 'This plot is available. You can proceed to reserve or buy.');
+    }
+
+    public function show(Reservation $reservation)
+    {
+        $user = Auth::user();
+        // Ensure the user owns the reservation or is admin
+        if ($user->id !== $reservation->user_id && !$user->isAdmin()) {
+            abort(403, 'Unauthorized');
+        }
+        return view('customer.reservations.show', compact('reservation'));
     }
 }

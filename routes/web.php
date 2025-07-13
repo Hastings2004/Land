@@ -182,31 +182,30 @@ Route::middleware(['auth', 'customer'])->prefix('customer')->name('customer.')->
     Route::get('/reservations', [ReservationController::class, 'index'])->name('reservations.index');
     Route::post('/reservations', [ReservationController::class, 'store'])->name('reservations.store');
     Route::delete('/reservations/{reservation}', [ReservationController::class, 'destroy'])->name('reservations.destroy');
+    Route::post('/reservations/{reservation}/pay', [\App\Http\Controllers\PaymentController::class, 'pay'])->name('reservations.pay');
+    Route::get('/reservations/{reservation}', [\App\Http\Controllers\ReservationController::class, 'show'])->name('reservation.show');
 
-    // Reviews
-    Route::post('/reviews', [ReviewController::class, 'store'])->name('reviews.store');
-
-    // Inquiries (customer can create and view their own)
-    Route::get('/inquiries', [InquiriesController::class, 'customerIndex'])->name('inquiries.index');
-    Route::get('/inquiries/create', [InquiriesController::class, 'customerCreate'])->name('inquiries.create');
-    Route::post('/inquiries', [InquiriesController::class, 'customerStore'])->name('inquiries.store');
-    Route::get('/inquiries/{inquiry}', [InquiriesController::class, 'customerShow'])->name('inquiries.show');
-    Route::get('/inquiries/{inquiry}/edit', [InquiriesController::class, 'customerEdit'])->name('inquiries.edit');
-    Route::put('/inquiries/{inquiry}', [InquiriesController::class, 'customerUpdate'])->name('inquiries.update');
-    Route::delete('/inquiries/{inquiry}', [InquiriesController::class, 'customerDestroy'])->name('inquiries.destroy');
-    Route::post('/inquiries/{inquiry}/restore', [InquiriesController::class, 'customerRestore'])->name('inquiries.restore');
-    Route::delete('/inquiries/{inquiry}/permanent-delete', [InquiriesController::class, 'customerPermanentDelete'])->name('inquiries.permanent-delete');
-
-    // Notification Management
-    Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
-    Route::post('/notifications/mark-read', [NotificationController::class, 'markAsRead'])->name('notifications.mark-read');
-    Route::post('/notifications/mark-all-read', [NotificationController::class, 'markAllAsRead'])->name('notifications.mark-all-read');
-    Route::get('/notifications/unread-count', [NotificationController::class, 'getUnreadCount'])->name('notifications.unread-count');
-    Route::get('/notifications/all', [NotificationController::class, 'getAll'])->name('notifications.all');
+    // Customer inquiries
+    Route::get('/inquiries', [\App\Http\Controllers\InquiriesController::class, 'customerIndex'])->name('inquiries.index');
+    Route::get('/inquiries/create', [\App\Http\Controllers\InquiriesController::class, 'customerCreate'])->name('inquiries.create');
+    Route::post('/inquiries', [\App\Http\Controllers\InquiriesController::class, 'customerStore'])->name('inquiries.store');
 
     // Customer notifications page (Blade view)
-    Route::get('/notifications/all/view', [NotificationController::class, 'showAll'])->name('notifications.all.view');
+    Route::get('/notifications/all/view', [\App\Http\Controllers\NotificationController::class, 'showAll'])->name('notifications.all.view');
+    Route::get('/notifications', [\App\Http\Controllers\NotificationController::class, 'index'])->name('notifications.index');
+    Route::post('/notifications/mark-read', [\App\Http\Controllers\NotificationController::class, 'markAsRead'])->name('notifications.mark-read');
+    Route::post('/notifications/mark-all-read', [\App\Http\Controllers\NotificationController::class, 'markAllAsRead'])->name('notifications.mark-all-read');
+    Route::get('/notifications/unread-count', [\App\Http\Controllers\NotificationController::class, 'getUnreadCount'])->name('notifications.unread-count');
+    Route::get('/notifications/all', [\App\Http\Controllers\NotificationController::class, 'getAll'])->name('notifications.all');
 });
+
+// Fallback GET route for payment to prevent MethodNotAllowedHttpException
+Route::get('/customer/reservations/{reservation}/pay', function () {
+    return redirect()->route('customer.reservations.index');
+});
+
+// Payment callback route for PayChangu (must be public)
+Route::post('/payments/callback', [\App\Http\Controllers\PaymentController::class, 'callback'])->name('payments.callback');
 
 // Legacy routes for backward compatibility (redirect to appropriate areas)
 Route::middleware(['auth'])->group(function () {

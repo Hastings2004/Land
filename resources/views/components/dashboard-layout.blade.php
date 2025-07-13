@@ -251,7 +251,7 @@
     <aside id="sidebar" class="fixed inset-y-0 left-0 w-64 bg-white shadow-2xl transform -translate-x-full transition-all duration-500 ease-in-out z-50 flex flex-col no-scrollbar overflow-y-auto rounded-r-2xl border-r border-gray-200">
         <!-- Header Section -->
         <div class="p-4 flex items-center justify-between lg:justify-start bg-yellow-500 rounded-br-2xl">
-            <h1 class="text-sm font-bold text-white inline-block align-middle whitespace-nowrap overflow-visible uppercase tracking-wide">ATSOGO LAND MARKETING</h1>
+            <h1 class="text-sm font-bold text-white inline-block align-middle whitespace-nowrap overflow-visible uppercase tracking-wide">ATSOGO ESTATE AGENCY</h1>
             <button class="lg:hidden text-white hover:text-gray-100 focus:outline-none transform hover:scale-110 transition-transform duration-200" onclick="toggleSidebar()">
                 <i class="fas fa-times text-xl"></i>
             </button>

@@ -142,38 +142,6 @@
                     <i class="fas fa-user-plus mr-2"></i>Create Account
                 </button>
             </div>
-            
-            {{-- Success message --}}
-            @if (session('success'))
-                <div class="mt-4 p-4 bg-gradient-to-r from-green-400 to-green-500 rounded-xl shadow-lg border border-green-300 relative overflow-hidden">
-                    <!-- Background Pattern -->
-                    <div class="absolute inset-0 bg-gradient-to-br from-green-300/20 to-transparent"></div>
-                    <div class="absolute top-0 right-0 w-16 h-16 bg-green-300/10 rounded-full -translate-y-8 translate-x-8"></div>
-                    
-                    <!-- Content -->
-                    <div class="relative z-10 flex items-center space-x-3">
-                        <!-- Success Icon -->
-                        <div class="flex-shrink-0">
-                            <div class="w-10 h-10 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center animate-pulse">
-                                <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                                </svg>
-                            </div>
-                        </div>
-                        
-                        <!-- Message Content -->
-                        <div class="flex-1">
-                            <h4 class="text-white font-bold text-sm mb-1">Success!</h4>
-                            <p class="text-green-100 text-sm">{{ session('success') }}</p>
-                        </div>
-                    </div>
-                    
-                    <!-- Decorative Elements -->
-                    <div class="absolute top-2 right-2">
-                        <div class="w-2 h-2 bg-white/30 rounded-full animate-ping"></div>
-                    </div>
-                </div>
-            @endif
         </form>
     </div>
 

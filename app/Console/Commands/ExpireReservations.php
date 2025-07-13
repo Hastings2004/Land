@@ -8,6 +8,7 @@ use App\Models\Plot;
 use Carbon\Carbon;
 use App\Notifications\ReservationExpiredNotification;
 use App\Models\Notification;
+use Illuminate\Support\Facades\Log;
 
 class ExpireReservations extends Command
 {
@@ -56,10 +57,11 @@ class ExpireReservations extends Command
             $reservation->user->notify(new ReservationExpiredNotification($reservation->plot->title));
 
             $plot = $reservation->plot;
-            // Only set to available if there are no other active reservations
-            if ($plot && !$plot->reservations()->where('status', 'active')->exists()) {
+            // Set to available immediately when any reservation expires
+            if ($plot) {
                 $plot->status = 'available';
                 $plot->save();
+                Log::info('Plot set to available', ['plot_id' => $plot->id, 'reservation_id' => $reservation->id, 'status' => $plot->status]);
             }
         }
 

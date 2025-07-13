@@ -2,75 +2,70 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Plot;
-use App\Models\Reservation;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
+use App\Models\Reservation;
+use App\Models\Payment;
 use Illuminate\Support\Facades\Auth;
-use App\Notifications\ReservationPaidNotification;
-use App\Notifications\ReservationCancelledNotification;
-use Barryvdh\DomPDF\Facade\Pdf;
-use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Log;
 
 class PaymentController extends Controller
 {
-    public function store(Request $request)
+    // Initiate payment and return JS for PayChangu inline pop-out
+    public function pay(Request $request, Reservation $reservation)
     {
-        $request->validate([
-            'reservation_id' => 'required|exists:reservations,id',
+        $user = Auth::user();
+        $amount = $reservation->plot->price;
+        $paychanguPublicKey = env('PAYCHANGU_PUBLIC_KEY');
+        $paychanguApiKey = env('PAYCHANGU_API_KEY');
+        $paychanguMerchantId = env('PAYCHANGU_MERCHANT_ID');
+        $callbackUrl = route('payments.callback');
+
+        // Create a payment record (pending)
+        $payment = Payment::create([
+            'user_id' => $user->id,
+            'plot_id' => $reservation->plot_id,
+            'reservation_id' => $reservation->id,
+            'amount' => $amount,
+            'status' => 'pending',
+            'provider' => 'paychangu',
         ]);
 
-        $reservation = Reservation::findOrFail($request->reservation_id);
-        $plot = $reservation->plot;
+        return response()->view('payments.inline', [
+            'amount' => $amount,
+            'user' => $user,
+            'payment' => $payment,
+            'callbackUrl' => $callbackUrl,
+            'reservation' => $reservation,
+            'paychanguPublicKey' => $paychanguPublicKey,
+            'paychanguApiKey' => $paychanguApiKey,
+            'paychanguMerchantId' => $paychanguMerchantId,
+        ]);
+    }
 
-        // Only allow payment if reservation is active
-        if ($reservation->status !== 'active') {
-            return back()->with('error', 'This reservation is not active.');
-        }
+    // Handle PayChangu callback/webhook
+    public function callback(Request $request)
+    {
+        Log::info('PayChangu callback received', $request->all());
+        // Validate and process PayChangu's response
+        $transactionId = $request->input('transaction_id');
+        $status = $request->input('status');
+        $paymentId = $request->input('payment_id');
 
-        DB::transaction(function () use ($reservation, $plot) {
-            // Mark reservation as paid
-            $reservation->status = 'paid';
+        $payment = Payment::find($paymentId);
+        if ($payment) {
+            $payment->status = $status;
+            $payment->transaction_id = $transactionId;
+            $payment->save();
+
+            // Optionally, update reservation status if payment is successful
+            if ($status === 'success') {
+                $reservation = $payment->reservation;
+                if ($reservation) {
+                    $reservation->status = 'completed';
             $reservation->save();
-
-            // Mark plot as sold
-            $plot->status = 'sold';
-            $plot->save();
-
-            // Cancel all other active reservations for this plot
-            $otherReservations = Reservation::where('plot_id', $plot->id)
-                ->where('id', '!=', $reservation->id)
-                ->where('status', 'active')
-                ->get();
-            foreach ($otherReservations as $other) {
-                $other->status = 'cancelled';
-                $other->save();
-                // Notify the user
-                $other->user->notify(new ReservationCancelledNotification($plot->title));
+                } 
             }
-        });
-
-        // Notify the paying user
-        $reservation->user->notify(new ReservationPaidNotification($plot->title));
-
-        // Generate PDF receipt
-        $pdf = Pdf::loadView('emails.receipt', [
-            'user' => $reservation->user,
-            'plot' => $plot,
-            'date' => now()->format('M d, Y'),
-        ]);
-        $pdfContent = $pdf->output();
-
-        // Email the PDF receipt to the user
-        Mail::send([], [], function ($message) use ($reservation, $pdfContent) {
-            $message->to($reservation->user->email)
-                ->subject('Your Payment Receipt - Atsogo Estate Agency')
-                ->attachData($pdfContent, 'receipt.pdf', [
-                    'mime' => 'application/pdf',
-                ])
-                ->setBody('Thank you for your payment. Please find your receipt attached.', 'text/html');
-        });
-
-        return back()->with('success', 'Payment successful! The plot is now marked as sold.');
+        }
+        return response()->json(['success' => true]);
     }
 }
