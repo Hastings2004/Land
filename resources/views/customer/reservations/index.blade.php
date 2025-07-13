@@ -178,12 +178,11 @@
                                         </a>
                                         
                                         @if($reservation->status === 'active')
-                                            <form action="{{ route('customer.reservations.pay', $reservation) }}" method="POST" class="inline-block">
-                                                @csrf
-                                                <button type="submit" class="inline-flex items-center px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600 font-semibold text-xs uppercase transition">
-                                                    <i class="fas fa-credit-card mr-2"></i> Pay Now
-                                                </button>
-                                            </form>
+                                            <button type="button" 
+                                                    onclick="makePayment({{ $reservation->id }}, {{ $reservation->plot->price }}, '{{ auth()->user()->email }}', '{{ auth()->user()->name }}')" 
+                                                    class="inline-flex items-center px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600 font-semibold text-xs uppercase transition">
+                                                <i class="fas fa-credit-card mr-2"></i> Pay Now 
+                                            </button>
                                             <form action="{{ route('customer.reservations.destroy', $reservation) }}" method="POST" class="inline">
                                                 @csrf
                                                 @method('DELETE')
@@ -267,6 +266,10 @@
         }
     </style>
 
+    <!-- PayChangu Script -->
+    <script src="https://in.paychangu.com/js/popup.js"></script>
+    <div id="wrapper"></div>
+
     <script>
         // Auto-hide success/error messages after 3 seconds
         document.addEventListener('DOMContentLoaded', function() {
@@ -281,5 +284,42 @@
                 }, 3000);
             });
         });
+
+        // Payment function that triggers PayChangu
+        function makePayment(reservationId, amount, userEmail, userName) {
+            // Disable the button to prevent double clicks
+            const button = event.target;
+            button.disabled = true;
+            button.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Processing...';
+            
+            // Generate a unique transaction reference
+            const txRef = 'RES-' + reservationId + '-' + Date.now();
+            
+            PaychanguCheckout({
+                "public_key": "PUB-TEST-PvuQhVa7NUDFOMJNfw5jgJZMC4ACs36Q",
+                "tx_ref": txRef,
+                "amount": amount,
+                "currency": "MWK",
+                "callback_url": "{{ route('payments.callback') }}",
+                "return_url": "{{ route('customer.reservations.index') }}",
+                "customer": {
+                    "email": userEmail,
+                    "first_name": userName,
+                    "last_name": "",
+                },
+                "customization": {
+                    "title": "Plot Reservation Payment",
+                    "description": "Payment for reservation #" + reservationId,
+                },
+                "meta": {
+                    "reservation_id": reservationId,
+                },
+                "onclose": function() {
+                    // Re-enable the button if payment is cancelled
+                    button.disabled = false;
+                    button.innerHTML = '<i class="fas fa-credit-card mr-2"></i> Pay Now';
+                }
+            });
+        }
     </script>
 </x-dashboard-layout> 
