@@ -13,6 +13,7 @@ use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ContactController;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Auth;
 
 /*
 |--------------------------------------------------------------------------
@@ -81,9 +82,14 @@ Route::get('/test-url-success', function () {
     return redirect('/test-simple?success=' . urlencode($message));
 });
 
-// Default welcome route - redirects to the main dashboard
+// Default welcome route - only guests see the welcome page
 Route::get('/', function () {
-    return redirect()->route('dashboard');
+    if (Auth::check()) {
+        // Redirect logged-in users to their dashboard
+        return redirect()->route(Auth::user()->role === 'admin' ? 'admin.dashboard' : 'customer.dashboard');
+    }
+    // Show welcome page to guests only
+    return view('welcome');
 });
 
 // Guest routes (no authentication required)

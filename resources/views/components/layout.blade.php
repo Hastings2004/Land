@@ -19,11 +19,6 @@
         {{ $slot }}
     </main>
 
-    <footer class="fixed bottom-0 left-0 w-full bg-white shadow">
-        <div class="text-center text-gray-500 text-sm py-4">
-            &copy; {{ date('Y') }} Atsogo Estate Agency. All rights reserved.
-        </div>
-    </footer>
     <!-- Alpine.js loaded last for reliability -->
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <!-- Alpine.js test block for troubleshooting -->

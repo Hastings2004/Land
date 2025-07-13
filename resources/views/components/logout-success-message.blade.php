@@ -46,11 +46,11 @@
         }, 100);
 
         // Auto-dismiss functionality for logout message
-        let logoutTimeLeft = 4000; // 4 seconds for logout message
+        let logoutTimeLeft = 2000; // 2 seconds for logout message
         const logoutProgressBar = document.getElementById('logout-progress-bar');
         const logoutInterval = setInterval(() => {
             logoutTimeLeft -= 50; // Update every 50ms for smooth animation
-            const progress = (logoutTimeLeft / 4000) * 100;
+            const progress = (logoutTimeLeft / 2000) * 100;
             logoutProgressBar.style.width = progress + '%';
             if (logoutTimeLeft <= 0) {
                 clearInterval(logoutInterval);
@@ -79,11 +79,11 @@
             logoutIsPaused = false;
             // Restart the countdown with remaining time
             const remainingProgress = parseFloat(logoutProgressBar.style.width);
-            const remainingTime = (remainingProgress / 100) * 4000;
+            const remainingTime = (remainingProgress / 100) * 2000;
             const newLogoutInterval = setInterval(() => {
                 if (!logoutIsPaused) {
                     logoutTimeLeft -= 50;
-                    const progress = (logoutTimeLeft / 4000) * 100;
+                    const progress = (logoutTimeLeft / 2000) * 100;
                     logoutProgressBar.style.width = progress + '%';
                     if (logoutTimeLeft <= 0) {
                         clearInterval(newLogoutInterval);
