@@ -271,6 +271,10 @@
     <div id="wrapper"></div>
 
     <script>
+        // Pass URLs from Blade to JS
+        const paychanguCallbackUrl = "{{ config('services.paychangu.callback_url') }}"; // Only for backend POST
+        const paychanguReturnUrl = "{{ route('customer.reservations.index') }}"; // For user redirect after payment
+
         // Auto-hide success/error messages after 3 seconds
         document.addEventListener('DOMContentLoaded', function() {
             const messages = document.querySelectorAll('.fixed');
@@ -298,8 +302,8 @@
                 "tx_ref": txRef,
                 "amount": amount,
                 "currency": "MWK",
-                "callback_url": "https://example.com/callbackurl",
-                "return_url": "https://example.com/returnurl",
+                "callback_url": paychanguCallbackUrl, // POST, for backend
+                "return_url": paychanguReturnUrl,     // GET, for user redirect
                 "customer": {
                     "email": userEmail,
                     "first_name": userName,

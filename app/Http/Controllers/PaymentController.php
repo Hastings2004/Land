@@ -426,6 +426,17 @@ class PaymentController extends Controller
                     'payment_id' => $payment->id
                 ]);
 
+                // Mark the plot as sold
+                $plot = $payment->reservation->plot;
+                if ($plot) {
+                    $plot->status = 'sold';
+                    $plot->save();
+                    Log::info('Plot marked as sold after successful payment', [
+                        'plot_id' => $plot->id,
+                        'payment_id' => $payment->id
+                    ]);
+                }
+
                 // Send notification to user
                 $payment->user->notify(new \App\Notifications\ReservationPaidNotification($payment->reservation));
             }

@@ -14,6 +14,10 @@
   <script src="https://in.paychangu.com/js/popup.js"></script>
   <div id="wrapper"></div>
   <script>
+    // Pass URLs from Blade to JS
+    const paychanguCallbackUrl = "{{ config('services.paychangu.callback_url') }}"; // Only for backend POST
+    const paychanguReturnUrl = "{{ route('customer.reservations.index') }}"; // For user redirect after payment
+
     function makePayment() {
       if (paymentInProgress) {
         return;
@@ -31,8 +35,8 @@
           "tx_ref": txRef,
           "amount": {{ $amount }},
           "currency": "MWK",
-          "callback_url": "{{ route('payments.callback') }}",
-          "return_url": "{{ route('customer.reservations.index') }}",
+         "callback_url": paychanguCallbackUrl, // POST, for backend
+                "return_url": paychanguReturnUrl,     // GET, for user redirect
           "customer": {
             "email": "{{ $user->email }}",
             "first_name": "{{ $user->name }}",
