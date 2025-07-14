@@ -59,9 +59,6 @@ class UserController extends Controller
             // Update the user
             $updated = $user->update($validated);
             
-            // Refresh the user from database to confirm changes
-            $user->refresh();
-            
             // Log the result
             Log::info('Profile update result', [
                 'user_id' => $user->id,

@@ -89,21 +89,21 @@
                     <h3 class="text-lg font-bold text-gray-800 mb-2">Description</h3>
                     <p class="text-gray-700 text-base leading-relaxed">{{ $plot->description }}</p>
                 </div>
-                <div class="flex flex-col md:flex-row gap-4 mt-8">
+                <div class="flex flex-col md:flex-row gap-4 mt-8 items-stretch min-h-[260px]">
                     @if($plot->status === 'available')
-                        <form action="{{ route('customer.reservations.store') }}" method="POST" class="flex-1">
+                        <form action="{{ route('customer.reservations.store') }}" method="POST" class="flex-1 h-full flex flex-col">
                             @csrf
                             <input type="hidden" name="plot_id" value="{{ $plot->id }}">
-                            <button type="submit" class="w-full px-6 py-3 bg-yellow-500 text-white font-semibold rounded-lg hover:bg-yellow-600 transition-colors text-lg shadow-md">Reserve this Plot</button>
+                            <button type="submit" class="w-full px-6 py-3 bg-yellow-500 text-white font-semibold rounded-lg hover:bg-yellow-600 transition-colors text-lg shadow-md flex-1">Reserve this Plot</button>
                         </form>
                     @elseif($plot->activeReservation && $plot->activeReservation->user_id === Auth::id())
-                        <div class="flex-1 text-center p-4 bg-yellow-100 border border-yellow-300 rounded-lg">
+                        <div class="flex-1 h-full flex flex-col text-center p-4 bg-yellow-100 border border-yellow-300 rounded-lg">
                             <p class="font-semibold text-yellow-800">You have reserved this plot.</p>
-                            <p class="text-sm text-yellow-700">This reservation expires on {{ $plot->activeReservation->expires_at->format('M d, Y \a\t H:i A') }}.</p>
+                            <p class="text-sm text-yellow-700">This reservation expires on {{ $plot->activeReservation->expires_at->format('M d, Y \\a\\t H:i A') }}.</p>
                             <a href="{{ route('customer.reservations.index') }}" class="mt-2 inline-block text-yellow-600 hover:underline">View My Reservations</a>
                         </div>
                     @elseif($plot->status === 'reserved' && $plot->activeReservation)
-                        <div class="flex-1 text-center p-6 bg-gradient-to-br from-yellow-50 via-yellow-100 to-yellow-200 border-l-8 border-yellow-400 rounded-2xl shadow-lg">
+                        <div class="flex-1 h-full flex flex-col text-center p-4 bg-gradient-to-br from-yellow-50 via-yellow-100 to-yellow-200 border-l-8 border-yellow-400 rounded-2xl shadow-lg items-center justify-start">
                             <div class="flex flex-col items-center justify-center gap-2 mb-2">
                                 <div class="w-14 h-14 flex items-center justify-center rounded-full bg-yellow-200 shadow-inner mb-2">
                                     <i class="fas fa-clock text-yellow-500 text-3xl animate-pulse"></i>
@@ -113,7 +113,7 @@
                                 </p>
                                 <p class="text-yellow-700 text-base mt-1">It will become available in:</p>
                                 <div id="countdown" class="text-3xl font-extrabold text-yellow-700 tracking-widest bg-white/70 px-6 py-2 rounded-xl shadow-inner border border-yellow-200 mt-2 mb-1"></div>
-                                <p class="text-xs text-gray-500 mt-2">Reservation expires on <span class="font-semibold text-yellow-700">{{ $plot->activeReservation->expires_at->format('M d, Y \a\t H:i A') }}</span></p>
+                                <p class="text-xs text-gray-500 mt-2">Reservation expires on <span class="font-semibold text-yellow-700">{{ $plot->activeReservation->expires_at->format('M d, Y \\a\t H:i A') }}</span></p>
                             </div>
                             <div class="mt-2 text-sm text-gray-600 italic">If the reservation is not completed, you’ll have a chance to reserve or buy this plot when the timer ends.</div>
                         </div>
@@ -138,13 +138,11 @@
                         });
                         </script>
                     @else
-                        <div class="flex-1 text-center p-4 bg-gray-100 border border-gray-300 rounded-lg">
+                        <div class="flex-1 h-full flex flex-col text-center p-4 bg-gray-100 border border-gray-300 rounded-lg">
                             <p class="font-semibold text-gray-800">This plot is not available for reservation.</p>
                         </div>
                     @endif
-                    <a href="{{ route('customer.inquiries.create') }}?plot_id={{ $plot->id }}" class="flex-1 px-6 py-3 bg-blue-500 text-white font-semibold rounded-lg hover:bg-blue-600 transition-colors text-lg shadow-md text-center flex items-center justify-center">
-                        <i class="fas fa-envelope mr-2"></i> Inquire about this Plot
-                    </a>
+                    <a href="{{ route('customer.inquiries.create') }}?plot_id={{ $plot->id }}" class="flex-1 h-full flex flex-col px-6 py-3 bg-blue-500 text-white font-semibold rounded-lg hover:bg-blue-600 transition-colors text-lg shadow-md text-center items-center justify-center"> <i class="fas fa-envelope mr-2"></i> Inquire about this Plot </a>
                 </div>
             </div>
         </div>

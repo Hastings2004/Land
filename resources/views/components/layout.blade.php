@@ -12,7 +12,9 @@
 </head>
 <body class="bg-whitesmoke-100">
     <!-- Logout Success Message Component -->
-    <x-logout-success-message />
+    @if (!request()->routeIs('login'))
+        <x-logout-success-message />
+    @endif
     
     <main>
         <x-success-message />

@@ -39,12 +39,12 @@
                     </div>
                     <div class="relative">
                         <label for="area_sqm" class="block text-sm font-semibold text-gray-700 mb-1">Area (sqm)</label>
-                        <input type="number" name="area_sqm" id="area_sqm" value="{{ old('area_sqm') }}" class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 transition-all duration-200 bg-gray-50 text-base placeholder-gray-400" placeholder="Enter area">
+                        <input type="number" name="area_sqm" id="area_sqm" value="{{ old('area_sqm') }}" min="0" class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 transition-all duration-200 bg-gray-50 text-base placeholder-gray-400" placeholder="Enter area">
                         @error('area_sqm')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
                     </div>
                     <div class="relative md:col-span-2">
                         <label for="price" class="block text-sm font-semibold text-gray-700 mb-1">Price</label>
-                        <input type="number" name="price" id="price" value="{{ old('price') }}" class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 transition-all duration-200 bg-gray-50 text-base placeholder-gray-400" placeholder="Enter price">
+                        <input type="number" name="price" id="price" value="{{ old('price') }}" min="0" class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 transition-all duration-200 bg-gray-50 text-base placeholder-gray-400" placeholder="Enter price">
                         @error('price')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
                     </div>
                     <div class="md:col-span-2">
@@ -197,6 +197,21 @@
                     const dt = new DataTransfer();
                 filesArray.forEach(file => dt.items.add(file));
                 input.files = dt.files;
+            }
+        });
+    });
+    // Prevent negative numbers in area and price fields
+    const areaInput = document.getElementById('area_sqm');
+    const priceInput = document.getElementById('price');
+    [areaInput, priceInput].forEach(input => {
+        input.addEventListener('input', function() {
+            if (this.value && parseFloat(this.value) < 0) {
+                this.value = 0;
+            }
+        });
+        input.addEventListener('keydown', function(e) {
+            if (e.key === '-' || e.key === 'Subtract') {
+                e.preventDefault();
             }
         });
     });

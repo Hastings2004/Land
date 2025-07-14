@@ -157,6 +157,10 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::put('/reservations/{reservation}/approve', [ReservationController::class, 'approve'])->name('reservations.approve');
     Route::put('/reservations/{reservation}/reject', [ReservationController::class, 'reject'])->name('reservations.reject');
 
+    // Payment Management
+    Route::get('/payments', [\App\Http\Controllers\PaymentController::class, 'adminIndex'])->name('payments.index');
+    Route::get('/payments/{payment}', [\App\Http\Controllers\PaymentController::class, 'adminShow'])->name('payments.show');
+
     // Notification Management
     Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
     Route::post('/notifications/mark-read', [NotificationController::class, 'markAsRead'])->name('notifications.mark-read');
@@ -195,6 +199,12 @@ Route::middleware(['auth', 'customer'])->prefix('customer')->name('customer.')->
     Route::get('/inquiries', [\App\Http\Controllers\InquiriesController::class, 'customerIndex'])->name('inquiries.index');
     Route::get('/inquiries/create', [\App\Http\Controllers\InquiriesController::class, 'customerCreate'])->name('inquiries.create');
     Route::post('/inquiries', [\App\Http\Controllers\InquiriesController::class, 'customerStore'])->name('inquiries.store');
+    Route::get('/inquiries/{inquiry}', [\App\Http\Controllers\InquiriesController::class, 'customerShow'])->name('inquiries.show');
+    Route::get('/inquiries/{inquiry}/edit', [\App\Http\Controllers\InquiriesController::class, 'customerEdit'])->name('inquiries.edit');
+    Route::put('/inquiries/{inquiry}', [\App\Http\Controllers\InquiriesController::class, 'customerUpdate'])->name('inquiries.update');
+    Route::delete('/inquiries/{inquiry}', [\App\Http\Controllers\InquiriesController::class, 'customerDestroy'])->name('inquiries.destroy');
+    Route::post('/inquiries/{inquiry}/restore', [\App\Http\Controllers\InquiriesController::class, 'customerRestore'])->name('inquiries.restore');
+    Route::delete('/inquiries/{inquiry}/permanent-delete', [\App\Http\Controllers\InquiriesController::class, 'customerPermanentDelete'])->name('inquiries.permanent-delete');
 
     // Customer notifications page (Blade view)
     Route::get('/notifications/all/view', [\App\Http\Controllers\NotificationController::class, 'showAll'])->name('notifications.all.view');
@@ -212,6 +222,40 @@ Route::get('/customer/reservations/{reservation}/pay', function () {
 
 // Payment callback route for PayChangu (must be public)
 Route::post('/payments/callback', [\App\Http\Controllers\PaymentController::class, 'callback'])->name('payments.callback');
+
+// Payment verification routes (for manual verification)
+Route::get('/payments/verify/{tx_ref}', [\App\Http\Controllers\PaymentController::class, 'verifyPayment'])->name('payments.verify');
+Route::post('/payments/{payment}/verify', [\App\Http\Controllers\PaymentController::class, 'manualVerify'])->name('payments.manual-verify');
+Route::post('/payments/{payment}/store-tx-ref', [\App\Http\Controllers\PaymentController::class, 'storeTxRef'])->name('payments.store-tx-ref');
+
+// Test route to simulate Paychangu callback (for debugging - remove in production)
+Route::get('/test-paychangu-callback/{payment_id}', function($payment_id) {
+    $payment = \App\Models\Payment::find($payment_id);
+    if (!$payment) {
+        return response()->json(['error' => 'Payment not found'], 404);
+    }
+    
+    // Simulate Paychangu callback data
+    $callbackData = [
+        'transaction_id' => 'TXN_' . time(),
+        'status' => 'success',
+        'payment_id' => $payment_id,
+        'amount' => $payment->amount,
+        'currency' => 'MWK',
+        'tx_ref' => 'RES-' . $payment_id . '-' . time(),
+        'customer_email' => $payment->user->email,
+        'customer_name' => $payment->user->name,
+    ];
+    
+    // Make POST request to callback endpoint
+    $response = \Illuminate\Support\Facades\Http::post(url('/payments/callback'), $callbackData);
+    
+    return response()->json([
+        'message' => 'Test callback sent',
+        'callback_data' => $callbackData,
+        'response' => $response->json()
+    ]);
+})->name('test.paychangu.callback');
 
 // Legacy routes for backward compatibility (redirect to appropriate areas)
 Route::middleware(['auth'])->group(function () {

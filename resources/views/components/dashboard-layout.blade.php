@@ -984,80 +984,49 @@
 
             window.showLogoutModal = function() { 
                 logoutModal.classList.remove('hidden');
-                // Add entrance animation
+                // Faster entrance animation
+                const modalContent = logoutModal.querySelector('.modal-content');
+                modalContent.style.transform = 'scale(0.95)';
+                modalContent.style.opacity = '0';
+                modalContent.style.transition = 'all 0.2s ease-out';
+                
                 setTimeout(() => {
-                    const modalContent = logoutModal.querySelector('.modal-content');
-                    modalContent.style.transform = 'scale(0.9)';
-                    modalContent.style.opacity = '0';
-                    modalContent.style.transition = 'all 0.3s ease-out';
-                    
-                    setTimeout(() => {
-                        modalContent.style.transform = 'scale(1)';
-                        modalContent.style.opacity = '1';
-                    }, 50);
+                    modalContent.style.transform = 'scale(1)';
+                    modalContent.style.opacity = '1';
                 }, 10);
             }
             
             window.hideLogoutModal = function() { 
                 const modalContent = logoutModal.querySelector('.modal-content');
-                modalContent.style.transform = 'scale(0.9)';
+                modalContent.style.transform = 'scale(0.95)';
                 modalContent.style.opacity = '0';
-                modalContent.style.transition = 'all 0.2s ease-in';
+                modalContent.style.transition = 'all 0.15s ease-in';
                 
                 setTimeout(() => {
                     logoutModal.classList.add('hidden');
                     modalContent.style.transform = '';
                     modalContent.style.opacity = '';
                     modalContent.style.transition = '';
-                }, 200);
+                }, 150);
             }
-            // Logout button is now handled by onclick="handleLogout()"
-            console.log('Logout form element:', logoutForm);
-            console.log('Confirm logout button:', confirmLogoutBtn);
+            // Logout functionality is now simplified and faster
             
-            // Fallback logout function
-            function performLogout() {
-                console.log('Performing direct logout...');
-                // Create a temporary form and submit it
-                const tempForm = document.createElement('form');
-                tempForm.method = 'POST';
-                tempForm.action = '{{ route('logout') }}';
-                
-                const csrfToken = document.createElement('input');
-                csrfToken.type = 'hidden';
-                csrfToken.name = '_token';
-                csrfToken.value = '{{ csrf_token() }}';
-                
-                tempForm.appendChild(csrfToken);
-                document.body.appendChild(tempForm);
-                tempForm.submit();
-            }
-            
-            // Global logout handler function
+            // Global logout handler function - Simplified and faster
             window.handleLogout = function() {
-                console.log('handleLogout called');
                 const btn = document.getElementById('confirm-logout-btn');
-                const originalText = btn.innerHTML;
+                const logoutForm = document.getElementById('logout-form');
                 
                 // Show loading state
                 btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Logging out...';
                 btn.disabled = true;
                 
-                // Try form submission first
-                const logoutForm = document.getElementById('logout-form');
+                // Submit form immediately
                 if (logoutForm) {
-                    console.log('Submitting logout form...');
                     logoutForm.submit();
                 } else {
-                    console.log('Form not found, using fallback...');
-                    performLogout();
+                    // Fallback: redirect to logout route
+                    window.location.href = '{{ route('logout') }}';
                 }
-                
-                // Reset button after a short delay (in case form submission fails)
-                setTimeout(() => {
-                    btn.innerHTML = originalText;
-                    btn.disabled = false;
-                }, 2000);
             };
             
             // Close logout modal when clicking outside

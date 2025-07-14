@@ -108,9 +108,9 @@
                 <div>
                     <label class="block text-sm font-semibold text-gray-700 mb-2">Price Range</label>
                     <div class="flex gap-2">
-                        <input type="number" name="min_price" placeholder="Min" value="{{ request('min_price') }}" 
+                        <input type="number" name="min_price" placeholder="Min" value="{{ request('min_price') }}" min="0" 
                                class="flex-1 px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500">
-                        <input type="number" name="max_price" placeholder="Max" value="{{ request('max_price') }}" 
+                        <input type="number" name="max_price" placeholder="Max" value="{{ request('max_price') }}" min="0" 
                                class="flex-1 px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500">
                     </div>
                 </div>
@@ -118,9 +118,9 @@
                 <div>
                     <label class="block text-sm font-semibold text-gray-700 mb-2">Area Range (sqm)</label>
                     <div class="flex gap-2">
-                        <input type="number" name="min_area" placeholder="Min" value="{{ request('min_area') }}" 
+                        <input type="number" name="min_area" placeholder="Min" value="{{ request('min_area') }}" min="0" 
                                class="flex-1 px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500">
-                        <input type="number" name="max_area" placeholder="Max" value="{{ request('max_area') }}" 
+                        <input type="number" name="max_area" placeholder="Max" value="{{ request('max_area') }}" min="0" 
                                class="flex-1 px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500">
                     </div>
                 </div>

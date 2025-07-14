@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use App\Notifications\NewPlotNotification;
 use App\Models\User;
+use Illuminate\Support\Facades\Storage as FacadesStorage;
 
 class AdminPlotController extends Controller
 {
@@ -249,8 +250,8 @@ class AdminPlotController extends Controller
                 $plotImage = $plot->plotImages()->where('image_path', $removedImagePath)->first();
                 if ($plotImage) {
                     // Delete the file from storage
-                    if (\Storage::disk('public')->exists($removedImagePath)) {
-                        \Storage::disk('public')->delete($removedImagePath);
+                    if (FacadesStorage::disk('public')->exists($removedImagePath)) {
+                        FacadesStorage::disk('public')->delete($removedImagePath);
                     }
                     $plotImage->delete();
                 }
@@ -369,7 +370,7 @@ class AdminPlotController extends Controller
      */
     public function pending()
     {
-        if (auth()->user()->role !== 'admin') {
+        if (Auth::user()->role !== 'admin') {
             abort(403, 'Unauthorized action.');
         }
         $plots = \App\Models\Plot::where('status', 'pending')->latest()->paginate(10);
@@ -381,10 +382,10 @@ class AdminPlotController extends Controller
      */
     public function approve($id)
     {
-        if (auth()->user()->role !== 'admin') {
+        if (Auth::user()->role !== 'admin') {
             abort(403, 'Unauthorized action.');
         }
-        $plot = \App\Models\Plot::findOrFail($id);
+        $plot = Plot::findOrFail($id);
         $plot->status = 'available';
         $plot->save();
         return redirect()->route('admin.plots.pending')->with('success', 'Plot approved successfully.');
@@ -395,10 +396,10 @@ class AdminPlotController extends Controller
      */
     public function reject($id)
     {
-        if (auth()->user()->role !== 'admin') {
+        if (Auth::user()->role !== 'admin') {
             abort(403, 'Unauthorized action.');
         }
-        $plot = \App\Models\Plot::findOrFail($id);
+        $plot = Plot::findOrFail($id);
         $plot->status = 'rejected';
         $plot->save();
         return redirect()->route('admin.plots.pending')->with('success', 'Plot rejected.');

@@ -14,30 +14,92 @@
   <script src="https://in.paychangu.com/js/popup.js"></script>
   <div id="wrapper"></div>
   <script>
-    function makePayment(){
-      PaychanguCheckout({
-        "public_key": "PUB-TEST-PvuQhVa7NUDFOMJNfw5jgJZMC4ACs36Q",
-        "tx_ref": 'RES-{{ $payment->id }}-{{ time() }}',
-        "amount": {{ $amount }},
-        "currency": "MWK",
-        "callback_url": "{{ $callbackUrl }}",
-        "return_url": "{{ route('customer.reservation.show', $reservation->id) }}",
-        "customer":{
-          "email": "{{ $user->email }}",
-          "first_name":"{{ $user->name }}",
-          "last_name":"",
+    function makePayment() {
+      if (paymentInProgress) {
+        return;
+      }
+
+      setLoadingState(true);
+      showStatus('Initializing payment...', 'info');
+
+      // Generate unique tx_ref
+      const txRef = 'RES-{{ $payment->id }}-{{ time() }}';
+
+      try {
+        PaychanguCheckout({
+          "public_key": "PUB-TEST-PvuQhVa7NUDFOMJNfw5jgJZMC4ACs36Q",
+          "tx_ref": txRef,
+          "amount": {{ $amount }},
+          "currency": "MWK",
+          "callback_url": "{{ route('payments.callback') }}",
+          "return_url": "{{ route('customer.reservations.index') }}",
+          "customer": {
+            "email": "{{ $user->email }}",
+            "first_name": "{{ $user->name }}",
+            "last_name": "",
+          },
+          "customization": {
+            "title": "Plot Reservation Payment",
+            "description": "Payment for reservation #{{ $reservation->id }}",
+          },
+          "meta": {
+            "reservation_id": "{{ $reservation->id }}",
+            "payment_id": "{{ $payment->id }}",
+            "plot_id": "{{ $reservation->plot_id }}"
+          },
+          "onclose": function() {
+            setLoadingState(false);
+            showStatus('Payment window was closed. You can try again or contact support.', 'error');
+            
+            // Redirect after 3 seconds
+            setTimeout(() => {
+              window.location.href = "{{ route('customer.reservations.index') }}";
+            }, 3000);
+          },
+          "onSuccess": function(response) {
+            setLoadingState(false);
+            showStatus('Payment successful! Redirecting...', 'success');
+            
+            // Store tx_ref in payment record for tracking
+            storeTxRef(txRef);
+            
+            // Redirect to reservation details
+            setTimeout(() => {
+              window.location.href = "{{ route('reservation.show', $reservation->id) }}";
+            }, 2000);
+          },
+          "onError": function(error) {
+            setLoadingState(false);
+            showStatus('Payment failed: ' + (error.message || 'Unknown error'), 'error');
+            console.error('Paychangu error:', error);
+          }
+        });
+      } catch (error) {
+        setLoadingState(false);
+        showStatus('Failed to initialize payment: ' + error.message, 'error');
+        console.error('Payment initialization error:', error);
+      }
+    }
+
+    function storeTxRef(txRef) {
+      // Store tx_ref in payment record for tracking
+      fetch('{{ route("payments.store-tx-ref", $payment->id) }}', {
+        method: 'POST',
+        headers: {
+          'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
         },
-        "customization": {
-          "title": "Plot Reservation Payment",
-          "description": "Payment for reservation #{{ $reservation->id }}",
-        },
-        "meta": {
-          "reservation_id": "{{ $reservation->id }}",
-          "payment_id": "{{ $payment->id }}"
-        },
-        "onclose": function() {
-          window.location.href = "{{ route('customer.reservations.index') }}";
+        body: JSON.stringify({ tx_ref: txRef })
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          console.log('Tx_ref stored successfully:', txRef);
         }
+      })
+      .catch(error => {
+        console.error('Error storing tx_ref:', error);
       });
     }
   </script>

@@ -289,9 +289,7 @@
         function makePayment(reservationId, amount, userEmail, userName) {
             // Disable the button to prevent double clicks
             const button = event.target;
-            button.disabled = true;
-            button.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Processing...';
-            
+            button.disabled = true;            
             // Generate a unique transaction reference
             const txRef = 'RES-' + reservationId + '-' + Date.now();
             
@@ -300,8 +298,8 @@
                 "tx_ref": txRef,
                 "amount": amount,
                 "currency": "MWK",
-                "callback_url": "{{ route('payments.callback') }}",
-                "return_url": "{{ route('customer.reservations.index') }}",
+                "callback_url": "https://example.com/callbackurl",
+                "return_url": "https://example.com/returnurl",
                 "customer": {
                     "email": userEmail,
                     "first_name": userName,

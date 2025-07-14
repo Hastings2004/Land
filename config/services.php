@@ -35,4 +35,11 @@ return [
         ],
     ],
 
+    'paychangu' => [
+        'public_key' => env('PAYCHANGU_PUBLIC_KEY'),
+        'secret_key' => env('PAYCHANGU_SECRET_KEY'),
+        'merchant_id' => env('PAYCHANGU_MERCHANT_ID'),
+        'callback_url' => url('/payments/callback'),
+    ],
+
 ];

@@ -9,10 +9,19 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('payments', function (Blueprint $table) {
-            $table->unsignedBigInteger('reservation_id')->nullable()->after('user_id');
-            $table->unsignedBigInteger('plot_id')->nullable()->after('reservation_id');
-            $table->string('transaction_id')->nullable()->after('status');
-            $table->string('provider')->nullable()->after('transaction_id');
+            // Only add columns that don't already exist
+            if (!Schema::hasColumn('payments', 'reservation_id')) {
+                $table->unsignedBigInteger('reservation_id')->nullable()->after('user_id');
+            }
+            if (!Schema::hasColumn('payments', 'plot_id')) {
+                $table->unsignedBigInteger('plot_id')->nullable()->after('reservation_id');
+            }
+            if (!Schema::hasColumn('payments', 'transaction_id')) {
+                $table->string('transaction_id')->nullable()->after('status');
+            }
+            if (!Schema::hasColumn('payments', 'provider')) {
+                $table->string('provider')->nullable()->after('transaction_id');
+            }
         });
     }
 

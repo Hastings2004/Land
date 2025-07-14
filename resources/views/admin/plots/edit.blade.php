@@ -257,12 +257,12 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div class="form-section">
                         <label for="price" class="form-label">Price (K)</label>
-                        <input type="number" name="price" id="price" value="{{ old('price', $plot->price) }}" required step="0.01" class="form-input">
+                        <input type="number" name="price" id="price" value="{{ old('price', $plot->price) }}" required step="0.01" min="0" class="form-input">
                         @error('price')<div class="form-error">{{ $message }}</div>@enderror
             </div>
                     <div class="form-section">
                         <label for="area_sqm" class="form-label">Area (sqm)</label>
-                        <input type="number" name="area_sqm" id="area_sqm" value="{{ old('area_sqm', $plot->area_sqm) }}" required step="0.01" class="form-input">
+                        <input type="number" name="area_sqm" id="area_sqm" value="{{ old('area_sqm', $plot->area_sqm) }}" required step="0.01" min="0" class="form-input">
                         @error('area_sqm')<div class="form-error">{{ $message }}</div>@enderror
             </div>
             </div>
@@ -377,6 +377,22 @@
                 if (hiddenInput) { hiddenInput.name = 'removed_images[]'; }
                 preview.remove();
             };
+
+            // Prevent negative numbers in area and price fields
+            const areaInput = document.getElementById('area_sqm');
+            const priceInput = document.getElementById('price');
+            [areaInput, priceInput].forEach(input => {
+                input.addEventListener('input', function() {
+                    if (this.value && parseFloat(this.value) < 0) {
+                        this.value = 0;
+                    }
+                });
+                input.addEventListener('keydown', function(e) {
+                    if (e.key === '-' || e.key === 'Subtract') {
+                        e.preventDefault();
+                    }
+                });
+            });
 
             // Success message logic remains unchanged
             const successMessage = document.getElementById('success-message');

@@ -113,7 +113,7 @@ class AuthController extends Controller
             $randomMessage = $messages[array_rand($messages)];
             Log::info('Setting logout success message: ' . $randomMessage);
             // Try session flash first, fallback to URL parameter
-            return redirect()->route('login')->with('success', $randomMessage)->with('success_url', urlencode($randomMessage));
+            return redirect('/')->with('success', $randomMessage)->with('success_url', urlencode($randomMessage));
 
 }
 
