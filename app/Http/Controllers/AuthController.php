@@ -89,33 +89,22 @@ class AuthController extends Controller
 
     //logout function
     public function logoutUser(Request $request){
-            // Get user info before logout for personalized message
-            $user = Auth::user();
-            $username = $user ? $user->username : 'User';
-            
-            //logout user
-            Auth::logout();
-            //end the session
-            $request -> session() ->invalidate();
+        // Get user info before logout for personalized message
+        $user = Auth::user();
+        $username = $user ? $user->username : 'User';
+        
+        //logout user
+        Auth::logout();
+        //end the session
+        $request -> session() ->invalidate();
 
-            //regenerate CSRF token
-            $request -> session()->regenerateToken();
+        //regenerate CSRF token
+        $request -> session()->regenerateToken();
 
-            //redirect to the home page with personalized message
-            $messages = [
-                'Goodbye, ' . $username . '! 👋 You have been logged out successfully. We hope to see you again soon!',
-                'See you later, ' . $username . '! ✨ Your session has ended. Come back anytime!',
-                'Farewell, ' . $username . '! 🌟 You are now logged out. Thanks for using ATSOGO!',
-                'Until next time, ' . $username . '! 🚀 You have been successfully logged out.',
-                'Take care, ' . $username . '! 💫 You are now logged out. We\'ll be here when you return!'
-            ];
-            
-            $randomMessage = $messages[array_rand($messages)];
-            Log::info('Setting logout success message: ' . $randomMessage);
-            // Try session flash first, fallback to URL parameter
-            return redirect('/')->with('success', $randomMessage)->with('success_url', urlencode($randomMessage));
-
-}
+        // Use a warm, appreciative, and professional message
+        $message = 'Thank you for visiting Atsogo Estate Agency! You have been logged out successfully. We appreciate you and look forward to seeing you again soon.';
+        return redirect('/?success=' . urlencode($message));
+    }
 
 
 }

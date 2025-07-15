@@ -271,10 +271,9 @@
     <div id="wrapper"></div>
 
     <script>
-        // Pass URLs from Blade to JS
-        const paychanguCallbackUrl = "{{ config('services.paychangu.callback_url') }}"; // Only for backend POST
-        const paychanguReturnUrl = "{{ route('customer.reservations.index') }}"; // For user redirect after payment
-
+        // Always use the correct port for local development
+        const paychanguCallbackUrl = "http://127.0.0.1:8000/payments/callback";
+        const paychanguReturnUrl = "http://127.0.0.1:8000/payments/success";
         // Auto-hide success/error messages after 3 seconds
         document.addEventListener('DOMContentLoaded', function() {
             const messages = document.querySelectorAll('.fixed');
@@ -302,8 +301,8 @@
                 "tx_ref": txRef,
                 "amount": amount,
                 "currency": "MWK",
-                "callback_url": paychanguCallbackUrl, // POST, for backend
-                "return_url": paychanguReturnUrl,     // GET, for user redirect
+                "callback_url": paychanguCallbackUrl, // for backend POST
+                "return_url": paychanguReturnUrl,     // for user redirect
                 "customer": {
                     "email": userEmail,
                     "first_name": userName,
@@ -316,10 +315,12 @@
                 "meta": {
                     "reservation_id": reservationId,
                 },
+                "onSuccess": function(response) {
+                    window.location.href = paychanguReturnUrl;
+                },
                 "onclose": function() {
-                    // Re-enable the button if payment is cancelled
                     button.disabled = false;
-                    button.innerHTML = '<i class="fas fa-credit-card mr-2"></i> Pay Now';
+                    button.innerHTML = '<i class=\"fas fa-credit-card mr-2\"></i> Pay Now';
                 }
             });
         }

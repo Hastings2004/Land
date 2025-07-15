@@ -573,4 +573,53 @@ class PaymentController extends Controller
         //     throw new \Exception('Invalid signature');
         // }
     }
+
+    public function showCardForm()
+    {
+        return view('payments.card');
+    }
+
+    public function charge(Request $request)
+    {
+        $payload = [
+            "card_number" => $request->card_number,
+            "expiry" => $request->expiry,
+            "cvv" => $request->cvv,
+            "cardholder_name" => $request->cardholder_name,
+            "amount" => $request->amount,
+            "currency" => $request->currency,
+            "email" => $request->email,
+            "redirect_url" => route('payments.3ds-redirect'),
+        ];
+        $response = \Illuminate\Support\Facades\Http::post('https://api.paychangu.com/charge-card', $payload)->json();
+        if (isset($response['success']) && $response['success'] && isset($response['requires_3ds_auth']) && $response['requires_3ds_auth']) {
+            session(['charge_id' => $response['orderReference'] ?? null]);
+            return redirect($response['3ds_auth_link']);
+        } elseif (isset($response['success']) && $response['success']) {
+            // No 3DS required, verify immediately
+            return redirect()->route('payments.verify', ['charge_id' => $response['orderReference'] ?? session('charge_id')]);
+        } else {
+            return view('payments.failed', ['error' => $response['message'] ?? 'Payment failed.']);
+        }
+    }
+
+    public function handle3dsRedirect(Request $request)
+    {
+        $charge_id = $request->query('charge_id') ?? session('charge_id');
+        $status = $request->query('status');
+        return redirect()->route('payments.verify', ['charge_id' => $charge_id]);
+    }
+
+    public function verifyCharge($charge_id)
+    {
+        $secret = config('services.paychangu.secret_key');
+        $response = \Illuminate\Support\Facades\Http::withToken($secret)
+            ->get("https://api.paychangu.com/charge-card/verify/{$charge_id}")
+            ->json();
+        if (isset($response['success']) && $response['success'] && ($response['status'] ?? null) === 'success') {
+            return view('payments.success');
+        } else {
+            return view('payments.failed', ['error' => $response['message'] ?? 'Payment verification failed.']);
+        }
+    }
 }

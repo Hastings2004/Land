@@ -223,6 +223,17 @@ Route::get('/customer/reservations/{reservation}/pay', function () {
 // Payment callback route for PayChangu (must be public)
 Route::post('/payments/callback', [\App\Http\Controllers\PaymentController::class, 'callback'])->name('payments.callback');
 
+// Add GET route for PayChangu return_url redirect
+Route::get('/payments/callback', function (\Illuminate\Http\Request $request) {
+    $status = $request->query('status');
+    $txRef = $request->query('tx_ref');
+    if ($status === 'success') {
+        return redirect()->route('customer.reservations.index')->with('success', 'Payment successful! Reference: ' . $txRef);
+    } else {
+        return redirect()->route('customer.reservations.index')->with('error', 'Payment failed or cancelled. Please try again.');
+    }
+});
+
 // Payment verification routes (for manual verification)
 Route::get('/payments/verify/{tx_ref}', [\App\Http\Controllers\PaymentController::class, 'verifyPayment'])->name('payments.verify');
 Route::post('/payments/{payment}/verify', [\App\Http\Controllers\PaymentController::class, 'manualVerify'])->name('payments.manual-verify');
@@ -286,6 +297,19 @@ Route::middleware(['auth'])->group(function () {
             : redirect()->route('customer.inquiries.index');
     })->name('inquiries.index');
 });
+
+// Public payment success page for PayChangu return_url (must remain unprotected)
+Route::get('/payments/success', function () {
+    return view('payments.success');
+})->name('payments.success');
+
+Route::get('/payments/card', [\App\Http\Controllers\PaymentController::class, 'showCardForm'])->name('payments.card');
+Route::post('/payments/charge', [\App\Http\Controllers\PaymentController::class, 'charge'])->name('payments.charge');
+Route::get('/payments/3ds-redirect', [\App\Http\Controllers\PaymentController::class, 'handle3dsRedirect'])->name('payments.3ds-redirect');
+Route::get('/payments/verify/{charge_id}', [\App\Http\Controllers\PaymentController::class, 'verifyCharge'])->name('payments.verify');
+Route::get('/payments/inline-demo', function () {
+    return view('payments.inline-demo');
+})->name('payments.inline-demo');
 
 
 

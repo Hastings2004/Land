@@ -249,14 +249,13 @@
     <div id="hover-trigger" class="fixed top-0 left-0 w-4 h-full z-40 hidden lg:block"></div>
 
     <aside id="sidebar" class="fixed inset-y-0 left-0 w-64 bg-white shadow-2xl transform -translate-x-full transition-all duration-500 ease-in-out z-50 flex flex-col no-scrollbar overflow-y-auto rounded-r-2xl border-r border-gray-200">
-        <!-- Header Section -->
+        <!-- Sidebar Header: Profile and Notifications -->
         <div class="p-4 flex items-center justify-between lg:justify-start bg-yellow-500 rounded-br-2xl">
             <h1 class="text-sm font-bold text-white inline-block align-middle whitespace-nowrap overflow-visible uppercase tracking-wide">ATSOGO ESTATE AGENCY</h1>
             <button class="lg:hidden text-white hover:text-gray-100 focus:outline-none transform hover:scale-110 transition-transform duration-200" onclick="toggleSidebar()">
                 <i class="fas fa-times text-xl"></i>
             </button>
         </div>
-
         <!-- Back Arrow for Dashboard -->
         <div class="px-4 py-3 border-b border-gray-200 bg-white">
             <div class="flex justify-end">
@@ -267,7 +266,6 @@
                 </a>
             </div>
         </div>
-
         <!-- Navigation Section -->
         <nav class="flex-grow p-3 bg-white">
             <ul class="space-y-1">
@@ -285,12 +283,10 @@
                         </div>
                     </li>
                 @endif
-
                 <!-- Dashboard Link -->
                 <li>
-                    <a href="{{ auth()->user()->isAdmin() ? route('admin.dashboard') : route('customer.dashboard') }}"
-                       class="group flex items-center p-3 rounded-lg font-medium transition-all duration-300 transform hover:scale-105
-                       {{ (request()->routeIs(auth()->user()->isAdmin() ? 'admin.dashboard' : 'customer.dashboard')) ? 'bg-yellow-500 text-white shadow-md' : 'text-gray-700 hover:bg-yellow-50 hover:shadow-sm' }}">
+                    <a href="{{ auth()->user()->isAdmin() ? route('admin.dashboard') : route('customer.dashboard') }}" rel="noopener" class="sidebar-link group flex items-center p-3 rounded-lg font-medium transition-all duration-300 transform hover:scale-105
+                   {{ (request()->routeIs(auth()->user()->isAdmin() ? 'admin.dashboard' : 'customer.dashboard')) ? 'bg-yellow-500 text-white shadow-md' : 'text-gray-700 hover:bg-yellow-50 hover:shadow-sm' }}">
                         <i class="fas fa-home mr-3 text-base group-hover:scale-110 transition-transform duration-300"></i>
                         <span class="font-medium text-sm">Dashboard</span>
                     </a>
@@ -299,40 +295,40 @@
                 {{-- Admin-specific links --}}
                 @if(auth()->check() && auth()->user()->isAdmin())
                     <li>
-                        <a href="{{ route('admin.plots.index') }}" 
-                           class="group flex items-center p-3 rounded-lg font-medium transition-all duration-300 transform hover:scale-105
+                        <a href="{{ route('admin.plots.index') }}" rel="noopener" 
+                           class="sidebar-link group flex items-center p-3 rounded-lg font-medium transition-all duration-300 transform hover:scale-105
                            {{ (request()->routeIs('admin.plots.index')) ? 'bg-yellow-500 text-white shadow-md' : 'text-gray-700 hover:bg-yellow-50 hover:shadow-sm' }}">
                             <i class="fas fa-th-list mr-3 text-base group-hover:scale-110 transition-transform duration-300"></i>
                             <span class="font-medium text-sm">Manage Plots</span>
                         </a>
                     </li>
                     <li>
-                        <a href="{{ route('admin.plots.create') }}" 
-                           class="group flex items-center p-3 rounded-lg font-medium transition-all duration-300 transform hover:scale-105
+                        <a href="{{ route('admin.plots.create') }}" rel="noopener" 
+                           class="sidebar-link group flex items-center p-3 rounded-lg font-medium transition-all duration-300 transform hover:scale-105
                            {{ (request()->routeIs('admin.plots.create')) ? 'bg-yellow-500 text-white shadow-md' : 'text-gray-700 hover:bg-yellow-50 hover:shadow-sm' }}">
                             <i class="fas fa-plus-square mr-3 text-base group-hover:scale-110 transition-transform duration-300"></i>
                             <span class="font-medium text-sm">Add New Plot</span>
                         </a>
                     </li>
                     <li>
-                        <a href="{{ route('admin.inquiries.index') }}" 
-                           class="group flex items-center p-3 rounded-lg font-medium transition-all duration-300 transform hover:scale-105
+                        <a href="{{ route('admin.inquiries.index') }}" rel="noopener" 
+                           class="sidebar-link group flex items-center p-3 rounded-lg font-medium transition-all duration-300 transform hover:scale-105
                            {{ (request()->routeIs('admin.inquiries.index')) ? 'bg-yellow-500 text-white shadow-md' : 'text-gray-700 hover:bg-yellow-50 hover:shadow-sm' }}">
                             <i class="fas fa-envelope-open-text mr-3 text-base group-hover:scale-110 transition-transform duration-300"></i>
                             <span class="font-medium text-sm">Manage Inquiries</span>
                         </a>
                     </li>
                     <li>
-                        <a href="{{ route('admin.users.index') }}" 
-                           class="group flex items-center p-3 rounded-lg font-medium transition-all duration-300 transform hover:scale-105
+                        <a href="{{ route('admin.users.index') }}" rel="noopener" 
+                           class="sidebar-link group flex items-center p-3 rounded-lg font-medium transition-all duration-300 transform hover:scale-105
                            {{ (request()->routeIs('admin.users.index')) ? 'bg-yellow-500 text-white shadow-md' : 'text-gray-700 hover:bg-yellow-50 hover:shadow-sm' }}">
                             <i class="fas fa-users mr-3 text-base group-hover:scale-110 transition-transform duration-300"></i>
                             <span class="font-medium text-sm">Manage Users</span>
                         </a>
                     </li>
                     <li>
-                        <a href="{{ route('admin.reservations.index') }}" 
-                           class="group flex items-center p-3 rounded-lg font-medium transition-all duration-300 transform hover:scale-105
+                        <a href="{{ route('admin.reservations.index') }}" rel="noopener" 
+                           class="sidebar-link group flex items-center p-3 rounded-lg font-medium transition-all duration-300 transform hover:scale-105
                            {{ (request()->routeIs('admin.reservations.index')) ? 'bg-yellow-500 text-white shadow-md' : 'text-gray-700 hover:bg-yellow-50 hover:shadow-sm' }}">
                             <i class="fas fa-calendar-alt mr-3 text-base group-hover:scale-110 transition-transform duration-300"></i>
                             <span class="font-medium text-sm">Manage Reservations</span>
@@ -343,32 +339,32 @@
                 {{-- Customer-specific links --}}
                 @if(auth()->check() && !auth()->user()->isAdmin())
                     <li>
-                        <a href="{{ route('customer.plots.index') }}" 
-                           class="group flex items-center p-3 rounded-lg font-medium transition-all duration-300 transform hover:scale-105
+                        <a href="{{ route('customer.plots.index') }}" rel="noopener" 
+                           class="sidebar-link group flex items-center p-3 rounded-lg font-medium transition-all duration-300 transform hover:scale-105
                            {{ (request()->routeIs('customer.plots.*')) ? 'bg-yellow-500 text-white shadow-md' : 'text-gray-700 hover:bg-yellow-50 hover:shadow-sm' }}">
                             <i class="fas fa-list-alt mr-3 text-base group-hover:scale-110 transition-transform duration-300"></i>
                             <span class="font-medium text-sm">Browse Plots</span>
                         </a>
                     </li>
                     <li>
-                        <a href="{{ route('customer.saved-plots.index') }}" 
-                           class="group flex items-center p-3 rounded-lg font-medium transition-all duration-300 transform hover:scale-105
+                        <a href="{{ route('customer.saved-plots.index') }}" rel="noopener" 
+                           class="sidebar-link group flex items-center p-3 rounded-lg font-medium transition-all duration-300 transform hover:scale-105
                            {{ (request()->routeIs('customer.saved-plots.*')) ? 'bg-yellow-500 text-white shadow-md' : 'text-gray-700 hover:bg-yellow-50 hover:shadow-sm' }}">
                             <i class="fas fa-bookmark mr-3 text-base group-hover:scale-110 transition-transform duration-300"></i>
                             <span class="font-medium text-sm">Saved Plots</span>
                         </a>
                     </li>
                     <li>
-                        <a href="{{ route('customer.reservations.index') }}" 
-                           class="group flex items-center p-3 rounded-lg font-medium transition-all duration-300 transform hover:scale-105
+                        <a href="{{ route('customer.reservations.index') }}" rel="noopener" 
+                           class="sidebar-link group flex items-center p-3 rounded-lg font-medium transition-all duration-300 transform hover:scale-105
                            {{ (request()->routeIs('customer.reservations.*')) ? 'bg-yellow-500 text-white shadow-md' : 'text-gray-700 hover:bg-yellow-50 hover:shadow-sm' }}">
                             <i class="fas fa-calendar-check mr-3 text-base group-hover:scale-110 transition-transform duration-300"></i>
                             <span class="font-medium text-sm">My Reservations</span>
                         </a>
                     </li>
                     <li>
-                        <a href="{{ route('customer.inquiries.index') }}" 
-                           class="group flex items-center p-3 rounded-lg font-medium transition-all duration-300 transform hover:scale-105
+                        <a href="{{ route('customer.inquiries.index') }}" rel="noopener" 
+                           class="sidebar-link group flex items-center p-3 rounded-lg font-medium transition-all duration-300 transform hover:scale-105
                            {{ (request()->routeIs('customer.inquiries.*')) ? 'bg-yellow-500 text-white shadow-md' : 'text-gray-700 hover:bg-yellow-50 hover:shadow-sm' }}">
                             <i class="fas fa-envelope mr-3 text-base group-hover:scale-110 transition-transform duration-300"></i>
                             <span class="font-medium text-sm">My Inquiries</span>
@@ -378,8 +374,8 @@
 
                 {{-- Common Profile Link --}}
                 <li>
-                    <a href="{{ route('profile.edit') }}" 
-                       class="group flex items-center p-3 rounded-lg font-medium transition-all duration-300 transform hover:scale-105
+                    <a href="{{ route('profile.edit') }}" rel="noopener" 
+                       class="sidebar-link group flex items-center p-3 rounded-lg font-medium transition-all duration-300 transform hover:scale-105
                        {{ (request()->routeIs('profile.*')) ? 'bg-yellow-500 text-white shadow-md' : 'text-gray-700 hover:bg-yellow-50 hover:shadow-sm' }}">
                         <i class="fas fa-user mr-3 text-base group-hover:scale-110 transition-transform duration-300"></i>
                         <span class="font-medium text-sm">Profile</span>
@@ -388,8 +384,8 @@
 
                 <!-- Logout Section -->
                 <li class="mt-4 pt-3 border-t border-gray-200">
-                    <a href="{{ route('logout') }}" onclick="event.preventDefault(); showLogoutModal();" 
-                       class="group flex items-center p-3 rounded-lg font-medium transition-all duration-300 transform hover:scale-105 text-gray-700 hover:bg-gradient-to-r hover:from-red-50 hover:to-pink-50 hover:shadow-sm">
+                    <a href="{{ route('logout') }}" onclick="event.preventDefault(); showLogoutModal();" rel="noopener" 
+                       class="sidebar-link group flex items-center p-3 rounded-lg font-medium transition-all duration-300 transform hover:scale-105 text-gray-700 hover:bg-gradient-to-r hover:from-red-50 hover:to-pink-50 hover:shadow-sm">
                         <i class="fas fa-sign-out-alt mr-3 text-base group-hover:scale-110 transition-transform duration-300"></i>
                         <span class="font-medium text-sm">Logout</span>
                     </a>
@@ -399,13 +395,35 @@
     </aside>
 
     <div class="flex-1 flex flex-col min-h-screen overflow-y-auto no-scrollbar">
-        <header class="bg-white shadow-md p-4 flex items-center justify-between sticky top-0 z-30 top-nav">
-            <button class="p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-300" onclick="toggleSidebar()">
-                <i class="fas fa-bars text-xl"></i>
-            </button>
-            <h1 class="text-lg font-bold text-gray-800">{{ env('APP_NAME') }}</h1>
+        <header class="bg-white shadow-md p-4 flex items-center justify-end sticky top-0 z-30 top-nav">
+            <div class="flex items-center space-x-4">
+                <!-- Notification Bell -->
+                <div class="relative">
+                    <button id="notification-bell" onclick="openNotificationModal()" class="relative focus:outline-none">
+                        <i class="fas fa-bell text-yellow-500 text-2xl"></i>
+                        <span id="notification-dot" class="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full border-2 border-white hidden"></span>
+                    </button>
+                </div>
+                <!-- Easy Logout -->
+                <form id="logout-form-dashboard" action="{{ route('logout') }}" method="POST">
+                    @csrf
+                    <button type="submit" class="flex items-center px-3 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-all text-xs font-semibold"><i class="fas fa-sign-out-alt mr-1"></i> Logout</button>
+                </form>
+            </div>
         </header>
-
+        <!-- Notification Pop-out Modal -->
+        <div id="notification-modal" class="fixed inset-0 bg-black bg-opacity-40 z-[9999] flex items-center justify-center hidden">
+            <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full p-6 relative">
+                <button id="notification-modal-close" class="absolute top-4 right-4 text-gray-400 hover:text-red-500 text-xl focus:outline-none"><i class="fas fa-times"></i></button>
+                <h2 class="text-2xl font-bold text-yellow-600 mb-4 flex items-center"><i class="fas fa-bell mr-2"></i> Notifications</h2>
+                <div id="notification-modal-list" class="max-h-96 overflow-y-auto divide-y divide-gray-100">
+                    <div class="p-4 text-center text-gray-400">No notifications</div>
+                </div>
+                <div class="mt-4 text-center">
+                    <button onclick="markAllAsRead()" class="text-xs text-yellow-500 hover:underline">Mark all as read</button>
+                </div>
+            </div>
+        </div>
         <!-- Success Message Component -->
         <x-success-message />
 
@@ -528,6 +546,8 @@
             </div>
         </div>
     </div>
+
+    <!-- Remove the global loading spinner and sidebar-link class from all sidebar links. Restore all <a> tags in the sidebar to their original classes and attributes. Remove the sidebarInstantNav JS and related event listeners. -->
 
     <script>
         function redirectToNotifications() {

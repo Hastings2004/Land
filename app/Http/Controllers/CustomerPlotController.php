@@ -23,6 +23,8 @@ class CustomerPlotController extends Controller
             ->where('status', '!=', 'pending')
             ->where('status', '!=', 'rejected')
             ->whereIn('status', ['available', 'reserved']);
+        // Exclude sold plots
+        $query->where('status', '!=', 'sold');
 
         // Search
         if ($request->has('search')) {

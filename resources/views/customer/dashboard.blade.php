@@ -32,7 +32,7 @@
                 <!-- Saved Plots Card -->
             <div class="bg-white rounded-2xl shadow-lg p-6 border border-yellow-200 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 cursor-pointer metrics-card" onclick="window.location.href='{{ route('customer.saved-plots.index') }}'">
                 <div class="flex items-center justify-between mb-4">
-                    <div class="p-3 bg-gradient-to-br from-yellow-100 to-yellow-200 rounded-xl">
+                    <div class="p-3 bg-white rounded-xl">
                             <i class="fas fa-bookmark text-yellow-500 text-2xl"></i>
                         </div>
                     <div class="text-right">
@@ -636,3 +636,4 @@
 
     <!-- Removed inline <script> block for greeting and quote logic; now handled in app.js -->
 </x-dashboard-layout>
+

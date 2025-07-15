@@ -37,7 +37,7 @@ class AdminPlotController extends Controller
             });
         }
 
-        // Apply filters
+        // Only show available, reserved, or sold plots (never show sold as available)
         if (request()->filled('status')) {
             $query->where('status', request('status'));
         }
