@@ -115,17 +115,18 @@ class DashboardController extends Controller
         $user = \Illuminate\Support\Facades\Auth::user();
 
         $stats = [
-            'savedPlots' => $user->savedPlots()->count(),
-            'reservations' => $user->reservations()->count(),
+            'savedPlots' => $user->savedPlots->count(),
+            'reservations' => $user->reservations->count(),
             'inquiries' => \App\Models\Inquiries::where('email', $user->email)->count(),
-            'reviews' => $user->reviews()->count(),
+            'reviews' => $user->reviews->count(),
+            'purchasedPlots' => \App\Models\Plot::where('user_id', $user->id)->where('status', 'sold')->count(),
         ];
 
         // Recent saved plots
-        $recentSavedPlots = $user->savedPlots()->latest()->take(5)->get();
+        $recentSavedPlots = $user->savedPlots->sortByDesc('pivot.created_at')->take(5);
 
         // Active reservations
-        $activeReservations = $user->reservations()->where('status', 'active')->latest()->take(5)->get();
+        $activeReservations = $user->reservations->where('status', 'active')->sortByDesc('created_at')->take(5);
 
         // Recent inquiries
         $recentInquiries = \App\Models\Inquiries::where('email', $user->email)->latest()->take(5)->get();
@@ -151,8 +152,8 @@ class DashboardController extends Controller
     private function getRecommendedPlots($user)
     {
         // Get IDs of plots the user has reserved or saved
-        $reservedPlotIds = $user->reservations()->pluck('plot_id')->toArray();
-        $savedPlotIds = $user->savedPlots()->pluck('plots.id')->toArray();
+        $reservedPlotIds = $user->reservations->pluck('plot_id')->toArray();
+        $savedPlotIds = $user->savedPlots->pluck('id')->toArray();
         $excludeIds = array_unique(array_merge($reservedPlotIds, $savedPlotIds));
 
         // Get locations and price range from user's saved/reserved plots
@@ -270,7 +271,7 @@ class DashboardController extends Controller
         $activities = collect();
 
         // Recent saved plots
-        $recentSaved = $user->savedPlots()->latest()->take(2)->get();
+        $recentSaved = $user->savedPlots->sortByDesc('pivot.created_at')->take(2);
         foreach ($recentSaved as $plot) {
             $activities->push([
                 'type' => 'saved_plot',
@@ -297,14 +298,14 @@ class DashboardController extends Controller
         }
 
         // Recent reservations
-        $recentReservations = $user->reservations()->latest()->take(2)->get();
+        $recentReservations = $user->reservations->sortByDesc('created_at')->take(2);
         foreach ($recentReservations as $reservation) {
             $activities->push([
                 'type' => 'reservation',
-                'message' => 'Reservation confirmed',
+                'message' => 'Reservation made',
                 'time' => $reservation->created_at,
                 'icon' => 'calendar',
-                'color' => 'purple'
+                'color' => 'yellow'
             ]);
         }
 

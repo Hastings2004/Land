@@ -96,11 +96,19 @@
                             <input type="hidden" name="plot_id" value="{{ $plot->id }}">
                             <button type="submit" class="w-full px-6 py-3 bg-yellow-500 text-white font-semibold rounded-lg hover:bg-yellow-600 transition-colors text-lg shadow-md flex-1">Reserve this Plot</button>
                         </form>
+                        <form action="{{ route('customer.plots.payNow', $plot->id) }}" method="POST" class="flex-1 h-full flex flex-col">
+                            @csrf
+                            <button type="submit" class="w-full px-6 py-3 bg-green-500 text-white font-semibold rounded-lg hover:bg-green-600 transition-colors text-lg shadow-md flex-1">Pay Now</button>
+                        </form>
                     @elseif($plot->activeReservation && $plot->activeReservation->user_id === Auth::id())
                         <div class="flex-1 h-full flex flex-col text-center p-4 bg-yellow-100 border border-yellow-300 rounded-lg">
                             <p class="font-semibold text-yellow-800">You have reserved this plot.</p>
                             <p class="text-sm text-yellow-700">This reservation expires on {{ $plot->activeReservation->expires_at->format('M d, Y \\a\\t H:i A') }}.</p>
                             <a href="{{ route('customer.reservations.index') }}" class="mt-2 inline-block text-yellow-600 hover:underline">View My Reservations</a>
+                            <form action="{{ route('customer.plots.payNow', $plot->id) }}" method="POST" class="mt-4">
+                                @csrf
+                                <button type="submit" class="w-full px-6 py-3 bg-green-500 text-white font-semibold rounded-lg hover:bg-green-600 transition-colors text-lg shadow-md">Pay Now</button>
+                            </form>
                         </div>
                     @elseif($plot->status === 'reserved' && $plot->activeReservation)
                         <div class="flex-1 h-full flex flex-col text-center p-4 bg-gradient-to-br from-yellow-50 via-yellow-100 to-yellow-200 border-l-8 border-yellow-400 rounded-2xl shadow-lg items-center justify-start">
@@ -113,7 +121,7 @@
                                 </p>
                                 <p class="text-yellow-700 text-base mt-1">It will become available in:</p>
                                 <div id="countdown" class="text-3xl font-extrabold text-yellow-700 tracking-widest bg-white/70 px-6 py-2 rounded-xl shadow-inner border border-yellow-200 mt-2 mb-1"></div>
-                                <p class="text-xs text-gray-500 mt-2">Reservation expires on <span class="font-semibold text-yellow-700">{{ $plot->activeReservation->expires_at->format('M d, Y \\a\t H:i A') }}</span></p>
+                                <p class="text-xs text-gray-500 mt-2">Reservation expires on <span class="font-semibold text-yellow-700">{{ $plot->activeReservation->expires_at->format('M d, Y \\a\\t H:i A') }}</span></p>
                             </div>
                             <div class="mt-2 text-sm text-gray-600 italic">If the reservation is not completed, you’ll have a chance to reserve or buy this plot when the timer ends.</div>
                         </div>

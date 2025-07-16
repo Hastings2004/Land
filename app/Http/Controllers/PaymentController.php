@@ -426,14 +426,16 @@ class PaymentController extends Controller
                     'payment_id' => $payment->id
                 ]);
 
-                // Mark the plot as sold
+                // Mark the plot as sold and transfer ownership
                 $plot = $payment->reservation->plot;
                 if ($plot) {
                     $plot->status = 'sold';
+                    $plot->user_id = $payment->user_id; // Transfer ownership to customer
                     $plot->save();
-                    Log::info('Plot marked as sold after successful payment', [
+                    Log::info('Plot marked as sold and ownership transferred after successful payment', [
                         'plot_id' => $plot->id,
-                        'payment_id' => $payment->id
+                        'payment_id' => $payment->id,
+                        'new_owner_id' => $payment->user_id
                     ]);
                 }
 

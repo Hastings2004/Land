@@ -397,13 +397,6 @@
     <div class="flex-1 flex flex-col min-h-screen overflow-y-auto no-scrollbar">
         <header class="bg-white shadow-md p-4 flex items-center justify-end sticky top-0 z-30 top-nav">
             <div class="flex items-center space-x-4">
-                <!-- Notification Bell -->
-                <div class="relative">
-                    <button id="notification-bell" onclick="openNotificationModal()" class="relative focus:outline-none">
-                        <i class="fas fa-bell text-yellow-500 text-2xl"></i>
-                        <span id="notification-dot" class="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full border-2 border-white hidden"></span>
-                    </button>
-                </div>
                 <!-- Easy Logout -->
                 <form id="logout-form-dashboard" action="{{ route('logout') }}" method="POST">
                     @csrf
@@ -474,7 +467,7 @@
                     <button id="confirm-logout-btn"
                             class="flex-1 px-4 py-3 bg-red-600 text-white font-bold text-base rounded-2xl shadow-xl hover:bg-red-700 hover:scale-110 focus:outline-none focus:ring-4 focus:ring-red-300 transition-all duration-200"
                             style="letter-spacing: 0.5px; box-shadow: 0 6px 24px 0 rgba(220,38,38,0.15);"
-                            onclick="handleLogout()">
+                            onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
                         <i class="fas fa-sign-out-alt mr-2"></i>Yes, Logout
                     </button>
                 </div>

@@ -92,7 +92,7 @@
                     type="submit"
                     class="w-full bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition duration-150 ease-in-out"
                 >
-                    <i class="fas fa-sign-in-alt mr-2"></i>Login
+                    Login
                 </button>
             </div>
             {{-- session message --}}

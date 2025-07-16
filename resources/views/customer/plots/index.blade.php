@@ -194,7 +194,8 @@
         <!-- Plots Grid -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 @foreach($plots as $plot)
-                <div class="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 group">
+                    @if($plot->status !== 'sold')
+                    <div class="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 group relative">
                     <!-- Plot Images Carousel -->
                     <div class="relative overflow-hidden">
                         <div class="plot-carousel-{{ $plot->id }} w-full h-48">
@@ -245,21 +246,13 @@
                             </div>
                         @endif
                         
-                        <!-- Status Badge -->
-                        <div class="absolute top-4 left-4">
-                            @if($plot->status === 'available')
-                                <span class="bg-green-500 text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wide shadow-lg">
-                                    Available
+                            <!-- Status Badge (Top-Right, Large, Tooltip) -->
+                            <div class="absolute top-4 right-4 z-30">
+                                <span class="px-5 py-2 text-lg font-bold rounded-full shadow-lg uppercase tracking-wide border-2 cursor-help"
+                                      title="Status: {{ ucfirst($plot->status) }}"
+                                      style="background: {{ $plot->status === 'available' ? '#22c55e' : '#facc15' }}; color: white; border-color: {{ $plot->status === 'available' ? '#16a34a' : '#eab308' }};">
+                                    {{ strtoupper($plot->status) }}
                                 </span>
-                            @elseif($plot->status === 'reserved')
-                                <span class="bg-yellow-500 text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wide shadow-lg">
-                                    Reserved
-                                </span>
-                            @elseif($plot->status === 'sold')
-                                <span class="bg-red-500 text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wide shadow-lg">
-                                    Sold
-                                </span>
-                            @endif
                         </div>
 
                         <!-- New Badge -->
@@ -303,9 +296,11 @@
 
                     <!-- Plot Details -->
                     <div class="p-6">
+                            <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-2">
                         <h3 class="text-lg font-bold text-gray-900 mb-2 group-hover:text-yellow-600 transition-colors duration-300">
                             {{ $plot->title }}
                         </h3>
+                        </div>
                         <p class="text-gray-600 mb-3 flex items-center">
                             <i class="fas fa-map-marker-alt text-yellow-500 mr-2"></i>
                             {{ $plot->location }}
@@ -328,7 +323,6 @@
                         <!-- Price -->
                         <div class="flex items-center justify-between mb-4">
                             <span class="text-2xl font-bold text-yellow-500">MK{{ number_format($plot->price) }}</span>
-                            <span class="text-sm text-gray-500">{{ $plot->created_at->format('M d, Y') }}</span>
                         </div>
 
                         <!-- Action Buttons -->
@@ -344,6 +338,7 @@
                         </div>
                         </div>
                     </div>
+                    @endif
                 @endforeach
             </div>
 

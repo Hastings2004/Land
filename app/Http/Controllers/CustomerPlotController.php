@@ -135,4 +135,48 @@ class CustomerPlotController extends Controller
         return view('customer.plots.show', compact('plot'));
     }
 
+    /**
+     * Instantly reserve and pay for a plot.
+     */
+    public function payNow(Plot $plot)
+    {
+        $user = Auth::user();
+        // Check if plot is available
+        if ($plot->status !== 'available') {
+            // If reserved by this user, redirect to payment
+            if ($plot->activeReservation && $plot->activeReservation->user_id === $user->id) {
+                return redirect()->route('customer.reservations.pay', $plot->activeReservation->id);
+            }
+            // Reserved by someone else or not available
+            return redirect()->back()->with('error', 'This plot is currently reserved or not available.');
+        }
+        // Check if user already has an active reservation for this plot
+        $reservation = $plot->activeReservation && $plot->activeReservation->user_id === $user->id
+            ? $plot->activeReservation
+            : $user->reservations->where('plot_id', $plot->id)->where('status', 'active')->first();
+        if (!$reservation) {
+            // Create reservation
+            $reservation = \App\Models\Reservation::create([
+                'user_id' => $user->id,
+                'plot_id' => $plot->id,
+                'expires_at' => now()->addHours(24),
+                'status' => 'active',
+            ]);
+            // Update plot status
+            $plot->status = 'reserved';
+            $plot->save();
+        }
+        // Redirect to payment
+        return redirect()->route('customer.reservations.pay', $reservation->id);
+    }
+
+    /**
+     * Show all purchased plots for the current user.
+     */
+    public function purchases()
+    {
+        $user = \Auth::user();
+        $purchasedPlots = \App\Models\Plot::where('user_id', $user->id)->where('status', 'sold')->latest()->get();
+        return view('customer.purchases.index', compact('purchasedPlots'));
+    }
 }

@@ -156,27 +156,60 @@
     </style>
 </head>
 <body>
-    @php
-        $success = request()->get('success');
-    @endphp
-    @if ($success)
-        <div id="logout-success-message" style="position: fixed; top: 24px; right: 24px; z-index: 9999; min-width: 220px; max-width: 350px; background: #f0fdf4; color: #166534; border: 1.5px solid #bbf7d0; border-radius: 6px; padding: 10px 18px 16px 18px; font-size: 1rem; font-weight: 500; box-shadow: 0 2px 8px rgba(16, 185, 129, 0.10); text-align: left; opacity: 0; transition: opacity 0.4s;">
-            <span style="display: block; margin-bottom: 2px;">{{ $success }}</span>
-            <div id="logout-success-bar" style="position: absolute; left: 0; bottom: 0; height: 4px; width: 100%; background: linear-gradient(90deg, #22c55e, #bbf7d0); border-radius: 0 0 6px 6px; transition: width 5s linear;"></div>
+    @if(session('success'))
+        <style>
+            #logout-success-message {
+                animation: fadeSlideIn 0.5s cubic-bezier(0.4,0,0.2,1);
+                border-left: 6px solid #22c55e;
+                background: #f0fdf4;
+                color: #166534;
+                box-shadow: 0 4px 24px 0 rgba(34,197,94,0.10);
+                border-radius: 0.75rem;
+                min-width: 220px;
+                max-width: 90vw;
+                padding: 14px 24px 14px 20px;
+                font-size: 1rem;
+                font-weight: 500;
+                position: fixed;
+                top: 2rem;
+                left: 2rem;
+                right: auto;
+                z-index: 9999;
+                display: flex;
+                align-items: center;
+                gap: 1rem;
+            }
+            @keyframes fadeSlideIn {
+                from { opacity: 0; transform: translateX(40px); }
+                to { opacity: 1; transform: translateX(0); }
+            }
+            #logout-success-message .close-btn {
+                opacity: 0;
+                transition: opacity 0.2s;
+                background: transparent;
+                border: none;
+                color: #22c55e;
+                font-size: 1.2rem;
+                cursor: pointer;
+                margin-left: auto;
+            }
+            #logout-success-message:hover .close-btn {
+                opacity: 1;
+            }
+        </style>
+        <div id="logout-success-message">
+            <span>{{ session('success') }}</span>
+            <button onclick="dismissLogoutSuccessMessage()" class="close-btn" aria-label="Close">&times;</button>
         </div>
         <script>
-            // Fade in
             setTimeout(function() {
                 var msg = document.getElementById('logout-success-message');
-                if (msg) msg.style.opacity = 1;
-                var bar = document.getElementById('logout-success-bar');
-                if (bar) bar.style.width = '0%';
-            }, 50);
-            // Fade out after 5s
-            setTimeout(function() {
+                if(msg) { msg.style.opacity = 0; msg.style.transform = 'translateX(40px)'; setTimeout(function(){ msg.remove(); }, 400); }
+            }, 5000);
+            function dismissLogoutSuccessMessage() {
                 var msg = document.getElementById('logout-success-message');
-                if (msg) { msg.style.opacity = 0; setTimeout(function(){ msg.remove(); }, 400); }
-            }, 5050);
+                if(msg) { msg.style.opacity = 0; msg.style.transform = 'translateX(40px)'; setTimeout(function(){ msg.remove(); }, 400); }
+            }
         </script>
     @endif
     <div class="hero">
@@ -184,7 +217,7 @@
             <img src="https://img.icons8.com/ios-filled/100/ffa500/real-estate.png" alt="Atsogo Logo" class="hero-logo">
             <div class="hero-title">Welcome to Atsogo Estate Agency</div>
             <div class="hero-desc">Discover, reserve, and manage land plots with confidence. <br> Your trusted partner for real estate in Malawi.</div>
-            <a href="{{ route('login') }}" class="cta-btn"><i class="fas fa-sign-in-alt mr-2"></i> Login / Register</a>
+            <a href="{{ route('login') }}" class="cta-btn">Login / Register</a>
         </div>
         <img class="hero-illustration" src="https://assets10.lottiefiles.com/packages/lf20_2ks3pjua.json" alt="Modern Real Estate Illustration" onerror="this.style.display='none'">
         </div>
@@ -210,9 +243,32 @@
             <div class="feature-desc">Your data and transactions are protected with industry-leading security and privacy.</div>
         </div>
     </div>
-    <footer>
-        &copy; {{ date('Y') }} Atsogo Estate Agency. All rights reserved.<br>
-        <span style="font-size:0.95em; color:#f59e42;">Made with <i class="fas fa-heart"></i> for Malawi</span>
+    {{-- Footer Section --}}
+    <footer class="w-full bg-gradient-to-r from-yellow-50 to-yellow-100 border-t border-yellow-200 mt-12 py-10 px-4 rounded-b-3xl shadow-lg">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-8">
+            <div class="flex items-center gap-3 mb-4 md:mb-0">
+                <img src="https://img.icons8.com/ios-filled/48/ffa500/real-estate.png" alt="Atsogo Logo" class="w-10 h-10">
+                <span class="text-yellow-700 font-bold text-lg tracking-wide">Atsogo Estate Agency</span>
+            </div>
+            <div class="flex flex-col md:flex-row items-center gap-6">
+                <div class="flex flex-col items-center md:items-start text-gray-600 text-sm">
+                    <div class="flex items-center mb-1"><i class="fas fa-phone mr-2 text-yellow-500"></i>+265 888 052 362</div>
+                    <div class="flex items-center mb-1"><i class="fas fa-envelope mr-2 text-yellow-500"></i>info@atsogo.mw</div>
+                    <div class="flex items-center"><i class="fas fa-map-marker-alt mr-2 text-yellow-500"></i>Area 47 sector 4, Mazengera street, gate No 25, Lilongwe</div>
+                </div>
+                <div class="flex items-center gap-4 mt-4 md:mt-0">
+                    <a href="#" class="text-yellow-500 hover:text-yellow-600 text-xl" title="Facebook"><i class="fab fa-facebook"></i></a>
+                    <a href="#" class="text-yellow-500 hover:text-yellow-600 text-xl" title="Twitter"><i class="fab fa-twitter"></i></a>
+                    <a href="#" class="text-yellow-500 hover:text-yellow-600 text-xl" title="Instagram"><i class="fab fa-instagram"></i></a>
+                </div>
+            </div>
+            <div class="flex flex-col items-center md:items-end gap-2 text-gray-600 text-sm">
+                <div class="flex gap-4">
+                    <a href="#" class="hover:text-yellow-600 font-semibold">Contact</a>
+                </div>
+                <div class="mt-2">&copy; {{ date('Y') }} Atsogo Estate Agency. All rights reserved.</div>
+            </div>
+        </div>
     </footer>
 </body>
 </html> 

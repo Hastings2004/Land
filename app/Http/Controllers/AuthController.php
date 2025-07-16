@@ -103,7 +103,7 @@ class AuthController extends Controller
 
         // Use a warm, appreciative, and professional message
         $message = 'Thank you for visiting Atsogo Estate Agency! You have been logged out successfully. We appreciate you and look forward to seeing you again soon.';
-        return redirect('/?success=' . urlencode($message));
+        return redirect()->route('welcome')->with('success', $message);
     }
 
 

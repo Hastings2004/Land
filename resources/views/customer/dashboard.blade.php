@@ -28,7 +28,7 @@
     </div>
 
         <!-- Interactive Metrics Cards -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                 <!-- Saved Plots Card -->
             <div class="bg-white rounded-2xl shadow-lg p-6 border border-yellow-200 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 cursor-pointer metrics-card" onclick="window.location.href='{{ route('customer.saved-plots.index') }}'">
                 <div class="flex items-center justify-between mb-4">
@@ -58,6 +58,21 @@
                 <h3 class="text-lg font-semibold text-gray-900 mb-2">Reservations</h3>
                 <p class="text-gray-700 text-sm">Your current bookings</p>
                 </div>
+
+                <!-- Purchased Plots Card -->
+            <div class="bg-white rounded-2xl shadow-lg p-6 border border-yellow-200 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 cursor-pointer metrics-card" onclick="window.location.href='{{ route('customer.purchases.index') }}'">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="p-3 bg-gradient-to-br from-red-100 to-red-200 rounded-xl">
+                        <i class="fas fa-home text-red-700 text-2xl"></i>
+                    </div>
+                    <div class="text-right">
+                        <div class="text-3xl font-bold text-red-800 metrics-number" id="purchased-plots-count">{{ $stats['purchasedPlots'] }}</div>
+                        <div class="text-xs text-red-800 font-medium">Purchased</div>
+                    </div>
+                </div>
+                <h3 class="text-lg font-semibold text-gray-900 mb-2">Purchased Plots</h3>
+                <p class="text-gray-700 text-sm">Your owned land</p>
+            </div>
 
                 <!-- Inquiries Card -->
             <div class="bg-white rounded-2xl shadow-lg p-6 border border-yellow-200 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 cursor-pointer metrics-card" onclick="window.location.href='{{ route('customer.inquiries.index') }}'">
@@ -433,59 +448,6 @@
             <button onclick="closeSavePlotModal()" class="px-6 py-2 bg-yellow-500 text-white rounded-lg font-bold hover:bg-yellow-600 transition">OK</button>
         </div>
     </div>
-
-    <!-- Footer Section -->
-    <footer class="w-full bg-white border-t border-yellow-200 mt-12 py-10 px-4 rounded-b-3xl shadow-lg">
-        <div class="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-10 md:gap-8">
-            <!-- About Us -->
-            <div class="flex flex-col h-full">
-                <h3 class="text-xl font-bold text-yellow-500 mb-3 flex items-center gap-2">
-                    <i class="fas fa-building text-yellow-500"></i> About Us
-                </h3>
-                <p class="text-gray-700 mb-2 font-semibold">Atsogo Estate Agent</p>
-                <p class="text-gray-600 text-sm flex-1">Atsogo Estate Agent is a registered real estate agent whose core purpose is to bridge the gap between prospective clients and property owners. We are committed to being the best, most trusted, reliable, and professional estate agent.</p>
-            </div>
-            <!-- What We Do -->
-            <div class="flex flex-col h-full">
-                <h3 class="text-xl font-bold text-yellow-500 mb-3 flex items-center gap-2">
-                    <i class="fas fa-tasks text-yellow-500"></i> What We Do
-                </h3>
-                <ul class="list-disc list-inside text-gray-600 text-sm space-y-2 flex-1">
-                    <li><span class="font-semibold text-gray-800">Property Management:</span> We manage properties on behalf of owners, including valuing, lease agreements, rental collections, maintenance, and marketing the property to let.</li>
-                </ul>
-            </div>
-            <!-- Opening Hours -->
-            <div class="flex flex-col h-full">
-                <h3 class="text-xl font-bold text-yellow-500 mb-3 flex items-center gap-2">
-                    <i class="fas fa-clock text-yellow-500"></i> Opening Hours
-                </h3>
-                <ul class="text-gray-600 text-sm space-y-2 flex-1">
-                    <li><span class="font-semibold text-gray-800">Mon - Tues:</span> 8:00 am - 5:00 pm</li>
-                    <li><span class="font-semibold text-gray-800">Wednes - Fri:</span> 8:00 am - 5:00 pm</li>
-                    <li><span class="font-semibold text-gray-800">Sat:</span> 8:00 am - 12:00 pm</li>
-                    <li><span class="font-semibold text-gray-800">Sun:</span> <span class="text-red-500 font-bold">CLOSED</span></li>
-                </ul>
-            </div>
-            <!-- Contact & Social -->
-            <div class="flex flex-col h-full">
-                <h3 class="text-xl font-bold text-yellow-500 mb-3 flex items-center gap-2">
-                    <i class="fas fa-address-book text-yellow-500"></i> Contact & Social
-                </h3>
-                <ul class="text-gray-600 text-sm space-y-2 mb-4 flex-1">
-                    <li class="flex items-start"><i class="fas fa-map-marker-alt text-yellow-500 mr-2 mt-1"></i> <span>Area 47 sector 4, Mazengera street, gate No 25, Lilongwe.</span></li>
-                    <li class="flex items-center"><i class="fas fa-phone-alt text-yellow-500 mr-2"></i> <a href="tel:+265888052362" class="hover:text-yellow-500 transition">+265 888 052 362</a></li>
-                    <li class="flex items-center"><i class="fas fa-envelope text-yellow-500 mr-2"></i> <a href="mailto:info@atsogo.mw" class="hover:text-yellow-500 transition">info@atsogo.mw</a></li>
-                </ul>
-                <div class="flex space-x-4 mt-2">
-                    <a href="https://www.facebook.com/atsogoestate" target="_blank" rel="noopener" class="bg-yellow-500 hover:bg-yellow-500 text-white rounded-full w-9 h-9 flex items-center justify-center transition transform hover:scale-110 shadow" title="Facebook"><i class="fab fa-facebook-f"></i></a>
-                    <a href="https://twitter.com/atsogoestate" target="_blank" rel="noopener" class="bg-yellow-500 hover:bg-yellow-500 text-white rounded-full w-9 h-9 flex items-center justify-center transition transform hover:scale-110 shadow" title="Twitter"><i class="fab fa-twitter"></i></a>
-                    <a href="https://www.instagram.com/atsogoestate" target="_blank" rel="noopener" class="bg-yellow-500 hover:bg-yellow-500 text-white rounded-full w-9 h-9 flex items-center justify-center transition transform hover:scale-110 shadow" title="Instagram"><i class="fab fa-instagram"></i></a>
-                    <a href="https://www.linkedin.com/company/atsogoestate" target="_blank" rel="noopener" class="bg-yellow-500 hover:bg-yellow-500 text-white rounded-full w-9 h-9 flex items-center justify-center transition transform hover:scale-110 shadow" title="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
-                </div>
-            </div>
-        </div>
-        <div class="mt-8 text-center text-xs text-gray-400">&copy; {{ date('Y') }} Atsogo Estate Agent. All rights reserved.</div>
-    </footer>
 
     <style>
         .quick-action-card {

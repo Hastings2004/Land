@@ -16,7 +16,7 @@
   <script>
     // Pass URLs from Blade to JS
     const paychanguCallbackUrl = "{{ config('services.paychangu.callback_url') }}"; // Only for backend POST
-    const paychanguReturnUrl = "{{ route('customer.reservations.index') }}"; // For user redirect after payment
+    const paychanguReturnUrl = "{{ route('customer.reservations.index') }}"; // Always redirect to reservation index
 
     function makePayment() {
       if (paymentInProgress) {

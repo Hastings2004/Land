@@ -90,7 +90,7 @@ Route::get('/', function () {
     }
     // Show welcome page to guests only
     return view('welcome');
-});
+})->name('welcome');
 
 // Guest routes (no authentication required)
 Route::middleware(['guest'])->group(function () {
@@ -213,6 +213,8 @@ Route::middleware(['auth', 'customer'])->prefix('customer')->name('customer.')->
     Route::post('/notifications/mark-all-read', [\App\Http\Controllers\NotificationController::class, 'markAllAsRead'])->name('notifications.mark-all-read');
     Route::get('/notifications/unread-count', [\App\Http\Controllers\NotificationController::class, 'getUnreadCount'])->name('notifications.unread-count');
     Route::get('/notifications/all', [\App\Http\Controllers\NotificationController::class, 'getAll'])->name('notifications.all');
+    Route::post('/plots/{plot}/pay-now', [CustomerPlotController::class, 'payNow'])->name('plots.payNow');
+    Route::get('/purchases', [App\Http\Controllers\CustomerPlotController::class, 'purchases'])->name('purchases.index');
 });
 
 // Fallback GET route for payment to prevent MethodNotAllowedHttpException
@@ -227,11 +229,11 @@ Route::post('/payments/callback', [\App\Http\Controllers\PaymentController::clas
 Route::get('/payments/callback', function (\Illuminate\Http\Request $request) {
     $status = $request->query('status');
     $txRef = $request->query('tx_ref');
-    if ($status === 'success') {
-        return redirect()->route('customer.reservations.index')->with('success', 'Payment successful! Reference: ' . $txRef);
-    } else {
-        return redirect()->route('customer.reservations.index')->with('error', 'Payment failed or cancelled. Please try again.');
-    }
+    // Always redirect to reservation index page
+    $message = $status === 'success'
+        ? 'Payment successful! Reference: ' . $txRef
+        : 'Payment failed or cancelled. Please try again.';
+    return redirect()->route('customer.reservations.index')->with($status === 'success' ? 'success' : 'error', $message);
 });
 
 // Payment verification routes (for manual verification)

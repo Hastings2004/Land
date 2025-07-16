@@ -35,16 +35,16 @@
                     <input
                         type="text"
                         id="full_name"
-                        class="input @error('full_name') ring-red-500 @enderror shadow appearance-none border rounded w-full py-2 pl-10 pr-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline focus:ring-2 focus:ring-yellow-400 transition duration-200 ease-in-out"
-                        name="full_name"
-                        value="{{ old('full_name') }}"
+                        class="input @error('username') ring-red-500 @enderror shadow appearance-none border rounded w-full py-2 pl-10 pr-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline focus:ring-2 focus:ring-yellow-400 transition duration-200 ease-in-out"
+                        name="username"
+                        value="{{ old('username') }}"
                         placeholder="Enter your full name"
                     >
                     <!-- Username icon using Font Awesome -->
                     <i class="fas fa-user absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
                 </div>
                 <!-- Error message for username validation -->
-                @error('full_name') <p class="text-red-500 text-xs italic mt-1">{{ $message }}</p> @enderror
+                @error('username') <p class="text-red-500 text-xs italic mt-1">{{ $message }}</p> @enderror
             </div>
 
             <!-- Email Input Field with Icon -->

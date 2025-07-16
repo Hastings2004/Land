@@ -259,7 +259,7 @@
             70% {
                 transform: scale(0.9);
             }
-            100% {
+            100% { 
                 opacity: 1;
                 transform: scale(1);
             }
