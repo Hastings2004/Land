@@ -5,21 +5,25 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <title>{{ config('app.name') }}</title>
+  <script src="https://in.paychangu.com/js/popup.js"></script>
 </head>
 <body class="bg-gray-100 flex items-center justify-center min-h-screen">
   <div class="text-center">
-    <h1 class="text-2xl font-bold mb-4">Pay for Your Reservation</h1>
     <button type="button" onclick="makePayment()" class="px-6 py-3 bg-yellow-500 text-white rounded-lg font-bold hover:bg-yellow-600 transition">Pay Now</button>
   </div>
-  <script src="https://in.paychangu.com/js/popup.js"></script>
   <div id="wrapper"></div>
   <script>
     // Pass URLs from Blade to JS
     const paychanguCallbackUrl = "{{ config('services.paychangu.callback_url') }}"; // Only for backend POST
     const paychanguReturnUrl = "{{ route('customer.reservations.index') }}"; // Always redirect to reservation index
 
+    // Auto-trigger payment popup on page load
+    document.addEventListener('DOMContentLoaded', function() {
+      makePayment();
+    });
+
     function makePayment() {
-      if (paymentInProgress) {
+      if (typeof paymentInProgress !== 'undefined' && paymentInProgress) {
         return;
       }
 
@@ -69,7 +73,7 @@
             
             // Redirect to reservation details
             setTimeout(() => {
-              window.location.href = "{{ route('reservation.show', $reservation->id) }}";
+              window.location.href = "{{ route('customer.reservations.index') }}";
             }, 2000);
           },
           "onError": function(error) {

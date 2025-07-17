@@ -15,6 +15,7 @@ class Payment extends Model
         'transaction_id',
         'provider',
         'provider_data',
+        'tx_ref',
     ];
 
     public function user() { return $this->belongsTo(User::class); }

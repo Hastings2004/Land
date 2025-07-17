@@ -7,14 +7,26 @@ use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 use App\Notifications\ProfileUpdatedNotification;
 
 class UserController extends Controller
 {
     //
-    public function index()
+    public function index(Request $request)
     {
-        $users = User::all();
+        $query = User::query();
+
+        if ($request->filled('search')) {
+            $search = $request->input('search');
+            $query->where(function($q) use ($search) {
+                $q->where('username', 'like', "%$search%")
+                  ->orWhere('email', 'like', "%$search%")
+                  ->orWhere('phone_number', 'like', "%$search%");
+            });
+        }
+
+        $users = $query->get();
         return view('admin.users.index', compact('users'));
     }
 
@@ -39,6 +51,7 @@ class UserController extends Controller
                 'username' => 'required|string|max:50',
                 'email' => 'required|email|max:50|unique:users,email,' . $user->id,
                 'phone_number' => 'required|string|max:20',
+                'profile_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
             ]);
 
             // Clean phone number (remove spaces, +, and formatting)
@@ -47,6 +60,17 @@ class UserController extends Controller
             // Ensure it's a valid Malawian phone number
             if (!preg_match('/^(265|0)\d{8,9}$/', $validated['phone_number'])) {
                 return back()->withErrors(['phone_number' => 'Please enter a valid Malawian phone number.']);
+            }
+
+            // Handle profile image upload
+            if ($request->hasFile('profile_image')) {
+                $image = $request->file('profile_image');
+                $imagePath = $image->store('profile_images', 'public');
+                // Delete old image if exists
+                if ($user->profile_image && Storage::disk('public')->exists($user->profile_image)) {
+                    Storage::disk('public')->delete($user->profile_image);
+                }
+                $validated['profile_image'] = $imagePath;
             }
 
             // Log the update attempt
@@ -66,7 +90,8 @@ class UserController extends Controller
                 'current_data' => [
                     'username' => $user->username,
                     'email' => $user->email,
-                    'phone_number' => $user->phone_number
+                    'phone_number' => $user->phone_number,
+                    'profile_image' => $user->profile_image
                 ]
             ]);
             // Notify the user (in-app notification)

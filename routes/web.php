@@ -313,6 +313,9 @@ Route::get('/payments/inline-demo', function () {
     return view('payments.inline-demo');
 })->name('payments.inline-demo');
 
+// Inline payment page for instant payment (used by Pay Now on plot details)
+Route::get('/payments/inline/{reservation}', [\App\Http\Controllers\PaymentController::class, 'pay'])->name('payments.inline');
+
 
 
 

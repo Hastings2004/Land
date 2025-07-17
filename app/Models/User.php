@@ -25,6 +25,7 @@ class User extends Authenticatable implements CanResetPassword, MustVerifyEmail
         'phone_number',
         'password',
         'role',
+        'profile_image',
     ];
 
     /**
@@ -64,6 +65,11 @@ class User extends Authenticatable implements CanResetPassword, MustVerifyEmail
     }
 
     public function reservations()
+    {
+        return $this->hasMany(Reservation::class);
+    }
+
+    public function reservationsWithTrashed()
     {
         return $this->hasMany(Reservation::class)->withTrashed();
     }

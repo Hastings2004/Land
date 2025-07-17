@@ -72,7 +72,7 @@
                 </div>
                 <h3 class="text-lg font-semibold text-gray-900 mb-2">Purchased Plots</h3>
                 <p class="text-gray-700 text-sm">Your owned land</p>
-            </div>
+                </div>
 
                 <!-- Inquiries Card -->
             <div class="bg-white rounded-2xl shadow-lg p-6 border border-yellow-200 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 cursor-pointer metrics-card" onclick="window.location.href='{{ route('customer.inquiries.index') }}'">

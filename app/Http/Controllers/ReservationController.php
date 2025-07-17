@@ -9,22 +9,26 @@ use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 use App\Notifications\ReservationCancelledNotification;
 use App\Notifications\ReservationPaidNotification;
+use Illuminate\Support\Facades\Mail;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class ReservationController extends Controller
 {
     public function index()
     {
         $user = Auth::user();
-        $reservations = $user->reservations()->withTrashed()->with('plot')->latest()->paginate(10);
-        // Only use allowed statuses
+        // Only show active reservations in the main list
+        $activeReservations = $user->reservations->where('status', 'active')->sortByDesc('created_at')->values();
+        // Show completed (sold) reservations in a separate section
+        $soldReservations = $user->reservations->where('status', 'completed')->sortByDesc('created_at')->values();
         $stats = [
-            'total' => $user->reservations()->withTrashed()->count(),
-            'active' => $user->reservations()->where('status', 'active')->count(),
-            'completed' => $user->reservations()->where('status', 'completed')->count(),
-            'expired' => $user->reservations()->withTrashed()->where('status', 'expired')->count(),
-            'cancelled' => $user->reservations()->where('status', 'cancelled')->count(),
+            'total' => \App\Models\Reservation::withTrashed()->where('user_id', $user->id)->count(),
+            'active' => \App\Models\Reservation::where('user_id', $user->id)->where('status', 'active')->count(),
+            'completed' => \App\Models\Reservation::where('user_id', $user->id)->where('status', 'completed')->count(),
+            'expired' => \App\Models\Reservation::withTrashed()->where('user_id', $user->id)->where('status', 'expired')->count(),
+            'cancelled' => \App\Models\Reservation::where('user_id', $user->id)->where('status', 'cancelled')->count(),
         ];
-        return view('customer.reservations.index', compact('reservations', 'stats'));
+        return view('customer.reservations.index', compact('activeReservations', 'soldReservations', 'stats'));
     }
 
     /**
@@ -100,9 +104,34 @@ class ReservationController extends Controller
         $plot->save();
 
         // Notify the customer of reservation
-        $user->notify(new ReservationPaidNotification($plot->title));
+        // Send notification to the user about the reservation
+        \App\Models\Notification::create([
+            'user_id' => $user->id,
+            'type' => 'reservation_paid',
+            'title' => 'Reservation Invoice',
+            'message' => 'Your reservation invoice for plot ' . $plot->title . ' has been generated.',
+            'data' => json_encode(['plot_title' => $plot->title]),
+            'is_read' => false,
+        ]);
 
-        return redirect()->route('customer.reservations.index')->with('success', 'Plot reserved successfully! It will expire in 24 hours.');
+        // Generate PDF invoice and email to customer
+        $invoiceNumber = 'INV-' . now()->format('Ymd') . '-' . $reservation->id;
+        $date = now()->format('Y-m-d');
+        $pdf = Pdf::loadView('reservations.invoice', [
+            'invoice_number' => $invoiceNumber,
+            'date' => $date,
+            'user' => $user,
+            'plot' => $plot,
+            'reservation' => $reservation,
+        ]);
+        $user->notify(new ReservationPaidNotification($plot->title));
+        Mail::send([], [], function ($message) use ($user, $pdf, $invoiceNumber) {
+            $message->to($user->email)
+                ->subject('Your Reservation Invoice')
+                ->attachData($pdf->output(), $invoiceNumber.'.pdf');
+        });
+
+        return redirect()->route('customer.reservations.index')->with('success', 'Plot reserved successfully! It will expire in 24 hours, and an invoice has been sent to your email.');
     }
 
     public function destroy(Reservation $reservation)
@@ -159,7 +188,7 @@ class ReservationController extends Controller
     {
         $user = Auth::user();
         // Ensure the user owns the reservation or is admin
-        if ($user->id !== $reservation->user_id && !$user->isAdmin()) {
+        if ($user->id !== $reservation->user_id && $user->role !== 'admin') {
             abort(403, 'Unauthorized');
         }
         return view('customer.reservations.show', compact('reservation'));

@@ -148,10 +148,15 @@ class PaymentController extends Controller
             }
 
             // Update payment record
+            $currentData = json_decode($payment->provider_data, true) ?: [];
+            $callbackData = $request->all();
+            if (!isset($callbackData['tx_ref']) && isset($currentData['tx_ref'])) {
+                $callbackData['tx_ref'] = $currentData['tx_ref'];
+            }
             $payment->update([
                 'status' => $status,
                 'transaction_id' => $transactionId,
-                'provider_data' => json_encode($request->all()), // Store full response for debugging
+                'provider_data' => json_encode($callbackData),
             ]);
 
             Log::info('PayChangu payment updated', [
@@ -166,7 +171,7 @@ class PaymentController extends Controller
                 case 'success':
                     $this->handleSuccessfulPayment($payment);
                     // Redirect to reservation details page after successful payment
-                    return redirect()->route('reservation.show', ['reservation' => $payment->reservation_id])
+                    return redirect()->route('customer.reservation.show', ['reservation' => $payment->reservation_id])
                         ->with('success', 'Payment successful!');
                 case 'failed':
                     $this->handleFailedPayment($payment);

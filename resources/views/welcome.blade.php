@@ -248,26 +248,30 @@
         <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-8">
             <div class="flex items-center gap-3 mb-4 md:mb-0">
                 <img src="https://img.icons8.com/ios-filled/48/ffa500/real-estate.png" alt="Atsogo Logo" class="w-10 h-10">
-                <span class="text-yellow-700 font-bold text-lg tracking-wide">Atsogo Estate Agency</span>
+                <span class="font-bold text-yellow-700 text-lg">Atsogo Estate Agency</span>
             </div>
-            <div class="flex flex-col md:flex-row items-center gap-6">
-                <div class="flex flex-col items-center md:items-start text-gray-600 text-sm">
-                    <div class="flex items-center mb-1"><i class="fas fa-phone mr-2 text-yellow-500"></i>+265 888 052 362</div>
-                    <div class="flex items-center mb-1"><i class="fas fa-envelope mr-2 text-yellow-500"></i>info@atsogo.mw</div>
-                    <div class="flex items-center"><i class="fas fa-map-marker-alt mr-2 text-yellow-500"></i>Area 47 sector 4, Mazengera street, gate No 25, Lilongwe</div>
+            <div class="flex flex-col md:flex-row items-center gap-4 text-yellow-700 text-sm">
+                <div class="flex items-center gap-2">
+                    <i class="fas fa-phone-alt"></i>
+                    <span>+265 888 052 362</span>
                 </div>
-                <div class="flex items-center gap-4 mt-4 md:mt-0">
-                    <a href="#" class="text-yellow-500 hover:text-yellow-600 text-xl" title="Facebook"><i class="fab fa-facebook"></i></a>
-                    <a href="#" class="text-yellow-500 hover:text-yellow-600 text-xl" title="Twitter"><i class="fab fa-twitter"></i></a>
-                    <a href="#" class="text-yellow-500 hover:text-yellow-600 text-xl" title="Instagram"><i class="fab fa-instagram"></i></a>
+                <div class="flex items-center gap-2">
+                    <i class="fas fa-envelope"></i>
+                    <span>info@atsogo.mw</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <span>Blantyre, Malawi</span>
                 </div>
             </div>
-            <div class="flex flex-col items-center md:items-end gap-2 text-gray-600 text-sm">
-                <div class="flex gap-4">
-                    <a href="#" class="hover:text-yellow-600 font-semibold">Contact</a>
-                </div>
-                <div class="mt-2">&copy; {{ date('Y') }} Atsogo Estate Agency. All rights reserved.</div>
+            <div class="flex items-center gap-4">
+                <a href="https://facebook.com/atsogoestate" target="_blank" class="text-yellow-600 hover:text-yellow-800 text-xl"><i class="fab fa-facebook"></i></a>
+                <a href="https://wa.me/265888052362" target="_blank" class="text-green-600 hover:text-green-800 text-xl"><i class="fab fa-whatsapp"></i></a>
+                <a href="mailto:info@atsogo.mw" class="text-yellow-600 hover:text-yellow-800 text-xl"><i class="fas fa-envelope"></i></a>
             </div>
+        </div>
+        <div class="mt-8 text-center text-yellow-700 text-xs font-semibold tracking-wide">
+            &copy; {{ date('Y') }} Atsogo Estate Agency. All rights reserved. | Designed with <i class="fas fa-heart text-red-500"></i> in Malawi.
         </div>
     </footer>
 </body>

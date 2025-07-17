@@ -132,6 +132,11 @@ class CustomerPlotController extends Controller
         // Increment view count
         $plot->increment('views');
 
+        // Eager load plotImages for gallery
+        $plot->load(['plotImages' => function($q) {
+            $q->orderBy('sort_order')->orderBy('is_primary', 'desc');
+        }]);
+
         return view('customer.plots.show', compact('plot'));
     }
 
@@ -145,7 +150,8 @@ class CustomerPlotController extends Controller
         if ($plot->status !== 'available') {
             // If reserved by this user, redirect to payment
             if ($plot->activeReservation && $plot->activeReservation->user_id === $user->id) {
-                return redirect()->route('customer.reservations.pay', $plot->activeReservation->id);
+                // Redirect to inline payment page for this reservation
+                return redirect()->route('payments.inline', ['reservation' => $plot->activeReservation->id]);
             }
             // Reserved by someone else or not available
             return redirect()->back()->with('error', 'This plot is currently reserved or not available.');
@@ -166,8 +172,8 @@ class CustomerPlotController extends Controller
             $plot->status = 'reserved';
             $plot->save();
         }
-        // Redirect to payment
-        return redirect()->route('customer.reservations.pay', $reservation->id);
+        // Redirect directly to the inline payment page for instant payment
+        return redirect()->route('payments.inline', ['reservation' => $reservation->id]);
     }
 
     /**
@@ -175,8 +181,11 @@ class CustomerPlotController extends Controller
      */
     public function purchases()
     {
-        $user = \Auth::user();
-        $purchasedPlots = \App\Models\Plot::where('user_id', $user->id)->where('status', 'sold')->latest()->get();
+        $user = Auth::user();
+        $purchasedPlots = \App\Models\Plot::where('user_id', $user->id)
+            ->where('status', 'sold')
+            ->latest()
+            ->get();
         return view('customer.purchases.index', compact('purchasedPlots'));
     }
 }

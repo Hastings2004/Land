@@ -16,31 +16,55 @@
     <div class="max-w-4xl mx-auto py-8">
         {{-- Remove unconditional success/error/info alerts at the top --}}
 
+        @if($plot->plotImages && $plot->plotImages->count() > 0)
+            <div class="p-4 bg-yellow-100 text-xs text-gray-800 rounded mb-4">
+                <strong>DEBUG: Plot Images URLs</strong>
+                <ul>
+                    @foreach($plot->plotImages as $img)
+                        <li><a href="{{ $img->image_url }}" target="_blank">{{ $img->image_url }}</a></li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+
         <div class="bg-white rounded-xl shadow-lg overflow-hidden border border-yellow-200">
             <!-- Responsive Image Carousel -->
-            <div class="relative group w-full h-80 md:h-[28rem] bg-gray-100 flex items-center justify-center">
+            <div class="relative w-full h-80 md:h-[28rem] bg-gray-100 flex items-center justify-center">
                 @if($plot->plotImages->count() > 0)
-                    <div id="carousel" class="w-full h-full relative">
+                    <div x-data="{ active: 0 }" class="relative w-full h-full">
                         @foreach($plot->plotImages as $index => $image)
-                            <img src="{{ $image->image_url }}" alt="{{ $image->alt_text ?: $plot->title }}" class="carousel-img absolute inset-0 w-full h-full object-cover transition-opacity duration-700 {{ $index === 0 ? 'opacity-100 z-10' : 'opacity-0 z-0' }}" data-index="{{ $index }}">
+                            <img
+                                src="{{ $image->image_url }}"
+                                alt="{{ $image->alt_text ?: $plot->title }}"
+                                class="absolute inset-0 w-full h-full object-cover rounded-xl transition-opacity duration-700"
+                                :class="active === {{ $index }} ? 'opacity-100 z-10' : 'opacity-0 z-0'"
+                                x-show="active === {{ $index }}"
+                                x-transition:enter="transition-opacity duration-700"
+                                x-transition:enter-start="opacity-0"
+                                x-transition:enter-end="opacity-100"
+                                x-transition:leave="transition-opacity duration-700"
+                                x-transition:leave-start="opacity-100"
+                                x-transition:leave-end="opacity-0"
+                            >
                         @endforeach
-                        <!-- Carousel Controls -->
                         @if($plot->plotImages->count() > 1)
-                            <button onclick="prevImage()" class="absolute left-4 top-1/2 -translate-y-1/2 bg-yellow-500/80 hover:bg-yellow-600 text-white rounded-full p-2 shadow-lg z-20"><i class="fas fa-chevron-left"></i></button>
-                            <button onclick="nextImage()" class="absolute right-4 top-1/2 -translate-y-1/2 bg-yellow-500/80 hover:bg-yellow-600 text-white rounded-full p-2 shadow-lg z-20"><i class="fas fa-chevron-right"></i></button>
+                            <button @click="active = active === 0 ? {{ $plot->plotImages->count() - 1 }} : active - 1" type="button" class="absolute left-4 top-1/2 -translate-y-1/2 bg-yellow-500/80 hover:bg-yellow-600 text-white rounded-full p-2 shadow-lg z-20">
+                                <i class="fas fa-chevron-left"></i>
+                            </button>
+                            <button @click="active = active === {{ $plot->plotImages->count() - 1 }} ? 0 : active + 1" type="button" class="absolute right-4 top-1/2 -translate-y-1/2 bg-yellow-500/80 hover:bg-yellow-600 text-white rounded-full p-2 shadow-lg z-20">
+                                <i class="fas fa-chevron-right"></i>
+                            </button>
                             <div class="absolute bottom-4 left-1/2 -translate-x-1/2 flex space-x-2 z-20">
                                 @foreach($plot->plotImages as $index => $image)
-                                    <span class="carousel-dot w-3 h-3 rounded-full bg-white border-2 border-yellow-500 cursor-pointer {{ $index === 0 ? 'bg-yellow-500' : '' }}" data-index="{{ $index }}"></span>
+                                    <span @click="active = {{ $index }}" class="w-3 h-3 rounded-full border-2 border-yellow-500 cursor-pointer {{ $index === 0 ? 'bg-yellow-500' : 'bg-white' }}" :class="active === {{ $index }} ? 'bg-yellow-500' : 'bg-white'"></span>
                                 @endforeach
                             </div>
                         @endif
                     </div>
+                @elseif($plot->image_path)
+                    <img src="{{ asset('storage/' . $plot->image_path) }}" alt="{{ $plot->title }}" class="w-full h-full object-cover rounded-xl">
                 @else
-                    @if($plot->image_path)
-                        <img src="{{ asset('storage/' . $plot->image_path) }}" alt="{{ $plot->title }}" class="w-full h-full object-cover">
-                    @else
-                        <img src="https://placehold.co/1200x400" alt="{{ $plot->title }}" class="w-full h-full object-cover">
-                    @endif
+                    <img src="https://placehold.co/1200x400" alt="{{ $plot->title }}" class="w-full h-full object-cover rounded-xl">
                 @endif
             </div>
             <div class="p-8 md:p-10">

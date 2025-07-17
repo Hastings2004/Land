@@ -13,9 +13,13 @@
         <div class="bg-white rounded-2xl p-8 mb-8 shadow-xl border border-gray-100">
             <div class="flex flex-col md:flex-row items-center gap-6">
                 <div class="flex-shrink-0">
-                    <div class="w-24 h-24 rounded-full bg-gradient-to-br from-yellow-400 to-yellow-500 flex items-center justify-center border-4 border-yellow-200 shadow-lg transition-transform duration-300 hover:scale-110 active:scale-95 cursor-pointer group">
-                        <span class="text-3xl font-bold text-yellow-900 group-hover:animate-bounce">{{ strtoupper(substr(auth()->user()->username, 0, 2)) }}</span>
-                    </div>
+                    @if(auth()->user()->profile_image)
+                        <img src="{{ asset('storage/' . auth()->user()->profile_image) }}" alt="Profile Image" class="w-24 h-24 rounded-full object-cover border-4 border-yellow-200 shadow-lg transition-transform duration-300 hover:scale-110 active:scale-95 cursor-pointer group">
+                    @else
+                        <div class="w-24 h-24 rounded-full bg-gradient-to-br from-yellow-400 to-yellow-500 flex items-center justify-center border-4 border-yellow-200 shadow-lg transition-transform duration-300 hover:scale-110 active:scale-95 cursor-pointer group">
+                            <span class="text-3xl font-bold text-yellow-900 group-hover:animate-bounce">{{ strtoupper(substr(auth()->user()->username, 0, 2)) }}</span>
+                        </div>
+                    @endif
                 </div>
                 <div class="flex-1 text-center md:text-left">
                     @if(auth()->user()->isAdmin())
