@@ -1,6 +1,5 @@
-@extends('components.dashboard-layout')
-
-@section('content')
+<x-dashboard-layout>
+<a href="{{ route('customer.dashboard') }}" class="inline-block mb-4 px-4 py-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300"><i class="fas fa-arrow-left mr-2"></i>Back</a>
 <div class="max-w-5xl mx-auto py-10">
     <h1 class="text-3xl font-bold text-gray-800 mb-8 flex items-center gap-2">
         <i class="fas fa-home text-red-500"></i> My Purchased Plots
@@ -37,4 +36,4 @@
         </div>
     @endif
 </div>
-@endsection 
+</x-dashboard-layout> 

@@ -1,6 +1,5 @@
-@extends('components.dashboard-layout')
-
-@section('content')
+<x-dashboard-layout>
+<a href="{{ route('admin.dashboard') }}" class="inline-block mb-4 px-4 py-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300"><i class="fas fa-arrow-left mr-2"></i>Back</a>
 <div class="container mx-auto px-4 py-8">
     <div class="flex justify-between items-center mb-6">
         <h1 class="text-3xl font-bold text-gray-800">Payment Management</h1>
@@ -181,4 +180,4 @@ function refreshPayments() {
     location.reload();
 }
 </script>
-@endsection 
+</x-dashboard-layout> 

@@ -1,6 +1,5 @@
-@extends('components.dashboard-layout')
-
-@section('content')
+<x-dashboard-layout>
+<a href="{{ route('customer.reservations.index') }}" class="inline-block mb-4 px-4 py-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300"><i class="fas fa-arrow-left mr-2"></i>Back</a>
 <div class="max-w-3xl mx-auto py-8">
     <h1 class="text-2xl font-bold mb-4 text-gray-800">Reservation Details</h1>
     <div class="bg-white rounded-xl shadow-lg p-6">
@@ -13,4 +12,4 @@
         <a href="{{ route('customer.reservations.index') }}" class="inline-block mt-4 px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600">Back to My Reservations</a>
     </div>
 </div>
-@endsection 
+</x-dashboard-layout> 
