@@ -39,8 +39,8 @@
           "tx_ref": txRef,
           "amount": {{ $amount }},
           "currency": "MWK",
-         "callback_url": paychanguCallbackUrl, // POST, for backend
-                "return_url": paychanguReturnUrl,     // GET, for user redirect
+         "callback_url": paychanguCallbackUrl + '?trxRef=' + encodeURIComponent(txRef);, // POST, for backend
+          "return_url": paychanguReturnUrl,     // GET, for user redirect
           "customer": {
             "email": "{{ $user->email }}",
             "first_name": "{{ $user->name }}",

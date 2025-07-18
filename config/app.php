@@ -84,6 +84,11 @@ return [
 
     'faker_locale' => env('APP_FAKER_LOCALE', 'en_US'),
 
+    // Add ngrok callback url config
+    'ngrok_callback_url' => env('NGROK_CALLBACK_URL', 'http://127.0.0.1:8000/payments/callback'),
+    // Add ngrok return url config
+    'ngrok_return_url' => env('NGROK_RETURN_URL', 'http://127.0.0.1:8000/payments/success'),
+
     /*
     |--------------------------------------------------------------------------
     | Encryption Key

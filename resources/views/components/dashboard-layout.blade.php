@@ -395,7 +395,13 @@
     </aside>
 
     <div class="flex-1 flex flex-col min-h-screen overflow-y-auto no-scrollbar">
-        <header class="bg-white shadow-md p-4 flex items-center justify-end sticky top-0 z-30 top-nav">
+        <header class="bg-white shadow-md p-4 flex items-center justify-between sticky top-0 z-30 top-nav">
+            <div class="flex items-center">
+                <!-- Hamburger always visible -->
+                <button class="text-gray-700 hover:text-yellow-500 focus:outline-none mr-4" onclick="toggleSidebar()">
+                    <i class="fas fa-bars text-2xl"></i>
+                </button>
+            </div>
             <div class="flex items-center space-x-4">
                 <!-- Easy Logout -->
                 <form id="logout-form-dashboard" action="{{ route('logout') }}" method="POST">

@@ -165,9 +165,9 @@
     <div id="wrapper"></div>
 
     <script>
-        // Always use the correct port for local development
-        const paychanguCallbackUrl = "http://127.0.0.1:8000/payments/callback";
-        const paychanguReturnUrl = "http://127.0.0.1:8000/payments/success";
+        // Use callback URL from environment/config
+        const paychanguCallbackUrl = "{{ $ngrok_callback_url }}";
+        const paychanguReturnUrl = "{{ $ngrok_return_url }}";
         // Auto-hide success/error messages after 3 seconds
         document.addEventListener('DOMContentLoaded', function() {
             const messages = document.querySelectorAll('.fixed');
@@ -195,13 +195,14 @@
                 "tx_ref": txRef,
                 "amount": amount,
                 "currency": "MWK",
-                "callback_url": paychanguCallbackUrl, // for backend POST
+                "callback_url": paychanguCallbackUrl , // from env/config
                 "return_url": paychanguReturnUrl,     // for user redirect
                 "customer": {
                     "email": userEmail,
                     "first_name": userName,
                     "last_name": "",
                 },
+
                 "customization": {
                     "title": "Plot Reservation Payment",
                     "description": "Payment for reservation #" + reservationId,

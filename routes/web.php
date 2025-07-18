@@ -140,6 +140,9 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
 
         // User Management
     Route::get('/users', [UserController::class, 'index'])->name('users.index');
+
+
+    
     Route::get('/users/{id}/edit', [UserController::class, 'edit'])->name('users.edit');
     Route::put('/users/{id}/update', [UserController::class, 'update'])->name('users.update');
 

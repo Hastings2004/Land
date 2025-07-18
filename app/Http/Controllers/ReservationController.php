@@ -28,7 +28,9 @@ class ReservationController extends Controller
             'expired' => \App\Models\Reservation::withTrashed()->where('user_id', $user->id)->where('status', 'expired')->count(),
             'cancelled' => \App\Models\Reservation::where('user_id', $user->id)->where('status', 'cancelled')->count(),
         ];
-        return view('customer.reservations.index', compact('activeReservations', 'soldReservations', 'stats'));
+        $ngrok_callback_url = config('app.ngrok_callback_url');
+        $ngrok_return_url = config('app.ngrok_return_url');
+        return view('customer.reservations.index', compact('activeReservations', 'soldReservations', 'stats', 'ngrok_callback_url', 'ngrok_return_url'));
     }
 
     /**
