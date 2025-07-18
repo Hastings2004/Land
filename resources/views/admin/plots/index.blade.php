@@ -144,6 +144,19 @@
         </div>
     </div>
 
+    <!-- Error Modal -->
+    <div x-data="{ showErrorModal: {{ session('error') ? 'true' : 'false' }} }" x-show="showErrorModal" x-cloak class="fixed inset-0 flex items-center justify-center z-50">
+        <div class="fixed inset-0 bg-black opacity-40"></div>
+        <div class="bg-white rounded-lg shadow-xl p-8 max-w-md w-full relative z-50">
+            <button @click="showErrorModal = false" class="absolute top-2 right-2 text-gray-400 hover:text-gray-700 text-2xl font-bold">&times;</button>
+            <div class="flex items-center mb-4">
+                <i class="fas fa-exclamation-triangle text-red-500 text-3xl mr-3"></i>
+                <h3 class="text-xl font-semibold text-gray-800">Action Not Allowed</h3>
+            </div>
+            <p class="text-gray-700">{{ session('error') }}</p>
+        </div>
+    </div>
+
     <!-- Success Message -->
     @if(session('success'))
         <div class="fixed top-4 right-4 bg-green-500 text-white px-6 py-4 rounded-lg shadow-lg z-50 animate-bounce-in">

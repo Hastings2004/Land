@@ -297,6 +297,11 @@ class AdminPlotController extends Controller
      */
     public function destroy(Plot $plot)
     {
+        // Prevent deleting reserved plots
+        if ($plot->status === 'reserved') {
+            return redirect()->route('admin.plots.index')
+                ->with('error', 'You cannot delete this plot because it is currently reserved by a customer.');
+        }
         // Delete the plot
         $plot->delete();
 
