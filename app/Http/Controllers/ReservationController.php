@@ -115,6 +115,19 @@ class ReservationController extends Controller
         $plot->status = 'reserved';
         $plot->save();
 
+        // Notify the customer of reservation (dashboard notification)
+        $notification = \App\Models\Notification::create([
+            'user_id' => $user->id,
+            'type' => 'reservation_invoice',
+            'title' => 'Reservation Invoice',
+            'message' => 'Your reservation invoice for plot ' . $plot->title . ' is available.',
+            'data' => json_encode(['plot_title' => $plot->title, 'reservation_id' => $reservation->id]),
+            'is_read' => false,
+        ]);
+        // Update the notification URL with the correct ID
+        $notification->message = 'Your reservation invoice for plot ' . $plot->title . ' is available. <a href="' . route('customer.notifications.show', ['notification' => $notification->id]) . '" class="text-yellow-700 underline">View/Download Invoice</a>';
+        $notification->save();
+
         // Notify the customer of reservation
         \App\Models\Notification::create([
             'user_id' => $user->id,

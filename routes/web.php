@@ -166,10 +166,12 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
 
     // Notification Management
     Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
+    Route::get('/notifications/{notification}', [NotificationController::class, 'show'])->name('notifications.show');
     Route::post('/notifications/mark-read', [NotificationController::class, 'markAsRead'])->name('notifications.mark-read');
     Route::post('/notifications/mark-all-read', [NotificationController::class, 'markAllAsRead'])->name('notifications.mark-all-read');
     Route::get('/notifications/unread-count', [NotificationController::class, 'getUnreadCount'])->name('notifications.unread-count');
     Route::get('/notifications/all', [NotificationController::class, 'getAll'])->name('notifications.all');
+    Route::get('/notifications/{notification}/download', [NotificationController::class, 'download'])->name('notifications.download');
 
     // Admin notifications page (Blade view)
     Route::get('/notifications/all/view', [NotificationController::class, 'showAll'])->name('notifications.all.view');
@@ -212,10 +214,12 @@ Route::middleware(['auth', 'customer'])->prefix('customer')->name('customer.')->
     // Customer notifications page (Blade view)
     Route::get('/notifications/all/view', [\App\Http\Controllers\NotificationController::class, 'showAll'])->name('notifications.all.view');
     Route::get('/notifications', [\App\Http\Controllers\NotificationController::class, 'index'])->name('notifications.index');
+    Route::get('/notifications/{notification}', [\App\Http\Controllers\NotificationController::class, 'show'])->name('notifications.show');
     Route::post('/notifications/mark-read', [\App\Http\Controllers\NotificationController::class, 'markAsRead'])->name('notifications.mark-read');
     Route::post('/notifications/mark-all-read', [\App\Http\Controllers\NotificationController::class, 'markAllAsRead'])->name('notifications.mark-all-read');
     Route::get('/notifications/unread-count', [\App\Http\Controllers\NotificationController::class, 'getUnreadCount'])->name('notifications.unread-count');
     Route::get('/notifications/all', [\App\Http\Controllers\NotificationController::class, 'getAll'])->name('notifications.all');
+    Route::get('/notifications/{notification}/download', [\App\Http\Controllers\NotificationController::class, 'download'])->name('notifications.download');
     Route::post('/plots/{plot}/pay-now', [CustomerPlotController::class, 'payNow'])->name('plots.payNow');
     Route::get('/purchases', [App\Http\Controllers\CustomerPlotController::class, 'purchases'])->name('purchases.index');
 });

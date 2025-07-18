@@ -19,7 +19,7 @@ return new class extends Migration
             $table->enum('status', ['active', 'expired', 'cancelled', 'completed'])->default('active');
             $table->timestamps();
 
-            $table->unique(['user_id', 'plot_id', 'status']);
+            // $table->unique(['user_id', 'plot_id', 'status']); // Removed to allow multiple cancelled reservations
         });
     }
 
