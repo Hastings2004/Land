@@ -145,15 +145,19 @@
     </div>
 
     <!-- Error Modal -->
-    <div x-data="{ showErrorModal: {{ session('error') ? 'true' : 'false' }} }" x-show="showErrorModal" x-cloak class="fixed inset-0 flex items-center justify-center z-50">
+    @php
+        $reservedError = session()->pull('error');
+    @endphp
+    <div x-data="{ showErrorModal: {{ isset(
+        $reservedError) && str_contains($reservedError, 'reserved') ? 'true' : 'false' }} }" x-show="showErrorModal" x-cloak class="fixed inset-0 flex items-center justify-center z-50">
         <div class="fixed inset-0 bg-black opacity-40"></div>
         <div class="bg-white rounded-lg shadow-xl p-8 max-w-md w-full relative z-50">
-            <button @click="showErrorModal = false" class="absolute top-2 right-2 text-gray-400 hover:text-gray-700 text-2xl font-bold">&times;</button>
+            <button @click="showErrorModal = false; window.location.replace(window.location.pathname + window.location.search);" class="absolute top-2 right-2 text-gray-400 hover:text-gray-700 text-2xl font-bold">&times;</button>
             <div class="flex items-center mb-4">
                 <i class="fas fa-exclamation-triangle text-red-500 text-3xl mr-3"></i>
                 <h3 class="text-xl font-semibold text-gray-800">Action Not Allowed</h3>
             </div>
-            <p class="text-gray-700">{{ session('error') }}</p>
+            <p class="text-gray-700">{{ $reservedError }}</p>
         </div>
     </div>
 

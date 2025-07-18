@@ -60,7 +60,14 @@
                 <!-- Images Upload Section -->
                 <div>
                     <label class="block text-sm font-semibold text-gray-700 mb-1">Upload Images <span class="text-xs text-gray-400">(Max 30MB each, up to 10 images)</span></label>
-                    <input type="file" id="images" name="images[]" multiple accept="image/*" class="block w-full text-sm text-gray-700 border border-gray-200 rounded-lg cursor-pointer focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500">
+                    <div class="drag-area" id="drag-area">
+                        <div style="margin-bottom: 0.5rem;">
+                            <i class="fas fa-cloud-upload-alt text-yellow-500 text-2xl mb-2"></i>
+                        </div>
+                        <div class="text-sm text-yellow-700 mb-1">Drag & drop or click to select images</div>
+                        <input type="file" id="images" name="images[]" multiple accept="image/*" class="hidden">
+                        <button type="button" id="choose-images-btn" class="btn-yellow mt-2" style="font-size:0.95rem;padding:0.5rem 1.25rem;">Choose Images</button>
+                    </div>
                     @error('images')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
                     @error('images.*')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
                     <div id="image-preview" class="flex flex-wrap gap-2 mt-2"></div>
@@ -73,6 +80,69 @@
             </form>
         </div>
                 </div>
+    <style>
+        .drag-area {
+            border: 2px dashed #fde68a;
+            background: #fff;
+            border-radius: 0.75rem;
+            padding: 1.2rem;
+            text-align: center;
+            margin-bottom: 1rem;
+            transition: border 0.2s, background 0.2s;
+        }
+        .drag-area.dragover {
+            border-color: #f59e0b;
+            background: #fef3c7;
+        }
+        .btn-yellow {
+            background: #f59e0b;
+            color: #fff;
+            border: none;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .btn-yellow:hover, .btn-yellow:focus {
+            background: #b45309;
+        }
+        .image-preview {
+            position: relative;
+            border-radius: 0.75rem;
+            overflow: hidden;
+            box-shadow: 0 2px 8px 0 rgba(251, 191, 36, 0.08);
+            margin-bottom: 0.5rem;
+        }
+        .image-preview img {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 0.75rem;
+        }
+        .remove-image-btn {
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            background: #f59e0b;
+            color: #fff;
+            border: none;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            cursor: pointer;
+            opacity: 0.85;
+            z-index: 2;
+            transition: background 0.2s, opacity 0.2s;
+        }
+        .remove-image-btn:hover {
+            background: #b45309;
+            opacity: 1;
+        }
+    </style>
     <script>
     document.addEventListener('DOMContentLoaded', function() {
         // Prevent negative numbers in area and price fields
@@ -90,29 +160,85 @@
                 }
             });
         });
-    });
-    </script>
-    <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const input = document.getElementById('images');
-    const preview = document.getElementById('image-preview');
-    input.addEventListener('change', function() {
-        preview.innerHTML = '';
-        if (this.files) {
-            Array.from(this.files).forEach(file => {
+
+        let selectedFiles = [];
+        const chooseBtn = document.getElementById('choose-images-btn');
+        const imagesInput = document.getElementById('images');
+        const dragArea = document.getElementById('drag-area');
+        const preview = document.getElementById('image-preview');
+
+        // Prevent browser from opening image in new tab when dropped outside drop area
+        window.addEventListener('dragover', function(e) { e.preventDefault(); });
+        window.addEventListener('drop', function(e) { e.preventDefault(); });
+
+        chooseBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            imagesInput.click();
+        });
+
+        function updateInputFiles() {
+            const dataTransfer = new DataTransfer();
+            selectedFiles.forEach(file => dataTransfer.items.add(file));
+            imagesInput.files = dataTransfer.files;
+        }
+
+        function showPreview() {
+            preview.innerHTML = '';
+            selectedFiles.forEach((file, idx) => {
                 if (file.type.startsWith('image/')) {
                     const reader = new FileReader();
                     reader.onload = function(e) {
+                        const imgDiv = document.createElement('div');
+                        imgDiv.className = 'image-preview relative';
                         const img = document.createElement('img');
                         img.src = e.target.result;
-                        img.className = 'h-20 w-20 object-cover rounded border';
-                        preview.appendChild(img);
+                        imgDiv.appendChild(img);
+                        // Add remove button
+                        const removeBtn = document.createElement('button');
+                        removeBtn.type = 'button';
+                        removeBtn.innerHTML = '&times;';
+                        removeBtn.className = 'remove-image-btn';
+                        removeBtn.onclick = function() {
+                            selectedFiles.splice(idx, 1);
+                            updateInputFiles();
+                            showPreview();
+                        };
+                        imgDiv.appendChild(removeBtn);
+                        preview.appendChild(imgDiv);
                     };
                     reader.readAsDataURL(file);
                 }
             });
         }
+
+        imagesInput.addEventListener('change', function(e) {
+            // Add new files to selectedFiles, avoiding duplicates
+            const newFiles = Array.from(imagesInput.files);
+            newFiles.forEach(file => {
+                if (!selectedFiles.some(f => f.name === file.name && f.size === file.size && f.lastModified === file.lastModified)) {
+                    selectedFiles.push(file);
+                }
+            });
+            updateInputFiles();
+            showPreview();
+        });
+
+        // Drag & drop
+        dragArea.addEventListener('drop', function(e) {
+            e.preventDefault();
+            dragArea.classList.remove('dragover');
+            const droppedFiles = Array.from(e.dataTransfer.files);
+            droppedFiles.forEach(file => {
+                if (!selectedFiles.some(f => f.name === file.name && f.size === file.size && f.lastModified === file.lastModified)) {
+                    selectedFiles.push(file);
+                }
+            });
+            updateInputFiles();
+            showPreview();
+        });
+
+        // Initial preview (in case of browser autofill)
+        showPreview();
     });
-});
-</script>
+    </script>
 </x-dashboard-layout>

@@ -197,8 +197,7 @@ class AdminPlotController extends Controller
         }
         
         // Redirect with a success message for regular requests
-        return redirect()->route('admin.plots.index')
-            ->with('success', 'Plot created successfully! Your new property listing has been added to the system.');
+        return redirect()->route('admin.plots.index');
     }
     /**
      * Display the specified resource.
