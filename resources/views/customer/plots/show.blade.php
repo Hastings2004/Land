@@ -17,28 +17,22 @@
         {{-- Remove unconditional success/error/info alerts at the top --}}
 
         @if($plot->plotImages && $plot->plotImages->count() > 0)
-            <div class="p-4 bg-yellow-100 text-xs text-gray-800 rounded mb-4">
-                <strong>DEBUG: Plot Images URLs</strong>
-                <ul>
-                    @foreach($plot->plotImages as $img)
-                        <li><a href="{{ $img->image_url }}" target="_blank">{{ $img->image_url }}</a></li>
-                    @endforeach
-                </ul>
-            </div>
+            <!-- Gallery polished: debug removed -->
         @endif
 
         <div class="bg-white rounded-xl shadow-lg overflow-hidden border border-yellow-200">
             <!-- Responsive Image Carousel -->
-            <div class="relative w-full h-80 md:h-[28rem] bg-gray-100 flex items-center justify-center">
+            <div class="relative w-full h-80 md:h-[28rem] bg-gray-100 flex items-center justify-center" x-data="{ active: 0, lightbox: false, zoom: false, startX: null }">
                 @if($plot->plotImages->count() > 0)
-                    <div x-data="{ active: 0 }" class="relative w-full h-full">
+                    <div class="relative w-full h-full">
                         @foreach($plot->plotImages as $index => $image)
                             <img
                                 src="{{ $image->image_url }}"
                                 alt="{{ $image->alt_text ?: $plot->title }}"
-                                class="absolute inset-0 w-full h-full object-cover rounded-xl transition-opacity duration-700"
+                                class="customer-gallery-img absolute inset-0 w-full h-full object-cover rounded-xl transition-opacity duration-700 shadow-lg border-4 border-white cursor-pointer"
                                 :class="active === {{ $index }} ? 'opacity-100 z-10' : 'opacity-0 z-0'"
                                 x-show="active === {{ $index }}"
+                                @click="lightbox = true"
                                 x-transition:enter="transition-opacity duration-700"
                                 x-transition:enter-start="opacity-0"
                                 x-transition:enter-end="opacity-100"
@@ -48,23 +42,50 @@
                             >
                         @endforeach
                         @if($plot->plotImages->count() > 1)
-                            <button @click="active = active === 0 ? {{ $plot->plotImages->count() - 1 }} : active - 1" type="button" class="absolute left-4 top-1/2 -translate-y-1/2 bg-yellow-500/80 hover:bg-yellow-600 text-white rounded-full p-2 shadow-lg z-20">
+                            <button @click="active = active === 0 ? {{ $plot->plotImages->count() - 1 }} : active - 1" type="button" class="absolute left-4 top-1/2 -translate-y-1/2 bg-yellow-500/90 hover:bg-yellow-600 text-white rounded-full p-3 shadow-lg z-20 focus:outline-none focus:ring-2 focus:ring-yellow-300">
                                 <i class="fas fa-chevron-left"></i>
                             </button>
-                            <button @click="active = active === {{ $plot->plotImages->count() - 1 }} ? 0 : active + 1" type="button" class="absolute right-4 top-1/2 -translate-y-1/2 bg-yellow-500/80 hover:bg-yellow-600 text-white rounded-full p-2 shadow-lg z-20">
+                            <button @click="active = active === {{ $plot->plotImages->count() - 1 }} ? 0 : active + 1" type="button" class="absolute right-4 top-1/2 -translate-y-1/2 bg-yellow-500/90 hover:bg-yellow-600 text-white rounded-full p-3 shadow-lg z-20 focus:outline-none focus:ring-2 focus:ring-yellow-300">
                                 <i class="fas fa-chevron-right"></i>
                             </button>
                             <div class="absolute bottom-4 left-1/2 -translate-x-1/2 flex space-x-2 z-20">
                                 @foreach($plot->plotImages as $index => $image)
-                                    <span @click="active = {{ $index }}" class="w-3 h-3 rounded-full border-2 border-yellow-500 cursor-pointer {{ $index === 0 ? 'bg-yellow-500' : 'bg-white' }}" :class="active === {{ $index }} ? 'bg-yellow-500' : 'bg-white'"></span>
+                                    <span @click="active = {{ $index }}" class="w-3 h-3 rounded-full border-2 border-yellow-500 cursor-pointer transition-all duration-200" :class="active === {{ $index }} ? 'bg-yellow-500 scale-125' : 'bg-white'" style="box-shadow: 0 1px 4px rgba(0,0,0,0.08);"></span>
                                 @endforeach
                             </div>
                         @endif
+                        <!-- Lightbox Modal -->
+                        <div x-show="lightbox" x-transition class="fixed inset-0 z-50 flex items-center justify-center bg-black/80" @keydown.window.escape="lightbox = false" @click.self="lightbox = false"
+                            @touchstart="startX = $event.touches[0].clientX" @touchend="
+                                if (startX !== null) {
+                                    let endX = $event.changedTouches[0].clientX;
+                                    if (endX - startX > 50) { active = active === 0 ? {{ $plot->plotImages->count() - 1 }} : active - 1; }
+                                    else if (startX - endX > 50) { active = active === {{ $plot->plotImages->count() - 1 }} ? 0 : active + 1; }
+                                    startX = null;
+                                }
+                            ">
+                            <button @click="lightbox = false" class="absolute top-6 right-8 text-white text-3xl z-60 focus:outline-none"><i class="fas fa-times"></i></button>
+                            <div class="relative max-w-3xl w-full flex flex-col items-center">
+                                <img :src="document.querySelectorAll('.customer-gallery-img')[active]?.src"
+                                    class="max-h-[80vh] w-auto rounded-xl shadow-2xl border-4 border-white bg-white cursor-zoom-in"
+                                    :class="zoom ? 'scale-150 cursor-zoom-out' : ''"
+                                    style="object-fit:contain; transition: transform 0.3s;"
+                                    alt="Large Image"
+                                    @click="zoom = !zoom"
+                                >
+                                <div class="flex justify-between w-full mt-4 items-center">
+                                    <button @click="active = active === 0 ? {{ $plot->plotImages->count() - 1 }} : active - 1" class="bg-yellow-500 hover:bg-yellow-600 text-white rounded-full p-3 shadow-lg focus:outline-none"><i class="fas fa-chevron-left"></i></button>
+                                    <a :href="document.querySelectorAll('.customer-gallery-img')[active]?.src" download class="bg-white border border-yellow-400 text-yellow-700 rounded-full px-4 py-2 font-semibold shadow hover:bg-yellow-100 focus:outline-none ml-4 mr-4 flex items-center gap-2"><i class='fas fa-download'></i> Download</a>
+                                    <button @click="active = active === {{ $plot->plotImages->count() - 1 }} ? 0 : active + 1" class="bg-yellow-500 hover:bg-yellow-600 text-white rounded-full p-3 shadow-lg focus:outline-none"><i class="fas fa-chevron-right"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- End Lightbox Modal -->
                     </div>
                 @elseif($plot->image_path)
-                    <img src="{{ asset('storage/' . $plot->image_path) }}" alt="{{ $plot->title }}" class="w-full h-full object-cover rounded-xl">
+                    <img src="{{ asset('storage/' . $plot->image_path) }}" alt="{{ $plot->title }}" class="w-full h-full object-cover rounded-xl shadow-lg border-4 border-white">
                 @else
-                    <img src="https://placehold.co/1200x400" alt="{{ $plot->title }}" class="w-full h-full object-cover rounded-xl">
+                    <img src="https://placehold.co/1200x400" alt="{{ $plot->title }}" class="w-full h-full object-cover rounded-xl shadow-lg border-4 border-white">
                 @endif
             </div>
             <div class="p-8 md:p-10">

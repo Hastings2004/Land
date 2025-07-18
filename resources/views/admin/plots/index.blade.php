@@ -144,6 +144,16 @@
         </div>
     </div>
 
+    <!-- Success Message -->
+    @if(session('success'))
+        <div class="fixed top-4 right-4 bg-green-500 text-white px-6 py-4 rounded-lg shadow-lg z-50 animate-bounce-in">
+            <div class="flex items-center">
+                <i class="fas fa-check-circle mr-2"></i>
+                {{ session('success') }}
+            </div>
+        </div>
+    @endif
+
     <!-- Plots Display Section -->
     <div class="bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden">
         @if($plots->isEmpty())
@@ -182,7 +192,7 @@
                                         </div>
                                     @endif
                                 </div>
-                            @elseif($plot->image_path)
+                            @elseif(!empty($plot->image_path))
                                 <img src="{{ asset('storage/' . $plot->image_path) }}" alt="Plot Image" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105">
                             @else
                                 <div class="w-full h-full flex items-center justify-center bg-yellow-50">

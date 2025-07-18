@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Storage;
 use App\Notifications\NewPlotNotification;
 use App\Models\User;
 use Illuminate\Support\Facades\Storage as FacadesStorage;
+use Illuminate\Support\Facades\Log;
 
 class AdminPlotController extends Controller
 {
@@ -116,6 +117,7 @@ class AdminPlotController extends Controller
      */
     public function store(Request $request)
     {
+        \Log::info('FILES:', ['files' => $request->file('images')]);
         $user = Auth::user();
 
         // Check if the user is an admin
@@ -128,6 +130,7 @@ class AdminPlotController extends Controller
         }
 
         // Validate the incoming request, including multiple images
+        Log::info('AdminPlotController@store: Validating request', $request->all());
         $validatedData = $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'required|string',
@@ -138,6 +141,7 @@ class AdminPlotController extends Controller
             'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:30720',
             'is_new_listing' => 'nullable', 
         ]);
+        Log::info('AdminPlotController@store: Validation passed', $validatedData);
 
         // Handle checkbox value
         $validatedData['is_new_listing'] = $request->has('is_new_listing');
@@ -145,6 +149,7 @@ class AdminPlotController extends Controller
         // Create the plot first
         $validatedData['user_id'] = $user->id;
         $plot = Plot::create($validatedData);
+        Log::info('AdminPlotController@store: Plot created', ['plot_id' => $plot->id]);
 
         // Notify all customers about the new plot
         $customers = User::where('role', 'customer')->get();
@@ -156,23 +161,30 @@ class AdminPlotController extends Controller
         if ($request->hasFile('images')) {
             $images = $request->file('images');
             $sortOrder = 1;
+            Log::info('AdminPlotController@store: Images found', ['count' => count($images)]);
             
             foreach ($images as $image) {
                 if ($image->isValid()) {
                     $imagePath = $image->store('plots', 'public');
+                    Log::info('AdminPlotController@store: Image stored', ['image_path' => $imagePath]);
                     
                     // Create plot image record
-                    $plot->plotImages()->create([
+                    $plotImage = $plot->plotImages()->create([
                         'plot_id' => $plot->id,
                         'image_path' => $imagePath,
                         'alt_text' => $plot->title . ' - Image ' . $sortOrder,
                         'sort_order' => $sortOrder,
                         'is_primary' => $sortOrder === 1, // First image is primary
                     ]);
+                    Log::info('AdminPlotController@store: PlotImage created', ['plot_image_id' => $plotImage->id, 'plot_id' => $plot->id]);
                     
                     $sortOrder++;
+                } else {
+                    Log::warning('AdminPlotController@store: Invalid image skipped');
                 }
             }
+        } else {
+            Log::info('AdminPlotController@store: No images uploaded');
         }
 
         // Check if it's an AJAX request

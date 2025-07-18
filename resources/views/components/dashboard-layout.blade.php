@@ -238,6 +238,7 @@
         }
     </style>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
 </head>
 <body class="flex h-screen overflow-hidden" data-user-role="{{ auth()->user()->role }}">
 

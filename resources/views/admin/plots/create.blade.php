@@ -60,20 +60,10 @@
                 <!-- Images Upload Section -->
                 <div>
                     <label class="block text-sm font-semibold text-gray-700 mb-1">Upload Images <span class="text-xs text-gray-400">(Max 30MB each, up to 10 images)</span></label>
-                    <div id="drop-area" class="flex flex-col items-center justify-center border-2 border-dashed border-yellow-400 rounded-lg p-6 bg-yellow-50 hover:bg-yellow-100 transition cursor-pointer mb-4">
-                        <i class="fas fa-cloud-upload-alt text-yellow-500 text-3xl mb-2"></i>
-                        <span class="text-gray-700 font-semibold mb-1">Drag & drop images here or</span>
-                        <label for="images" class="inline-flex items-center px-4 py-2 bg-yellow-500 text-white font-semibold rounded-lg shadow hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:ring-offset-2 transition-all duration-200 cursor-pointer">
-                            <i class="fas fa-upload mr-2"></i>
-                            <span>Select Images</span>
-                            <input type="file" id="images" name="images[]" multiple accept="image/*" class="hidden">
-                        </label>
-                        <span id="selected-files" class="text-sm text-gray-500 mt-2"></span>
-                    </div>
-                    <div id="image_preview" class="relative flex items-center justify-center mt-4 min-h-[120px] w-full">
-                        <!-- Carousel navigation will be injected here by JS if needed -->
-                    </div>
-                    <div id="image-upload-error" class="text-red-500 text-xs mt-2 hidden"></div>
+                    <input type="file" id="images" name="images[]" multiple accept="image/*" class="block w-full text-sm text-gray-700 border border-gray-200 rounded-lg cursor-pointer focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500">
+                    @error('images')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
+                    @error('images.*')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
+                    <div id="image-preview" class="flex flex-wrap gap-2 mt-2"></div>
                 </div>
                 <div class="flex justify-end">
                     <button type="submit" class="inline-flex items-center px-6 py-3 bg-yellow-500 text-white font-semibold rounded-lg shadow hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:ring-offset-2 transition-all duration-200">
@@ -85,135 +75,44 @@
                 </div>
     <script>
     document.addEventListener('DOMContentLoaded', function() {
-        const imageInput = document.getElementById('images');
-        const imagePreviewContainer = document.getElementById('image_preview');
-        const errorDiv = document.getElementById('image-upload-error');
-        const selectedFilesSpan = document.getElementById('selected-files');
-        const dropArea = document.getElementById('drop-area');
-        let filesArray = [];
-        // Drag-and-drop events
-        ['dragenter', 'dragover'].forEach(eventName => {
-            dropArea.addEventListener(eventName, (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                dropArea.classList.add('bg-yellow-100');
+        // Prevent negative numbers in area and price fields
+        const areaInput = document.getElementById('area_sqm');
+        const priceInput = document.getElementById('price');
+        [areaInput, priceInput].forEach(input => {
+            input.addEventListener('input', function() {
+                if (this.value && parseFloat(this.value) < 0) {
+                    this.value = 0;
+                }
             });
-        });
-        ['dragleave', 'drop'].forEach(eventName => {
-            dropArea.addEventListener(eventName, (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                dropArea.classList.remove('bg-yellow-100');
+            input.addEventListener('keydown', function(e) {
+                if (e.key === '-' || e.key === 'Subtract') {
+                    e.preventDefault();
+                }
             });
-        });
-        dropArea.addEventListener('drop', (e) => {
-            const dt = e.dataTransfer;
-            const files = dt.files;
-            handleFiles(files);
-        });
-        imageInput.addEventListener('change', function() {
-            handleFiles(this.files);
-            this.value = '';
-        });
-        function handleFiles(fileList) {
-            errorDiv.classList.add('hidden');
-            let errorMessages = [];
-            let validFiles = [];
-            for (let i = 0; i < fileList.length; i++) {
-                const file = fileList[i];
-                if (!file.type.startsWith('image/')) {
-                    errorMessages.push(`"${file.name}" is not an image file.`);
-                    continue;
-                }
-                if (file.size > 30 * 1024 * 1024) {
-                    errorMessages.push(`"${file.name}" is larger than 30MB.`);
-                    continue;
-                }
-                if (filesArray.length + validFiles.length >= 10) {
-                    errorMessages.push('You can upload up to 10 images.');
-                    break;
-                }
-                validFiles.push(file);
-            }
-            if (errorMessages.length > 0) {
-                errorDiv.textContent = errorMessages.join(' ');
-                errorDiv.classList.remove('hidden');
-            }
-            filesArray = filesArray.concat(validFiles);
-            renderPreview();
-            selectedFilesSpan.textContent = filesArray.length > 0 ? `${filesArray.length} image(s) selected` : '';
-        }
-        function renderPreview() {
-            imagePreviewContainer.innerHTML = '';
-            if (filesArray.length === 0) return;
-            let currentIndex = 0;
-            const carousel = document.createElement('div');
-            carousel.className = 'relative w-full flex items-center justify-center';
-            const imgWrapper = document.createElement('div');
-            imgWrapper.className = 'w-full flex items-center justify-center';
-            const img = document.createElement('img');
-            img.className = 'rounded-xl shadow-lg object-contain max-h-60 max-w-full';
-            img.src = URL.createObjectURL(filesArray[currentIndex]);
-            imgWrapper.appendChild(img);
-            carousel.appendChild(imgWrapper);
-            if (filesArray.length > 1) {
-                const prevBtn = document.createElement('button');
-                prevBtn.type = 'button';
-                prevBtn.className = 'absolute left-2 top-1/2 -translate-y-1/2 bg-white bg-opacity-80 rounded-full p-2 shadow hover:bg-yellow-100 focus:outline-none';
-                prevBtn.innerHTML = '<i class="fas fa-chevron-left"></i>';
-                prevBtn.onclick = function() {
-                    currentIndex = (currentIndex - 1 + filesArray.length) % filesArray.length;
-                    img.src = URL.createObjectURL(filesArray[currentIndex]);
-                };
-                carousel.appendChild(prevBtn);
-                const nextBtn = document.createElement('button');
-                nextBtn.type = 'button';
-                nextBtn.className = 'absolute right-2 top-1/2 -translate-y-1/2 bg-white bg-opacity-80 rounded-full p-2 shadow hover:bg-yellow-100 focus:outline-none';
-                nextBtn.innerHTML = '<i class="fas fa-chevron-right"></i>';
-                nextBtn.onclick = function() {
-                    currentIndex = (currentIndex + 1) % filesArray.length;
-                    img.src = URL.createObjectURL(filesArray[currentIndex]);
-                };
-                carousel.appendChild(nextBtn);
-            }
-                    // Remove button
-                    const removeBtn = document.createElement('button');
-                    removeBtn.type = 'button';
-            removeBtn.className = 'absolute top-2 right-2 bg-red-500 text-white rounded-full p-2 shadow hover:bg-red-600 focus:outline-none';
-                    removeBtn.innerHTML = '<i class="fas fa-times"></i>';
-            removeBtn.onclick = function() {
-                filesArray.splice(currentIndex, 1);
-                renderPreview();
-                selectedFilesSpan.textContent = filesArray.length > 0 ? `${filesArray.length} image(s) selected` : '';
-            };
-            carousel.appendChild(removeBtn);
-            imagePreviewContainer.appendChild(carousel);
-        }
-        // On form submit, append filesArray to the input
-        document.querySelector('form').addEventListener('submit', function(e) {
-            if (filesArray.length > 0) {
-                // Remove the input and add a new one with the files
-                const input = document.getElementById('images');
-                    const dt = new DataTransfer();
-                filesArray.forEach(file => dt.items.add(file));
-                input.files = dt.files;
-            }
-        });
-    });
-    // Prevent negative numbers in area and price fields
-    const areaInput = document.getElementById('area_sqm');
-    const priceInput = document.getElementById('price');
-    [areaInput, priceInput].forEach(input => {
-        input.addEventListener('input', function() {
-            if (this.value && parseFloat(this.value) < 0) {
-                this.value = 0;
-            }
-        });
-        input.addEventListener('keydown', function(e) {
-            if (e.key === '-' || e.key === 'Subtract') {
-                e.preventDefault();
-            }
         });
     });
     </script>
+    <script>
+document.addEventListener('DOMContentLoaded', function() {
+    const input = document.getElementById('images');
+    const preview = document.getElementById('image-preview');
+    input.addEventListener('change', function() {
+        preview.innerHTML = '';
+        if (this.files) {
+            Array.from(this.files).forEach(file => {
+                if (file.type.startsWith('image/')) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        const img = document.createElement('img');
+                        img.src = e.target.result;
+                        img.className = 'h-20 w-20 object-cover rounded border';
+                        preview.appendChild(img);
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+        }
+    });
+});
+</script>
 </x-dashboard-layout>

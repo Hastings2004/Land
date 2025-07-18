@@ -214,7 +214,7 @@
                                         </div>
                                     @endif
                                 </div>
-                            @elseif($plot->image_path)
+                            @elseif(!empty($plot->image_path))
                                 <img src="{{ asset('storage/' . $plot->image_path) }}" alt="Plot Image" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105">
                             @else
                                 <div class="w-full h-full flex items-center justify-center bg-yellow-50">
