@@ -11,6 +11,7 @@ use App\Notifications\ReservationCancelledNotification;
 use App\Notifications\ReservationPaidNotification;
 use Illuminate\Support\Facades\Mail;
 use Barryvdh\DomPDF\Facade\Pdf;
+use App\Mail\ReservationConfirmation;
 
 class ReservationController extends Controller
 {
@@ -77,10 +78,18 @@ class ReservationController extends Controller
         return back()->with('success', 'Reservation rejected successfully.');
     }
 
+    /**
+     * Store a new reservation.
+     */
     public function store(Request $request)
     {
+        // Validate the incoming request
+        $validated = $request->validate([
+            'plot_id' => 'required|exists:plots,id',
+        ]);
+
         $user = Auth::user();
-        $plot = Plot::findOrFail($request->plot_id);
+        $plot = Plot::findOrFail($validated['plot_id']);
 
         // Check if the plot is already reserved
         if ($plot->activeReservation) {
@@ -92,6 +101,7 @@ class ReservationController extends Controller
             return back()->with('info', 'You already have an active reservation for this plot.');
         }
 
+        // Create the reservation
         $reservation = Reservation::create([
             'user_id' => $user->id,
             'plot_id' => $plot->id,
@@ -104,7 +114,6 @@ class ReservationController extends Controller
         $plot->save();
 
         // Notify the customer of reservation
-        // Send notification to the user about the reservation
         \App\Models\Notification::create([
             'user_id' => $user->id,
             'type' => 'reservation_paid',
@@ -130,6 +139,14 @@ class ReservationController extends Controller
                 ->subject('Your Reservation Invoice')
                 ->attachData($pdf->output(), $invoiceNumber.'.pdf');
         });
+
+        // Send the confirmation email
+        try {
+            Mail::to($user->email)->send(new ReservationConfirmation($reservation));
+        } catch (\Exception $e) {
+            // Optional: Log error if email fails to send
+            // \Log::error('Reservation email failed to send: ' . $e->getMessage());
+        }
 
         return redirect()->route('customer.reservations.index')->with('success', 'Plot reserved successfully! It will expire in 24 hours, and an invoice has been sent to your email.');
     }
