@@ -52,7 +52,14 @@ class ReservationConfirmation extends Mailable
     public function content()
     {
         return new Content(
-            view: 'emails.reservations.confirmation',
+            view: 'reservations.invoice',
+            with: [
+                'invoice_number' => 'INV-' . $this->reservation->created_at->format('Ymd') . '-' . $this->reservation->id,
+                'date' => $this->reservation->created_at->format('Y-m-d'),
+                'user' => $this->reservation->user,
+                'plot' => $this->reservation->plot,
+                'reservation' => $this->reservation,
+            ],
         );
     }
 

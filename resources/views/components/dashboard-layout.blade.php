@@ -404,6 +404,11 @@
                 </button>
             </div>
             <div class="flex items-center space-x-4">
+                <!-- Notification Bell -->
+                <button onclick="redirectToNotifications()" class="relative focus:outline-none">
+                    <i class="fas fa-bell text-2xl text-yellow-500"></i>
+                    <span id="notification-dot" class="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full"></span>
+                </button>
                 <!-- Easy Logout -->
                 <form id="logout-form-dashboard" action="{{ route('logout') }}" method="POST">
                     @csrf

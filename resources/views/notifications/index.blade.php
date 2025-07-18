@@ -14,7 +14,7 @@
         </span>
         <h2 class="text-3xl font-extrabold text-yellow-700 tracking-tight">Notifications</h2>
         @if($notifications->count() > 0)
-            <form action="{{ route('notifications.mark-all-read') }}" method="POST" class="ml-auto">
+            <form action="{{ route(auth()->user()->role === 'admin' ? 'admin.notifications.mark-all-read' : 'customer.notifications.mark-all-read') }}" method="POST" class="ml-auto">
                 @csrf
                 <button type="submit" class="flex items-center px-4 py-2 bg-yellow-200 text-yellow-800 rounded-lg hover:bg-yellow-300 hover:text-yellow-900 font-bold text-xs shadow-md transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-yellow-400">
                     <i class="fas fa-check-double mr-2"></i> Mark all as read
@@ -31,7 +31,9 @@
     @else
         <div class="space-y-5">
             @foreach($notifications as $notification)
-                <div tabindex="0" class="flex items-start gap-4 p-5 bg-white hover:bg-yellow-50 transition-all duration-200 cursor-pointer rounded-2xl shadow-lg border border-yellow-100 focus:ring-2 focus:ring-yellow-400 outline-none @if(!$notification->is_read) ring-2 ring-yellow-400 bg-gradient-to-r from-yellow-50 to-yellow-100 @endif">
+                <a href="{{ route(auth()->user()->role === 'admin' ? 'admin.notifications.show' : 'customer.notifications.show', $notification->id) }}"
+                   tabindex="0"
+                   class="flex items-start gap-4 p-5 bg-white hover:bg-yellow-50 transition-all duration-200 cursor-pointer rounded-2xl shadow-lg border border-yellow-100 focus:ring-2 focus:ring-yellow-400 outline-none @if(!$notification->is_read) ring-2 ring-yellow-400 bg-gradient-to-r from-yellow-50 to-yellow-100 @endif">
                     <div class="flex-shrink-0 flex flex-col items-center pt-1">
                         <span class="text-3xl">
                             @if($notification->type === 'reservation_expiring') <i class="fas fa-hourglass-half text-yellow-500"></i>
@@ -53,7 +55,7 @@
                         </div>
                         <p class="text-base text-gray-700 leading-snug">{{ $notification->message }}</p>
                     </div>
-                </div>
+                </a>
             @endforeach
         </div>
         <div class="mt-10 flex justify-center">
