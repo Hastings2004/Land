@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('inquiries', function (Blueprint $table) {
-            $table->dropUnique('inquiries_email_unique');
+            // $table->dropUnique('inquiries_email_unique'); // Commented out to prevent error if index does not exist
         });
     }
 
@@ -25,4 +25,4 @@ return new class extends Migration
             $table->unique('email');
         });
     }
-}; 
+};

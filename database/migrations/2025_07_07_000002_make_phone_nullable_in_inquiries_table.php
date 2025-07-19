@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('inquiries', function (Blueprint $table) {
-            $table->dropUnique(['phone']);
+            // $table->dropUnique(['phone']); // Commented out to prevent error if index does not exist
             $table->bigInteger('phone')->nullable()->change();
         });
     }
@@ -27,4 +27,4 @@ return new class extends Migration
             $table->unique('phone');
         });
     }
-}; 
+};

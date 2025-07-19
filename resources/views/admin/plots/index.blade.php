@@ -1,7 +1,7 @@
 <x-dashboard-layout>
     <!-- Back Button -->
     <div class="mb-6">
-        <a href="{{ route('dashboard') }}" 
+        <a href="{{ route('dashboard') }}"
            class="inline-flex items-center px-4 py-2 bg-white text-gray-700 rounded-lg font-semibold text-sm border border-gray-300 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2 transition-all duration-200 transform hover:-translate-y-1">
             <i class="fas fa-arrow-left mr-2"></i>
             Back to Dashboard
@@ -30,21 +30,21 @@
     </div>
 
     <!-- Search, Sort, Filter Section + Filters Panel (Alpine.js) -->
-    <div x-data="{ filtersOpen: false }" x-init="$nextTick(() => { filtersOpen = false })">
+    <div x-data="{ filtersOpen: false }">
         <div class="bg-white rounded-xl shadow p-4 md:p-6 mb-8 border border-gray-100">
         <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between md:gap-6">
             <!-- Search Form -->
             <form action="{{ route('admin.plots.index') }}" method="GET" class="w-full md:w-auto flex-1">
             <div class="relative">
-                    <input type="text" name="search" 
-                           class="w-full pl-12 pr-10 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 bg-gray-50 text-gray-800 placeholder-gray-500 transition-all duration-200 text-base md:text-sm" 
-                           placeholder="Search plots by title, location..." 
+                    <input type="text" name="search"
+                           class="w-full pl-12 pr-10 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 bg-gray-50 text-gray-800 placeholder-gray-500 transition-all duration-200 text-base md:text-sm"
+                           placeholder="Search plots by title, location..."
                            value="{{ request('search') }}">
                     <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                             <i class="fas fa-search text-yellow-500"></i>
                 </div>
                     @if(request('search'))
-                        <a href="{{ route('admin.plots.index', array_merge(request()->except(['search', 'page']))) }}" 
+                        <a href="{{ route('admin.plots.index', array_merge(request()->except(['search', 'page']))) }}"
                                class="absolute inset-y-0 right-0 pr-4 flex items-center text-yellow-500 hover:text-yellow-700 transition-colors duration-200">
                             <i class="fas fa-times"></i>
                         </a>
@@ -53,7 +53,7 @@
         </form>
             <!-- Filter Button -->
             <div class="flex flex-col sm:flex-row gap-3 w-full md:w-auto justify-end items-stretch md:items-center">
-                <button type="button" 
+                <button type="button"
                         @click="filtersOpen = !filtersOpen"
                             :aria-expanded="filtersOpen ? 'true' : 'false'"
                             aria-controls="filters-panel"
@@ -62,7 +62,7 @@
                     Filters
                         <i class="fas fa-chevron-down ml-2 text-xs transition-transform duration-200 text-yellow-500" :class="filtersOpen ? 'rotate-180' : ''"></i>
                 </button>
-                <a href="{{ route('admin.plots.index', ['new_listings' => true]) }}" 
+                <a href="{{ route('admin.plots.index', ['new_listings' => true]) }}"
                        class="inline-flex items-center px-4 py-2 bg-yellow-500 text-white rounded-lg font-semibold text-sm hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2 transition-all duration-200 shadow-md hover:shadow-lg transform hover:-translate-y-1">
                     <i class="fas fa-star mr-2"></i>
                     New Listings
@@ -72,10 +72,11 @@
     </div>
     <!-- Filters Panel -->
         <div class="mb-8">
-        <form action="{{ route('admin.plots.index') }}" method="GET" 
+        <form action="{{ route('admin.plots.index') }}" method="GET"
                  id="filters-panel"
-             x-show="filtersOpen" 
+             x-show="filtersOpen"
              x-cloak
+             style="display:none"
              x-transition:enter="transition ease-out duration-300"
              x-transition:enter-start="transform opacity-0 -translate-y-4"
              x-transition:enter-end="transform opacity-100 translate-y-0"
@@ -108,9 +109,9 @@
                 <div>
                     <label class="block text-sm font-semibold text-gray-700 mb-2">Price Range</label>
                     <div class="flex gap-2">
-                        <input type="number" name="min_price" placeholder="Min" value="{{ request('min_price') }}" min="0" 
+                        <input type="number" name="min_price" placeholder="Min" value="{{ request('min_price') }}" min="0"
                                class="flex-1 px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500">
-                        <input type="number" name="max_price" placeholder="Max" value="{{ request('max_price') }}" min="0" 
+                        <input type="number" name="max_price" placeholder="Max" value="{{ request('max_price') }}" min="0"
                                class="flex-1 px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500">
                     </div>
                 </div>
@@ -118,22 +119,22 @@
                 <div>
                     <label class="block text-sm font-semibold text-gray-700 mb-2">Area Range (sqm)</label>
                     <div class="flex gap-2">
-                        <input type="number" name="min_area" placeholder="Min" value="{{ request('min_area') }}" min="0" 
+                        <input type="number" name="min_area" placeholder="Min" value="{{ request('min_area') }}" min="0"
                                class="flex-1 px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500">
-                        <input type="number" name="max_area" placeholder="Max" value="{{ request('max_area') }}" min="0" 
+                        <input type="number" name="max_area" placeholder="Max" value="{{ request('max_area') }}" min="0"
                                class="flex-1 px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500">
                     </div>
                 </div>
             </div>
             <!-- Filter Actions -->
             <div class="flex flex-col sm:flex-row gap-3 mt-6 pt-6 border-t border-gray-100">
-                <button type="submit" 
+                <button type="submit"
                             @click="filtersOpen = false"
                             class="inline-flex items-center px-6 py-2 bg-yellow-500 text-white rounded-lg font-semibold text-sm hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2 transition-all duration-200 shadow-md hover:shadow-lg transform hover:-translate-y-1">
                     <i class="fas fa-search mr-2"></i>
                     Apply Filters
                 </button>
-                <a href="{{ route('admin.plots.index') }}" 
+                <a href="{{ route('admin.plots.index') }}"
                        @click="filtersOpen = false"
                        class="inline-flex items-center px-6 py-2 bg-white text-gray-700 rounded-lg font-semibold text-sm border border-gray-300 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2 transition-all duration-200">
                     <i class="fas fa-times mr-2"></i>
@@ -146,20 +147,21 @@
 
     <!-- Error Modal -->
     @php
-        $reservedError = session()->pull('error');
+        $reservedError = session()->pull('reserved_error');
     @endphp
-    <div x-data="{ showErrorModal: {{ isset(
-        $reservedError) && str_contains($reservedError, 'reserved') ? 'true' : 'false' }} }" x-show="showErrorModal" x-cloak class="fixed inset-0 flex items-center justify-center z-50">
+    @if($reservedError)
+    <div x-data="{ showErrorModal: true }" x-show="showErrorModal" x-cloak class="fixed inset-0 flex items-center justify-center z-50">
         <div class="fixed inset-0 bg-black opacity-40"></div>
         <div class="bg-white rounded-lg shadow-xl p-8 max-w-md w-full relative z-50">
-            <button @click="showErrorModal = false; window.location.replace(window.location.pathname + window.location.search);" class="absolute top-2 right-2 text-gray-400 hover:text-gray-700 text-2xl font-bold">&times;</button>
+            <button @click="showErrorModal = false;" class="absolute top-2 right-2 text-gray-400 hover:text-gray-700 text-2xl font-bold">&times;</button>
             <div class="flex items-center mb-4">
                 <i class="fas fa-exclamation-triangle text-red-500 text-3xl mr-3"></i>
                 <h3 class="text-xl font-semibold text-gray-800">Action Not Allowed</h3>
             </div>
-            <p class="text-gray-700">{{ $reservedError }}</p>
+            <p class="text-gray-700">You cannot delete this plot because it is currently reserved by a customer.</p>
         </div>
     </div>
+    @endif
 
     <!-- Success Message -->
     @if(session('success'))
@@ -181,7 +183,7 @@
                 </div>
                 <h3 class="text-xl font-semibold text-gray-800 mb-2">No Plots Found</h3>
                 <p class="text-gray-500 mb-6">No plots available matching your criteria.</p>
-                <a href="{{ route('admin.plots.create') }}" 
+                <a href="{{ route('admin.plots.create') }}"
                    class="inline-flex items-center px-6 py-3 bg-yellow-500 text-white rounded-lg font-semibold hover:bg-yellow-600 transition-all duration-200 shadow-md hover:shadow-lg transform hover:-translate-y-1">
                     <i class="fas fa-plus mr-2"></i>
                     Add New Plot
@@ -238,11 +240,11 @@
                             </div>
                             <div class="flex-1"></div>
                             <div class="flex gap-2 mt-4">
-                                <a href="{{ route('admin.plots.show', $plot) }}" 
+                                <a href="{{ route('admin.plots.show', $plot) }}"
                                    class="inline-flex items-center px-4 py-2 bg-white text-yellow-700 border border-yellow-300 rounded-lg font-semibold text-xs hover:bg-yellow-50 hover:text-yellow-900 transition-all duration-200">
                                     <i class="fas fa-eye mr-1"></i> View
                                 </a>
-                                <a href="{{ route('admin.plots.edit', $plot) }}" 
+                                <a href="{{ route('admin.plots.edit', $plot) }}"
                                    class="inline-flex items-center px-4 py-2 bg-yellow-500 text-white rounded-lg font-semibold text-xs hover:bg-yellow-600 transition-all duration-200">
                                     <i class="fas fa-edit mr-1"></i> Edit
                                 </a>

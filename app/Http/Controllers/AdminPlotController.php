@@ -21,10 +21,10 @@ class AdminPlotController extends Controller
     {
         // Get sort parameter from request
         $sort = request('sort', 'latest');
-        
+
         // Build query with plotImages relationship
         $query = Plot::with('plotImages');
-        
+
         // Apply search if search parameter is provided
         if (request()->filled('search')) {
             $searchTerm = request('search');
@@ -62,7 +62,7 @@ class AdminPlotController extends Controller
         if (request()->filled('max_area')) {
             $query->where('area_sqm', '<=', request('max_area'));
         }
-        
+
         // Apply sorting based on parameter
         switch ($sort) {
             case 'oldest':
@@ -91,15 +91,15 @@ class AdminPlotController extends Controller
                 $query->latest();
                 break;
         }
-        
+
         // Apply new listings filter if requested
         if (request('new_listings')) {
             $query->where('is_new_listing', true);
         }
-        
+
         // Fetch plots with pagination
         $plots = $query->paginate(10)->appends(request()->query());
-       
+
         return view('admin.plots.index', ["plots" => $plots]);
     }
 
@@ -139,13 +139,13 @@ class AdminPlotController extends Controller
             'location' => 'required|string|max:255',
             'category' => 'required|string|in:residential,commercial,industrial',
             'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:30720',
-            'is_new_listing' => 'nullable', 
+            'is_new_listing' => 'nullable',
         ]);
         Log::info('AdminPlotController@store: Validation passed', $validatedData);
 
         // Handle checkbox value
         $validatedData['is_new_listing'] = $request->has('is_new_listing');
-        
+
         // Create the plot first
         $validatedData['user_id'] = $user->id;
         $plot = Plot::create($validatedData);
@@ -162,12 +162,12 @@ class AdminPlotController extends Controller
             $images = $request->file('images');
             $sortOrder = 1;
             Log::info('AdminPlotController@store: Images found', ['count' => count($images)]);
-            
+
             foreach ($images as $image) {
                 if ($image->isValid()) {
                     $imagePath = $image->store('plots', 'public');
                     Log::info('AdminPlotController@store: Image stored', ['image_path' => $imagePath]);
-                    
+
                     // Create plot image record
                     $plotImage = $plot->plotImages()->create([
                         'plot_id' => $plot->id,
@@ -177,7 +177,7 @@ class AdminPlotController extends Controller
                         'is_primary' => $sortOrder === 1, // First image is primary
                     ]);
                     Log::info('AdminPlotController@store: PlotImage created', ['plot_image_id' => $plotImage->id, 'plot_id' => $plot->id]);
-                    
+
                     $sortOrder++;
                 } else {
                     Log::warning('AdminPlotController@store: Invalid image skipped');
@@ -195,7 +195,7 @@ class AdminPlotController extends Controller
                 'redirect' => route('admin.plots.index')
             ]);
         }
-        
+
         // Redirect with a success message for regular requests
         return redirect()->route('admin.plots.index');
     }
@@ -217,8 +217,8 @@ class AdminPlotController extends Controller
      */
     public function edit(Plot $plot)
     {
-        $activeView = 'admin_plots_edit'; 
-        
+        $activeView = 'admin_plots_edit';
+
         // Load plotImages relationship
         $plot->load('plotImages');
 
@@ -234,8 +234,8 @@ class AdminPlotController extends Controller
 
         if($user->role != "admin"){
             abort(403, 'Unauthorized action.');
-        }        
-        
+        }
+
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'required|string',
@@ -299,7 +299,7 @@ class AdminPlotController extends Controller
         // Prevent deleting reserved plots
         if ($plot->status === 'reserved') {
             return redirect()->route('admin.plots.index')
-                ->with('error', 'You cannot delete this plot because it is currently reserved by a customer.');
+                ->with('reserved_error', true);
         }
         // Delete the plot
         $plot->delete();
