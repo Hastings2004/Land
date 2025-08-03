@@ -47,34 +47,20 @@ class InquiriesController extends Controller
      */
     public function customerIndex(Request $request)
     {
-        // Customer view: Show only their own inquiries that are not deleted
         $user = Auth::user();
-        
-        // Debug: Log the user's email
-        \Illuminate\Support\Facades\Log::info('Customer inquiries query for email: ' . $user->email);
-        
-        $inquiries = Inquiries::where('email', $user->email)
-            ->where('customer_deleted', false)
-            ->latest()->paginate(15);
-            
-        // Debug: Log the count
-        \Illuminate\Support\Facades\Log::info('Found ' . $inquiries->count() . ' inquiries for customer');
-
-        // Optional: Add search functionality
+        $query = \App\Models\Inquiries::where('email', $user->email)->where('customer_deleted', false);
+        if ($request->has('status') && $request->status) {
+            $query->where('status', $request->status);
+        }
         if ($request->has('search') && !empty($request->search)) {
             $searchTerm = '%' . $request->search . '%';
-            $inquiries = Inquiries::where('email', $user->email)
-                ->where('customer_deleted', false)
-                ->where(function($query) use ($searchTerm) {
-                    $query->where('name', 'like', $searchTerm)
-                        ->orWhere('email', 'like', $searchTerm)
-                        ->orWhere('message', 'like', $searchTerm);
-                })
-                ->latest()
-                ->paginate(15)
-                ->appends(['search' => $request->search]);
+            $query->where(function($q) use ($searchTerm) {
+                $q->where('name', 'like', $searchTerm)
+                  ->orWhere('email', 'like', $searchTerm)
+                  ->orWhere('message', 'like', $searchTerm);
+            });
         }
-
+        $inquiries = $query->latest()->paginate(15)->appends($request->all());
         return view('customer.inquiries.index', compact('inquiries'));
     }
 

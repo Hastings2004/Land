@@ -56,53 +56,58 @@
 
     <!-- Statistics Cards -->
     <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-        <div class="bg-white rounded-xl shadow-lg p-6 border-l-4 border-blue-500">
-            <div class="flex items-center justify-between">
-                <div>
-                    <div class="text-2xl font-bold text-blue-600">{{ $inquiries->total() }}</div>
-                    <div class="text-gray-600 text-sm font-semibold">Total Inquiries</div>
-                </div>
-                <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                    <i class="fas fa-envelope text-blue-600 text-xl"></i>
-                </div>
-            </div>
-        </div>
-
-        <div class="bg-white rounded-xl shadow-lg p-6 border-l-4 border-yellow-500">
-            <div class="flex items-center justify-between">
-                <div>
-                    <div class="text-2xl font-bold text-yellow-600">{{ $inquiries->where('status', 'new')->count() }}</div>
-                    <div class="text-gray-600 text-sm font-semibold">New</div>
-                </div>
-                <div class="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center">
-                    <i class="fas fa-clock text-yellow-600 text-xl"></i>
+        <a href="{{ route('customer.inquiries.index') }}">
+            <div class="bg-white rounded-xl shadow-lg p-6 border-l-4 border-blue-500 hover:bg-blue-50 cursor-pointer">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <div class="text-2xl font-bold text-blue-600">{{ $inquiries->total() }}</div>
+                        <div class="text-gray-600 text-sm font-semibold">Total Inquiries</div>
+                    </div>
+                    <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-envelope text-blue-600 text-xl"></i>
+                    </div>
                 </div>
             </div>
-        </div>
-
-        <div class="bg-white rounded-xl shadow-lg p-6 border-l-4 border-green-500">
-            <div class="flex items-center justify-between">
-                <div>
-                    <div class="text-2xl font-bold text-green-600">{{ $inquiries->where('status', 'responded')->count() }}</div>
-                    <div class="text-gray-600 text-sm font-semibold">Responded</div>
-                </div>
-                <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-                    <i class="fas fa-reply text-green-600 text-xl"></i>
-                </div>
-            </div>
-        </div>
-
-        <div class="bg-white rounded-xl shadow-lg p-6 border-l-4 border-gray-500">
-            <div class="flex items-center justify-between">
-                <div>
-                    <div class="text-2xl font-bold text-gray-600">{{ $inquiries->where('status', 'closed')->count() }}</div>
-                    <div class="text-gray-600 text-sm font-semibold">Closed</div>
-                </div>
-                <div class="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center">
-                    <i class="fas fa-check-circle text-gray-600 text-xl"></i>
+        </a>
+        <a href="{{ route('customer.inquiries.index', ['status' => 'new']) }}">
+            <div class="bg-white rounded-xl shadow-lg p-6 border-l-4 border-yellow-500 hover:bg-yellow-50 cursor-pointer">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <div class="text-2xl font-bold text-yellow-600">{{ $inquiries->where('status', 'new')->count() }}</div>
+                        <div class="text-gray-600 text-sm font-semibold">New</div>
+                    </div>
+                    <div class="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-clock text-yellow-600 text-xl"></i>
+                    </div>
                 </div>
             </div>
-        </div>
+        </a>
+        <a href="{{ route('customer.inquiries.index', ['status' => 'responded']) }}">
+            <div class="bg-white rounded-xl shadow-lg p-6 border-l-4 border-green-500 hover:bg-green-50 cursor-pointer">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <div class="text-2xl font-bold text-green-600">{{ $inquiries->where('status', 'responded')->count() }}</div>
+                        <div class="text-gray-600 text-sm font-semibold">Responded</div>
+                    </div>
+                    <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-reply text-green-600 text-xl"></i>
+                    </div>
+                </div>
+            </div>
+        </a>
+        <a href="{{ route('customer.inquiries.index', ['status' => 'closed']) }}">
+            <div class="bg-white rounded-xl shadow-lg p-6 border-l-4 border-gray-500 hover:bg-gray-50 cursor-pointer">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <div class="text-2xl font-bold text-gray-600">{{ $inquiries->where('status', 'closed')->count() }}</div>
+                        <div class="text-gray-600 text-sm font-semibold">Closed</div>
+                    </div>
+                    <div class="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-check-circle text-gray-600 text-xl"></i>
+                    </div>
+                </div>
+            </div>
+        </a>
     </div>
 
     <!-- Search and Filter Section -->

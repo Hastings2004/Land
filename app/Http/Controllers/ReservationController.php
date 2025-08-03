@@ -15,13 +15,28 @@ use App\Mail\ReservationConfirmation;
 
 class ReservationController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $user = Auth::user();
-        // Only show active reservations in the main list
-        $activeReservations = $user->reservations->where('status', 'active')->sortByDesc('created_at')->values();
-        // Show completed (sold) reservations in a separate section
-        $soldReservations = $user->reservations->where('status', 'completed')->sortByDesc('created_at')->values();
+        $status = $request->query('status');
+        $activeReservations = collect();
+        $soldReservations = collect();
+        if ($status) {
+            if ($status === 'active') {
+                $activeReservations = $user->reservations->where('status', 'active')->sortByDesc('created_at')->values();
+            } elseif ($status === 'completed') {
+                $soldReservations = $user->reservations->where('status', 'completed')->sortByDesc('created_at')->values();
+            } elseif ($status === 'expired') {
+                $activeReservations = $user->reservations->where('status', 'expired')->sortByDesc('created_at')->values();
+            } elseif ($status === 'cancelled') {
+                $activeReservations = $user->reservations->where('status', 'cancelled')->sortByDesc('created_at')->values();
+            } else {
+                $activeReservations = $user->reservations->sortByDesc('created_at')->values();
+            }
+        } else {
+            $activeReservations = $user->reservations->where('status', 'active')->sortByDesc('created_at')->values();
+            $soldReservations = $user->reservations->where('status', 'completed')->sortByDesc('created_at')->values();
+        }
         $stats = [
             'total' => \App\Models\Reservation::withTrashed()->where('user_id', $user->id)->count(),
             'active' => \App\Models\Reservation::where('user_id', $user->id)->where('status', 'active')->count(),
@@ -125,17 +140,7 @@ class ReservationController extends Controller
             'is_read' => false,
         ]);
 
-        // Notify the customer of reservation
-        \App\Models\Notification::create([
-            'user_id' => $user->id,
-            'type' => 'reservation_paid',
-            'title' => 'Reservation Invoice',
-            'message' => 'Your reservation invoice for plot ' . $plot->title . ' has been generated.',
-            'data' => json_encode(['plot_title' => $plot->title]),
-            'is_read' => false,
-        ]);
-
-        // Generate PDF invoice and email to customer
+        // Generate PDF invoice (for use in the mailable)
         $invoiceNumber = 'INV-' . now()->format('Ymd') . '-' . $reservation->id;
         $date = now()->format('Y-m-d');
         $pdf = Pdf::loadView('reservations.invoice', [
@@ -145,14 +150,7 @@ class ReservationController extends Controller
             'plot' => $plot,
             'reservation' => $reservation,
         ]);
-        $user->notify(new ReservationPaidNotification($plot->title));
-        Mail::send([], [], function ($message) use ($user, $pdf, $invoiceNumber) {
-            $message->to($user->email)
-                ->subject('Your Reservation Invoice')
-                ->attachData($pdf->output(), $invoiceNumber.'.pdf');
-        });
-
-        // Send the confirmation email
+        // Removed direct Mail::send block to avoid duplicate emails
         try {
             Mail::to($user->email)->send(new ReservationConfirmation($reservation));
         } catch (\Exception $e) {

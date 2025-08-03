@@ -17,61 +17,71 @@
 
     <!-- Statistics Cards -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <div class="bg-white rounded-xl shadow-lg p-6 border-l-4 border-yellow-500">
-            <div class="flex items-center justify-between">
-                <div>
-                    <div class="text-2xl font-bold text-yellow-600">{{ $stats['total'] }}</div>
-                    <div class="text-gray-600 text-sm font-semibold">Total Reservations</div>
-                </div>
-                <div class="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center">
-                    <i class="fas fa-calendar text-yellow-600 text-xl"></i>
-                </div>
-            </div>
-        </div>
-        <div class="bg-white rounded-xl shadow-lg p-6 border-l-4 border-green-500">
-            <div class="flex items-center justify-between">
-                <div>
-                    <div class="text-2xl font-bold text-green-600">{{ $stats['active'] }}</div>
-                    <div class="text-gray-600 text-sm font-semibold">Active</div>
-                </div>
-                <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-                    <i class="fas fa-check-circle text-green-600 text-xl"></i>
+        <a href="{{ route('customer.reservations.index') }}">
+            <div class="bg-white rounded-xl shadow-lg p-6 border-l-4 border-yellow-500 hover:bg-yellow-50 cursor-pointer">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <div class="text-2xl font-bold text-yellow-600">{{ $stats['total'] }}</div>
+                        <div class="text-gray-600 text-sm font-semibold">Total Reservations</div>
+                    </div>
+                    <div class="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-calendar text-yellow-600 text-xl"></i>
+                    </div>
                 </div>
             </div>
-        </div>
-        <div class="bg-white rounded-xl shadow-lg p-6 border-l-4 border-blue-500">
-            <div class="flex items-center justify-between">
-                <div>
-                    <div class="text-2xl font-bold text-blue-600">{{ $stats['completed'] }}</div>
-                    <div class="text-gray-600 text-sm font-semibold">Completed</div>
-                </div>
-                <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                    <i class="fas fa-thumbs-up text-blue-600 text-xl"></i>
-                </div>
-            </div>
-        </div>
-        <div class="bg-white rounded-xl shadow-lg p-6 border-l-4 border-gray-500">
-            <div class="flex items-center justify-between">
-                <div>
-                    <div class="text-2xl font-bold text-gray-600">{{ $stats['expired'] }}</div>
-                    <div class="text-gray-600 text-sm font-semibold">Expired</div>
-                </div>
-                <div class="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center">
-                    <i class="fas fa-hourglass-end text-gray-600 text-xl"></i>
+        </a>
+        <a href="{{ route('customer.reservations.index', ['status' => 'active']) }}">
+            <div class="bg-white rounded-xl shadow-lg p-6 border-l-4 border-green-500 hover:bg-green-50 cursor-pointer">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <div class="text-2xl font-bold text-green-600">{{ $stats['active'] }}</div>
+                        <div class="text-gray-600 text-sm font-semibold">Active</div>
+                    </div>
+                    <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-check-circle text-green-600 text-xl"></i>
+                    </div>
                 </div>
             </div>
-        </div>
-        <div class="bg-white rounded-xl shadow-lg p-6 border-l-4 border-red-500">
-            <div class="flex items-center justify-between">
-                <div>
-                    <div class="text-2xl font-bold text-red-600">{{ $stats['cancelled'] }}</div>
-                    <div class="text-gray-600 text-sm font-semibold">Cancelled</div>
-                </div>
-                <div class="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center">
-                    <i class="fas fa-times-circle text-red-600 text-xl"></i>
+        </a>
+        <a href="{{ route('customer.reservations.index', ['status' => 'completed']) }}">
+            <div class="bg-white rounded-xl shadow-lg p-6 border-l-4 border-blue-500 hover:bg-blue-50 cursor-pointer">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <div class="text-2xl font-bold text-blue-600">{{ $stats['completed'] }}</div>
+                        <div class="text-gray-600 text-sm font-semibold">Completed</div>
+                    </div>
+                    <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-thumbs-up text-blue-600 text-xl"></i>
+                    </div>
                 </div>
             </div>
-        </div>
+        </a>
+        <a href="{{ route('customer.reservations.index', ['status' => 'expired']) }}">
+            <div class="bg-white rounded-xl shadow-lg p-6 border-l-4 border-gray-500 hover:bg-gray-50 cursor-pointer">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <div class="text-2xl font-bold text-gray-600">{{ $stats['expired'] }}</div>
+                        <div class="text-gray-600 text-sm font-semibold">Expired</div>
+                    </div>
+                    <div class="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-hourglass-end text-gray-600 text-xl"></i>
+                    </div>
+                </div>
+            </div>
+        </a>
+        <a href="{{ route('customer.reservations.index', ['status' => 'cancelled']) }}">
+            <div class="bg-white rounded-xl shadow-lg p-6 border-l-4 border-red-500 hover:bg-red-50 cursor-pointer">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <div class="text-2xl font-bold text-red-600">{{ $stats['cancelled'] }}</div>
+                        <div class="text-gray-600 text-sm font-semibold">Cancelled</div>
+                    </div>
+                    <div class="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-times-circle text-red-600 text-xl"></i>
+                    </div>
+                </div>
+            </div>
+        </a>
     </div>
 
     <!-- Active Reservations List -->
